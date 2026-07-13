@@ -12,12 +12,13 @@ export function issueSession(res, payload) {
         httpOnly: true,
         secure: config.isProd,
         sameSite: "lax",
+        domain: config.cookieDomain,
         maxAge: config.sessionTtlHours * 60 * 60 * 1000,
     });
 }
 
 export function clearSession(res) {
-    res.clearCookie(COOKIE_NAME);
+    res.clearCookie(COOKIE_NAME, { domain: config.cookieDomain });
 }
 
 function readSession(req) {

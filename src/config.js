@@ -44,4 +44,27 @@ export const config = {
     port: Number(process.env.PORT || 3001),
     publicUrl: process.env.PUBLIC_URL || `http://localhost:${process.env.PORT || 3001}`,
     isProd: process.env.NODE_ENV === "production",
+
+    // Session cookies were being set host-only (no Domain attribute), so a
+    // cookie issued on "dumbledore.online" was invisible on
+    // "www.dumbledore.online" and vice versa. The site is reachable on both
+    // (www redirects to apex), and some navigations — notably Chrome's
+    // "Request Desktop Site" reload on Android — can momentarily resolve
+    // the other host before the redirect settles, which looked like a
+    // random logout. Setting an explicit leading-dot domain makes the
+    // cookie valid across both hosts. Only meaningful in prod; leave unset
+    // for localhost (cookies don't support Domain=localhost).
+    cookieDomain: (() => {
+        if (!config_isProdHost()) return undefined;
+        try {
+            const host = new URL(process.env.PUBLIC_URL).hostname.replace(/^www\./, "");
+            return `.${host}`;
+        } catch {
+            return undefined;
+        }
+    })(),
 };
+
+function config_isProdHost() {
+    return process.env.NODE_ENV === "production" && !!process.env.PUBLIC_URL;
+}

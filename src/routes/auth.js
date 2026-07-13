@@ -16,6 +16,7 @@ authRouter.get("/login", (req, res) => {
         httpOnly: true,
         secure: config.isProd,
         sameSite: "lax",
+        domain: config.cookieDomain,
         maxAge: 5 * 60 * 1000,
     });
 
@@ -30,7 +31,7 @@ authRouter.get("/callback", async (req, res) => {
     }
 
     const expectedState = req.cookies?.[STATE_COOKIE];
-    res.clearCookie(STATE_COOKIE);
+    res.clearCookie(STATE_COOKIE, { domain: config.cookieDomain });
 
     if (!code || !state || state !== expectedState) {
         return res.redirect("/?authError=invalid_state");
