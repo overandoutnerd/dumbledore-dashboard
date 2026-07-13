@@ -23,11 +23,23 @@ export function clearSession(res) {
 
 function readSession(req) {
     const token = req.cookies?.[COOKIE_NAME];
-    if (!token) return null;
+
+    if (!token) {
+        console.log(
+            `[auth] no session cookie — host="${req.headers.host}" path="${req.path}" ` +
+                `cookiesPresent=[${Object.keys(req.cookies || {}).join(",")}] ` +
+                `ua="${req.headers["user-agent"]}"`,
+        );
+        return null;
+    }
 
     try {
         return jwt.verify(token, config.sessionSecret);
-    } catch {
+    } catch (err) {
+        console.log(
+            `[auth] session cookie present but invalid — host="${req.headers.host}" ` +
+                `path="${req.path}" reason="${err.name}: ${err.message}"`,
+        );
         return null;
     }
 }
