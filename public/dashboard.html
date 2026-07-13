@@ -1529,13 +1529,19 @@ async function bootstrap() {
     const params = new URLSearchParams(location.search);
     const authError = params.get('authError');
     if (authError) {
-        const messages = {
-            invalid_state: "Login expired, please try again.",
-            server_error: "Something went wrong signing you in. Please try again.",
-        };
-        showLoginGate(messages[authError] || 'Could not sign you in. Please try again.');
+        // Don't trust this blindly and bail out — Chrome's "Request Desktop
+        // Site" reload (and possibly other history-replay navigations) can
+        // resurrect an OLD, stale URL for this tab that still has an
+        // authError query param on it from a genuine failed-login moment
+        // way earlier, even though history.replaceState() below already
+        // scrubbed it from the visible address bar for THIS session. If we
+        // trust it unconditionally, a perfectly valid, still-logged-in
+        // session gets shown the login gate every time that stale URL gets
+        // replayed. Strip it immediately, and only actually show the error
+        // message further down if the real /api/me check confirms we're
+        // genuinely not authenticated.
+        debugLog(`authError param present in URL ("${authError}") — clearing it, verifying real session before trusting it`);
         history.replaceState({}, '', location.pathname);
-        return;
     }
 
     try {
@@ -1552,8 +1558,12 @@ async function bootstrap() {
             debugLog(`/api/me retry (+${delayMs}ms) -> status ${meRes.status}`);
         }
         if (meRes.status === 401) {
-            debugLog('giving up -> showLoginGate()');
-            showLoginGate();
+            debugLog('confirmed unauthenticated -> showLoginGate()');
+            const messages = {
+                invalid_state: "Login expired, please try again.",
+                server_error: "Something went wrong signing you in. Please try again.",
+            };
+            showLoginGate(authError ? (messages[authError] || 'Could not sign you in. Please try again.') : undefined);
             throw new Error('not_authenticated');
         }
         if (!meRes.ok) throw new Error(`request_failed_${meRes.status}`);
