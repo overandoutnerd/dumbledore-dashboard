@@ -1532,8 +1532,9 @@ async function bootstrap() {
         // the session cookie can occasionally lag by a beat. Retry once,
         // silently, before letting api() flash the login gate over it.
         let meRes = await fetch('/api/me', { credentials: 'include' });
-        if (meRes.status === 401) {
-            await new Promise(r => setTimeout(r, 300));
+        for (const delayMs of [300, 600]) {
+            if (meRes.status !== 401) break;
+            await new Promise(r => setTimeout(r, delayMs));
             meRes = await fetch('/api/me', { credentials: 'include' });
         }
         if (meRes.status === 401) {
@@ -1798,8 +1799,12 @@ async function submitSentence() {
    COMMANDS TAB
    ============================================================ */
 async function loadCommands() {
-    const { commands } = await api('/api/commands');
-    COMMANDS = commands;
+    try {
+        const { commands } = await api('/api/commands');
+        COMMANDS = commands;
+    } catch (err) {
+        if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadCommands failed', err);
+    }
 }
 
 async function loadCommandUsage(){
