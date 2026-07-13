@@ -664,6 +664,19 @@ body{
 .confirm-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .confirm-btn-row .btn{min-width:0;padding-left:6px;padding-right:6px;}
 
+/* ============ SWITCH SERVER MODAL ============ */
+.switch-server-card{
+    max-width:420px;width:100%;background:var(--night-2);border:1px solid var(--thread);border-radius:18px;
+    padding:26px 24px 22px;text-align:center;transform:scale(.95);transition:transform .2s ease;
+    box-shadow:0 30px 60px -15px rgba(0,0,0,.7);
+}
+.confirm-overlay.show .switch-server-card{transform:scale(1);}
+.switch-server-card h2{font-family:"Cinzel",serif;font-size:18px;color:var(--parchment);margin-bottom:6px;}
+.switch-server-card p{font-size:12.5px;color:var(--parchment-dim);line-height:1.5;margin-bottom:16px;}
+.switch-server-card .server-picker-list{max-height:320px;overflow-y:auto;text-align:left;margin:0 -4px;padding:0 4px;}
+.switch-server-close{margin-top:14px;background:none;border:none;color:var(--parchment-faint);font-size:11.5px;cursor:pointer;}
+.switch-server-close:hover{color:var(--gold-light);}
+
 /* ============ IDENTITY BUTTON GRID (fixes mobile overflow) ============ */
 .identity-subsection{margin-bottom:16px;}
 .identity-subsection:last-child{margin-bottom:0;}
@@ -752,7 +765,7 @@ body{
             <span class="nicon" data-icon="settings" data-size="18"></span><span class="nlabel">Settings</span>
         </button>
     </nav>
-    <button class="sidebar-switch-server" onclick="switchServer()">
+    <button class="sidebar-switch-server" onclick="openSwitchServerModal()">
         <span data-icon="chevronRight" data-size="13"></span> Switch server
     </button>
 </div>
@@ -766,7 +779,7 @@ body{
             <h1 id="topbarBotName">Dumbledore</h1>
             <p><span class="status-dot"></span> Online · watching over the castle</p>
         </div>
-        <button class="guild-badge" id="guildBadge" onclick="switchServer()" title="Switch server">Server</button>
+        <button class="guild-badge" id="guildBadge" onclick="openSwitchServerModal()" title="Switch server">Server</button>
         <div class="user-chip" id="userChip">
             <img id="userAvatar" src="" alt="">
             <span id="userName"></span>
@@ -1167,6 +1180,17 @@ body{
 
 <div class="toast" id="toast"></div>
 
+<div class="confirm-overlay" id="switchServerOverlay" onclick="if(event.target===this) closeSwitchServerModal()">
+    <div class="switch-server-card">
+        <div class="login-emblem" style="margin:0 auto 12px;"><span data-icon="home" data-size="24"></span></div>
+        <h2>Switch Server</h2>
+        <p>Pick another server to manage. Your current session stays put until you choose one.</p>
+        <div class="server-picker-list" id="switchServerList"></div>
+        <div class="login-error login-hidden" id="switchServerError"></div>
+        <button class="switch-server-close" onclick="closeSwitchServerModal()">Cancel</button>
+    </div>
+</div>
+
 <div class="confirm-overlay" id="confirmOverlay">
     <div class="confirm-card">
         <div class="confirm-icon" id="confirmIcon"></div>
@@ -1412,6 +1436,13 @@ async function showServerPicker(errorMsg) {
     }
 
     const listEl = document.getElementById('serverPickerList');
+    await populateGuildList(listEl, 'selectServer');
+}
+
+/** Fetches the mod-eligible guild list and renders it into `listEl`, wiring
+ *  each row to call `window[onSelectFnName](guildId)` when clicked. Shared by
+ *  the full-screen server picker and the switch-server modal. */
+async function populateGuildList(listEl, onSelectFnName) {
     listEl.innerHTML = `<p class="no-params">Looking for servers you moderate…</p>`;
 
     try {
@@ -1421,7 +1452,7 @@ async function showServerPicker(errorMsg) {
             return;
         }
         listEl.innerHTML = guilds.map(g => `
-            <div class="server-row" onclick="selectServer('${g.id}')">
+            <div class="server-row" onclick="${onSelectFnName}('${g.id}')">
                 ${g.iconUrl ? `<img class="server-icon" src="${g.iconUrl}" alt="">` : `<div class="server-icon-fallback">${escapeHtml(g.name.slice(0,2).toUpperCase())}</div>`}
                 <div class="server-info">
                     <div class="sname">${escapeHtml(g.name)}</div>
@@ -1444,12 +1475,32 @@ async function selectServer(guildId){
     }
 }
 
-async function switchServer(){
+/* ============================================================
+   SWITCH SERVER (popup dialog over the current dashboard)
+   ============================================================ */
+function openSwitchServerModal(){
+    const overlay = document.getElementById('switchServerOverlay');
+    overlay.classList.add('show');
+    document.getElementById('switchServerError').classList.add('login-hidden');
+    populateGuildList(document.getElementById('switchServerList'), 'selectServerFromModal');
+}
+
+function closeSwitchServerModal(){
+    document.getElementById('switchServerOverlay').classList.remove('show');
+}
+
+async function selectServerFromModal(guildId){
+    const errEl = document.getElementById('switchServerError');
+    errEl.classList.add('login-hidden');
     try {
-        await api('/api/guilds/deselect', { method:'POST' });
-        location.reload();
-    } catch {
-        location.reload();
+        await api(`/api/guilds/${guildId}/select`, { method:'POST' });
+        const { user } = await api('/api/me');
+        CURRENT_USER = user;
+        closeSwitchServerModal();
+        await loadDashboard();
+    } catch (err) {
+        errEl.textContent = friendlyError(err.message) || "Couldn't switch to that server. Try again.";
+        errEl.classList.remove('login-hidden');
     }
 }
 
@@ -1559,21 +1610,27 @@ async function bootstrap() {
             return;
         }
 
-        showApp();
-        applyPermissionGates();
-        await Promise.all([
-            loadCommands(),
-            loadCommandUsage(),
-            loadChannelsAndRoles(),
-            renderHome(),
-        ]);
-        renderCategoryChips();
-        renderCommands();
-        loadSettings();
-        loadBotIdentity();
+        await loadDashboard();
     } catch {
         showLoginGate();
     }
+}
+
+/** Renders the app shell + all guild-scoped data for CURRENT_USER. Shared by
+ *  initial bootstrap and by switching servers in place (no page reload). */
+async function loadDashboard() {
+    showApp();
+    applyPermissionGates();
+    await Promise.all([
+        loadCommands(),
+        loadCommandUsage(),
+        loadChannelsAndRoles(),
+        renderHome(),
+    ]);
+    renderCategoryChips();
+    renderCommands();
+    loadSettings();
+    loadBotIdentity();
 }
 
 /* ============================================================
