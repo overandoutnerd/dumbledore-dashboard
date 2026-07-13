@@ -2721,6 +2721,19 @@ renderHousePointControls();
 hydrateStaticIcons();
 bootstrap();
 
+// Chrome (notably on Android when toggling "Desktop site") can restore this
+// page from the back-forward cache instead of doing a real reload. When
+// that happens, none of the script above re-runs, so whatever was on
+// screen at the moment the page got frozen — including a mid-load login
+// gate flash — is what you see, permanently, until a real reload happens.
+// The 'pageshow' event with persisted=true is how the platform tells us
+// "this is a restore, not a fresh load" — re-run bootstrap() so it
+// re-checks the real auth state instead of showing stale UI.
+window.addEventListener("pageshow", (event) => {
+    if (event.persisted) bootstrap();
+});
+
+
 </script>
 </body>
 </html>
