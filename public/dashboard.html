@@ -1,0 +1,2721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dumbledore — Mod Dashboard</title>
+<meta name="theme-color" content="#0c0e1f">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============ RESET & TOKENS (matched to DesiPotterheads landing) ============ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+:root{
+    --night:#0c0e1f;
+    --night-2:#14172e;
+    --night-3:#1a1d38;
+
+    --marigold:#fca503;
+    --gold:#daa520;
+    --gold-light:#ffd873;
+
+    --maroon:#9c2b2b;
+    --jade:#1f7a5c;
+    --ravenclaw:#2a4d8f;
+    --ravenclaw-light:#5a7fc2;
+    --hufflepuff:#e5a324;
+
+    --parchment:#f6ecd9;
+    --parchment-dim:#cfc4ab;
+    --parchment-faint:#9089a0;
+
+    --thread:rgba(252,165,3,.35);
+    --card-bg:rgba(20,23,46,.55);
+    --card-border:rgba(218,165,32,.22);
+    --danger:#c0392b;
+    --safe:#3d9970;
+}
+@media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+}
+body{
+    min-height:100vh;
+    font-family:"Poppins",sans-serif;
+    color:var(--parchment);
+    background:
+        radial-gradient(ellipse at 15% -10%, rgba(156,43,43,.22), transparent 55%),
+        radial-gradient(ellipse at 90% 5%, rgba(31,122,92,.16), transparent 50%),
+        linear-gradient(180deg, var(--night), var(--night-2));
+    position:relative;
+    overflow-x:hidden;
+    -webkit-tap-highlight-color:transparent;
+}
+
+/* ============ AMBIENT BACKGROUND ============ */
+#stars{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+.mandala{position:fixed;width:340px;height:340px;border-radius:50%;pointer-events:none;opacity:.08;z-index:0;
+    background:radial-gradient(circle,transparent 40%,var(--gold) 41%,transparent 42%),
+    repeating-conic-gradient(from 0deg,var(--gold) 0deg 4deg,transparent 4deg 18deg);
+    mix-blend-mode:screen;}
+.mandala.tl{top:-140px;left:-160px;animation:spinSlow 100s linear infinite;}
+.mandala.br{bottom:-120px;right:-160px;animation:spinSlowRev 120s linear infinite;}
+@keyframes spinSlow{to{transform:rotate(360deg);}}
+@keyframes spinSlowRev{to{transform:rotate(-360deg);}}
+@keyframes shimmer{0%{background-position:-150% 0;}100%{background-position:250% 0;}}
+@keyframes floatIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ============ LAYOUT ============ */
+.app{position:relative;z-index:2;max-width:640px;margin:0 auto;padding:0 0 96px;min-height:100vh;}
+
+/* ---- TOP HEADER ---- */
+.topbar{
+    position:sticky;top:0;z-index:20;
+    display:flex;align-items:center;gap:12px;
+    padding:14px 18px;
+    background:rgba(12,14,31,.86);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--card-border);
+}
+.topbar .bot-mini-avatar{
+    width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(135deg,var(--maroon),var(--jade));
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;border:2px solid var(--gold);
+    box-shadow:0 0 16px rgba(252,165,3,.3);
+    flex-shrink:0;overflow:hidden;color:var(--parchment);
+}
+.topbar .bot-mini-avatar img{width:100%;height:100%;object-fit:cover;}
+.topbar .titles{flex:1;min-width:0;}
+.topbar .titles h1{
+    font-family:"Cinzel",serif;font-size:15px;font-weight:600;
+    letter-spacing:.03em;color:var(--gold-light);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.topbar .titles p{
+    font-size:11px;color:var(--parchment-dim);
+    display:flex;align-items:center;gap:5px;margin-top:1px;
+}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--jade);box-shadow:0 0 6px var(--jade);flex-shrink:0;animation:pulseDot 2s ease-in-out infinite;}
+@keyframes pulseDot{0%,100%{opacity:1;}50%{opacity:.4;}}
+.topbar .guild-badge{
+    font-family:"Cinzel",serif;font-size:10px;letter-spacing:.08em;
+    padding:6px 10px;border-radius:999px;
+    background:rgba(252,165,3,.1);border:1px solid var(--thread);
+    color:var(--marigold);white-space:nowrap;cursor:pointer;
+    max-width:120px;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;
+    transition:background .2s ease;
+}
+.topbar .guild-badge:hover{background:rgba(252,165,3,.18);}
+
+/* ---- SECTION / PAGE TITLES ---- */
+.page{padding:20px 18px 8px;animation:floatIn .4s ease both;}
+.page-head{margin-bottom:18px;}
+.eyebrow{
+    font-family:"Cinzel",serif;font-size:10.5px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--marigold);margin-bottom:5px;
+}
+.page-head h2{
+    font-family:"Cinzel",serif;font-size:22px;font-weight:600;color:var(--parchment);
+}
+.page-head p{
+    font-family:"Cormorant Garamond",serif;font-size:16px;color:var(--parchment-dim);
+    margin-top:4px;font-style:italic;
+}
+
+/* ---- CARD ---- */
+.card{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:16px;
+    padding:18px;
+    margin-bottom:14px;
+    position:relative;
+}
+.card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--thread),transparent);
+}
+.card h3{
+    font-family:"Cinzel",serif;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px;justify-content:space-between;
+}
+.card h3 .tag{font-size:10px;letter-spacing:.05em;color:var(--parchment-faint);text-transform:none;font-family:"Poppins",sans-serif;}
+
+/* ---- STAT GRID ---- */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat-card{
+    background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;
+    padding:14px 14px 12px;
+}
+.stat-card .icon{font-size:18px;margin-bottom:8px;display:block;}
+.stat-card .value{font-family:"Cinzel",serif;font-size:22px;color:var(--gold-light);line-height:1;}
+.stat-card .label{font-size:11px;color:var(--parchment-dim);margin-top:6px;letter-spacing:.02em;}
+.stat-card .delta{font-size:10.5px;margin-top:6px;color:var(--jade);}
+.stat-card .delta.down{color:var(--maroon);}
+.stat-card .delta .down{color:var(--maroon);}
+
+/* ---- HOUSE CUP ---- */
+.house-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(218,165,32,.1);}
+.house-row:last-child{border-bottom:none;}
+.house-rank{
+    font-family:"Cinzel",serif;font-size:13px;color:var(--parchment-faint);width:16px;text-align:center;flex-shrink:0;
+}
+.house-emoji{
+    width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    font-size:17px;flex-shrink:0;
+}
+.house-info{flex:1;min-width:0;}
+.house-info .hname{font-family:"Cinzel",serif;font-size:13px;color:var(--parchment);}
+.house-bar-track{height:5px;border-radius:99px;background:rgba(255,255,255,.06);margin-top:6px;overflow:hidden;}
+.house-bar-fill{height:100%;border-radius:99px;transition:width .8s ease;}
+.house-pts{font-family:"Cinzel",serif;font-size:14px;color:var(--gold-light);flex-shrink:0;width:56px;text-align:right;}
+
+/* ---- LEADERBOARD ---- */
+.lb-row{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid rgba(218,165,32,.08);}
+.lb-row:last-child{border-bottom:none;}
+.lb-rank{font-family:"Cinzel",serif;font-size:13px;color:var(--parchment-faint);width:20px;flex-shrink:0;}
+.lb-rank.top1{color:var(--gold-light);}
+.lb-rank.top2{color:#c9c9d4;}
+.lb-rank.top3{color:#d59a6f;}
+.lb-avatar{
+    width:32px;height:32px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-family:"Cinzel",serif;font-size:12px;color:var(--night);font-weight:600;
+    background:linear-gradient(135deg,var(--gold-light),var(--marigold));
+}
+.lb-info{flex:1;min-width:0;}
+.lb-info .lname{font-size:13px;color:var(--parchment);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-info .lmeta{font-size:11px;color:var(--parchment-dim);margin-top:1px;}
+.lb-xp{font-family:"Cinzel",serif;font-size:12.5px;color:var(--marigold);flex-shrink:0;}
+
+/* ---- ACTIVITY FEED ---- */
+.feed-item{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid rgba(218,165,32,.08);}
+.feed-item:last-child{border-bottom:none;}
+.feed-icon{
+    width:30px;height:30px;border-radius:9px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:14px;
+    background:rgba(252,165,3,.1);border:1px solid var(--thread);
+}
+.feed-body{flex:1;min-width:0;}
+.feed-body .ftitle{font-size:12.5px;color:var(--parchment);line-height:1.4;}
+.feed-body .ftitle b{color:var(--gold-light);font-weight:600;}
+.feed-body .ftime{font-size:10.5px;color:var(--parchment-faint);margin-top:2px;}
+
+/* ---- LINK ROW ---- */
+.link-row{display:flex;align-items:center;justify-content:space-between;padding-top:2px;}
+.view-all{
+    font-family:"Cinzel",serif;font-size:10.5px;letter-spacing:.08em;color:var(--marigold);
+    text-decoration:none;text-transform:uppercase;cursor:pointer;background:none;border:none;
+}
+
+/* ---- EMPTY STATE ---- */
+.empty-state{text-align:center;padding:22px 10px;}
+.empty-state .eicon{font-size:26px;margin-bottom:8px;}
+.empty-state p{font-family:"Cormorant Garamond",serif;font-size:16px;color:var(--parchment-dim);font-style:italic;}
+
+/* ============ COMMANDS TAB ============ */
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-wrap input{
+    width:100%;padding:12px 16px 12px 40px;border-radius:12px;
+    background:var(--card-bg);border:1px solid var(--card-border);
+    color:var(--parchment);font-family:"Poppins",sans-serif;font-size:13.5px;outline:none;
+    transition:border-color .3s ease;
+}
+.search-wrap input:focus{border-color:var(--thread);}
+.search-wrap input::placeholder{color:var(--parchment-faint);}
+.search-wrap .sicon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.6;}
+
+.chip-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;scrollbar-width:none;}
+.chip-row::-webkit-scrollbar{display:none;}
+.chip{
+    flex-shrink:0;padding:8px 15px;border-radius:999px;
+    font-family:"Cinzel",serif;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+    background:rgba(255,255,255,.03);border:1px solid var(--card-border);color:var(--parchment-dim);
+    cursor:pointer;transition:all .25s ease;white-space:nowrap;
+}
+.chip.active{background:linear-gradient(120deg,var(--gold-light),var(--marigold));color:var(--night);border-color:transparent;font-weight:600;}
+
+.cmd-count{font-size:11.5px;color:var(--parchment-faint);margin-bottom:12px;}
+
+.cmd-card{
+    background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;
+    margin-bottom:10px;overflow:hidden;transition:border-color .25s ease;
+}
+.cmd-card.open{border-color:var(--thread);}
+.cmd-head{
+    display:flex;align-items:center;gap:12px;padding:14px 15px;cursor:pointer;
+}
+.cmd-slash{
+    font-family:"Cinzel",serif;font-size:14px;color:var(--gold-light);flex-shrink:0;
+}
+.cmd-head-text{flex:1;min-width:0;}
+.cmd-head-text .cname{font-family:"Cinzel",serif;font-size:14px;color:var(--parchment);}
+.cmd-head-text .cdesc{font-size:12px;color:var(--parchment-dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmd-chevron{color:var(--parchment-faint);font-size:12px;transition:transform .3s ease;flex-shrink:0;}
+.cmd-card.open .cmd-chevron{transform:rotate(180deg);}
+
+.perm-badge{
+    font-size:9.5px;font-family:"Poppins",sans-serif;font-weight:600;letter-spacing:.03em;
+    padding:4px 9px;border-radius:999px;white-space:nowrap;flex-shrink:0;
+    display:flex;align-items:center;gap:4px;
+}
+.perm-everyone{background:rgba(31,122,92,.15);color:#5fc9a3;border:1px solid rgba(31,122,92,.35);}
+.perm-manager{background:rgba(252,165,3,.13);color:var(--marigold);border:1px solid var(--thread);}
+.perm-server{background:rgba(218,165,32,.15);color:var(--gold-light);border:1px solid rgba(218,165,32,.35);}
+.perm-roles{background:rgba(156,43,43,.15);color:#e08080;border:1px solid rgba(156,43,43,.35);}
+
+.cmd-body{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+.cmd-card.open .cmd-body{max-height:600px;}
+.cmd-body-inner{padding:0 15px 16px;border-top:1px solid rgba(218,165,32,.1);margin-top:2px;padding-top:12px;}
+.cmd-full-desc{font-family:"Cormorant Garamond",serif;font-size:15.5px;color:var(--parchment-dim);line-height:1.5;margin-bottom:12px;font-style:italic;}
+.cmd-meta-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.meta-pill{font-size:10.5px;padding:5px 10px;border-radius:8px;background:rgba(255,255,255,.04);color:var(--parchment-dim);border:1px solid rgba(255,255,255,.06);}
+
+.params-label{font-family:"Cinzel",serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.param-item{
+    display:flex;flex-direction:column;gap:2px;padding:9px 11px;border-radius:9px;
+    background:rgba(255,255,255,.025);margin-bottom:6px;border-left:2px solid var(--thread);
+}
+.param-top{display:flex;align-items:center;gap:8px;}
+.param-name{font-family:"Poppins",sans-serif;font-size:12.5px;font-weight:600;color:var(--parchment);}
+.param-type{font-size:9.5px;color:var(--parchment-faint);background:rgba(255,255,255,.05);padding:2px 6px;border-radius:5px;}
+.param-req{font-size:9px;color:var(--marigold);letter-spacing:.04em;}
+.param-opt{font-size:9px;color:var(--parchment-faint);letter-spacing:.04em;}
+.param-desc{font-size:11.5px;color:var(--parchment-dim);}
+.no-params{font-size:12px;color:var(--parchment-faint);font-style:italic;font-family:"Cormorant Garamond",serif;}
+
+/* ============ BOT TAB ============ */
+.identity-card{padding:0;overflow:visible;margin-bottom:20px;}
+.bot-banner{
+    height:120px;border-radius:16px 16px 0 0;position:relative;overflow:hidden;
+    background:linear-gradient(135deg,var(--maroon),var(--night-2) 60%,var(--jade));
+    border:1px solid var(--card-border);border-bottom:none;
+}
+.bot-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,14,31,0) 40%,rgba(12,14,31,.85) 100%);}
+.bot-banner .shimmer{position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,216,115,.16) 45%,transparent 60%);background-size:300% 100%;animation:shimmer 6s linear infinite;mix-blend-mode:screen;}
+.bot-banner-edit{
+    position:absolute;top:10px;right:10px;z-index:2;
+    background:rgba(12,14,31,.7);border:1px solid var(--thread);color:var(--gold-light);
+    font-size:10.5px;font-family:"Cinzel",serif;letter-spacing:.05em;padding:6px 11px;border-radius:999px;
+    cursor:pointer;backdrop-filter:blur(6px);
+}
+.identity-body{
+    background:var(--card-bg);border:1px solid var(--card-border);border-top:none;
+    border-radius:0 0 16px 16px;padding:0 18px 18px;position:relative;
+}
+.bot-avatar-wrap{margin-top:-38px;margin-bottom:10px;position:relative;display:inline-block;}
+.bot-avatar{
+    width:76px;height:76px;border-radius:50%;
+    background:linear-gradient(135deg,var(--gold-light),var(--marigold));
+    border:4px solid var(--night-2);
+    display:flex;align-items:center;justify-content:center;font-size:34px;
+    box-shadow:0 0 30px rgba(252,165,3,.3);
+}
+.avatar-edit-dot{
+    position:absolute;bottom:2px;right:2px;width:24px;height:24px;border-radius:50%;
+    background:var(--night-2);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;
+    font-size:11px;cursor:pointer;
+}
+.bot-name-row{display:flex;align-items:center;gap:8px;}
+.bot-name-row h2{font-family:"Cinzel",serif;font-size:19px;color:var(--parchment);}
+.bot-verified{font-size:12px;color:var(--jade);}
+.bot-tag{font-size:12px;color:var(--parchment-dim);margin-top:2px;}
+
+.field-group{margin-bottom:16px;}
+.field-label{font-family:"Cinzel",serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:block;}
+.field-input-row{display:flex;gap:8px;min-width:0;}
+.field-input{
+    flex:1;min-width:0;width:100%;padding:11px 14px;border-radius:11px;background:rgba(255,255,255,.03);
+    border:1px solid var(--card-border);color:var(--parchment);font-family:"Poppins",sans-serif;font-size:13px;outline:none;
+    transition:border-color .25s ease;box-sizing:border-box;
+}
+.field-input:focus{border-color:var(--thread);}
+.field-hint{font-size:10.5px;color:var(--parchment-faint);margin-top:6px;}
+
+.btn{
+    font-family:"Cinzel",serif;font-size:11.5px;letter-spacing:.05em;font-weight:600;
+    padding:11px 18px;border-radius:11px;border:none;cursor:pointer;white-space:nowrap;
+    transition:transform .2s ease, box-shadow .2s ease;flex-shrink:0;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(120deg,var(--gold-light),var(--marigold));color:var(--night);box-shadow:0 10px 26px -12px rgba(252,165,3,.55);}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--parchment);border:1px solid var(--card-border);}
+.btn-danger{background:rgba(156,43,43,.15);color:#e08080;border:1px solid rgba(156,43,43,.4);}
+.btn-block{width:100%;min-width:0;}
+.btn-sm{padding:8px 13px;font-size:10px;}
+.btn-row{display:flex;gap:8px;}
+
+.toast{
+    position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:rgba(12,14,31,.94);border:1px solid var(--thread);color:var(--gold-light);
+    font-family:"Cinzel",serif;font-size:11.5px;letter-spacing:.04em;
+    padding:12px 20px;border-radius:999px;z-index:100;opacity:0;pointer-events:none;
+    transition:all .35s ease;box-shadow:0 20px 40px -10px rgba(0,0,0,.6);
+    display:flex;align-items:center;gap:8px;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+.info-list .info-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(218,165,32,.08);}
+.info-list .info-row:last-child{border-bottom:none;}
+.info-row .ilabel{font-size:12.5px;color:var(--parchment-dim);display:flex;align-items:center;gap:7px;}
+.info-row .ivalue{font-family:"Cinzel",serif;font-size:12.5px;color:var(--gold-light);}
+
+.cmd-shortcut-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(218,165,32,.08);}
+.cmd-shortcut-row:last-child{border-bottom:none;}
+.cmd-shortcut-row .cs-name{font-family:"Cinzel",serif;font-size:12.5px;color:var(--gold-light);}
+.cmd-shortcut-row .cs-desc{font-size:11px;color:var(--parchment-dim);margin-top:2px;}
+.copy-btn{
+    font-size:10px;padding:6px 11px;border-radius:8px;background:rgba(255,255,255,.04);
+    border:1px solid var(--card-border);color:var(--parchment-dim);cursor:pointer;flex-shrink:0;
+    font-family:"Poppins",sans-serif;
+}
+
+/* ============ SETTINGS TAB ============ */
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(218,165,32,.08);gap:12px;}
+.setting-row:last-child{border-bottom:none;}
+.setting-text{flex:1;min-width:0;}
+.setting-text .sname{font-size:13.5px;color:var(--parchment);font-weight:500;display:flex;align-items:center;gap:8px;}
+.setting-text .sdesc{font-size:11.5px;color:var(--parchment-dim);margin-top:3px;line-height:1.4;}
+
+.toggle{width:44px;height:25px;border-radius:999px;background:rgba(255,255,255,.08);position:relative;cursor:pointer;flex-shrink:0;transition:background .3s ease;border:1px solid var(--card-border);}
+.toggle.on{background:linear-gradient(120deg,var(--gold-light),var(--marigold));border-color:transparent;}
+.toggle .knob{position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:var(--parchment);transition:transform .3s ease;box-shadow:0 2px 6px rgba(0,0,0,.3);}
+.toggle.on .knob{transform:translateX(19px);background:var(--night);}
+
+.sub-panel{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+.sub-panel.open{max-height:320px;overflow:visible;}
+.sub-panel-inner{padding:12px 0 4px;}
+.select-field{
+    width:100%;padding:11px 14px;border-radius:11px;background:rgba(255,255,255,.03);
+    border:1px solid var(--card-border);color:var(--parchment);font-family:"Poppins",sans-serif;font-size:12.5px;
+    outline:none;margin-bottom:8px;appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23daa520'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;
+}
+
+.chip-static{
+    display:inline-flex;align-items:center;gap:6px;font-size:11px;
+    padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.03);
+    border:1px solid var(--card-border);color:var(--parchment-dim);margin:0 6px 6px 0;
+}
+.chip-static b{color:var(--gold-light);font-family:"Cinzel",serif;font-weight:600;}
+
+.role-id-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(218,165,32,.06);}
+.role-id-row .rname{font-size:12px;color:var(--parchment-dim);}
+.role-id-row .rid{font-family:monospace;font-size:10.5px;color:var(--parchment-faint);background:rgba(255,255,255,.03);padding:3px 7px;border-radius:6px;}
+
+.mod-channel-row{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--card-border);margin-bottom:7px;}
+.mod-channel-row:last-child{margin-bottom:0;}
+.mod-channel-row .mcname{font-size:12.5px;color:var(--parchment);}
+.mod-channel-row .mc-remove{background:none;border:none;color:var(--parchment-faint);font-size:14px;cursor:pointer;padding:2px 6px;}
+.mod-channel-row .mc-remove:hover{color:#e08080;}
+
+/* ============ BOTTOM NAV ============ */
+.bottom-nav{
+    position:fixed;bottom:0;left:0;right:0;z-index:30;
+    display:flex;justify-content:center;
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+    background:rgba(12,14,31,.9);backdrop-filter:blur(16px);
+    border-top:1px solid var(--card-border);
+}
+.bottom-nav-inner{display:flex;width:100%;max-width:640px;justify-content:space-around;}
+.nav-btn{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    background:none;border:none;color:var(--parchment-faint);cursor:pointer;
+    padding:6px 18px;border-radius:12px;transition:all .25s ease;position:relative;
+}
+.nav-btn .nicon{font-size:19px;transition:transform .25s ease;}
+.nav-btn .nlabel{font-family:"Cinzel",serif;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;}
+.nav-btn.active{color:var(--gold-light);}
+.nav-btn.active .nicon{transform:translateY(-2px);}
+.nav-btn.active::before{
+    content:"";position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+    width:4px;height:4px;border-radius:50%;background:var(--marigold);box-shadow:0 0 8px var(--marigold);
+}
+
+/* ============ SIDEBAR (desktop / large screens) ============ */
+.sidebar{display:none;}
+
+@media (min-width: 700px){
+    .bottom-nav{display:none;}
+
+    .sidebar{
+        display:flex;flex-direction:column;
+        position:fixed;top:0;left:0;bottom:0;width:230px;z-index:30;
+        background:rgba(12,14,31,.92);backdrop-filter:blur(16px);
+        border-right:1px solid var(--card-border);
+        padding:22px 14px;
+    }
+    .sidebar-brand{display:flex;align-items:center;gap:10px;padding:0 6px;margin-bottom:30px;}
+    .sidebar-brand-icon{
+        width:34px;height:34px;border-radius:50%;flex-shrink:0;
+        background:linear-gradient(135deg,var(--maroon),var(--jade));
+        display:flex;align-items:center;justify-content:center;border:2px solid var(--gold);color:var(--parchment);
+    }
+    .sidebar-brand-name{font-family:"Cinzel",serif;font-size:14px;color:var(--gold-light);letter-spacing:.03em;}
+    .sidebar-nav{display:flex;flex-direction:column;gap:4px;flex:1;}
+
+    .sidebar .nav-btn{
+        flex-direction:row;justify-content:flex-start;gap:12px;
+        padding:11px 12px;border-radius:11px;width:100%;
+    }
+    .sidebar .nav-btn .nlabel{font-size:12.5px;text-transform:none;letter-spacing:.02em;}
+    .sidebar .nav-btn:hover{background:rgba(255,255,255,.03);}
+    .sidebar .nav-btn.active{background:rgba(252,165,3,.1);}
+    .sidebar .nav-btn.active .nicon{transform:none;}
+    .sidebar .nav-btn.active::before{
+        top:50%;left:0;transform:translateY(-50%);
+        width:3px;height:60%;border-radius:0 3px 3px 0;box-shadow:none;
+    }
+
+    .sidebar-switch-server{
+        display:flex;align-items:center;justify-content:center;gap:6px;
+        background:none;border:1px solid var(--card-border);color:var(--parchment-faint);
+        font-family:"Cinzel",serif;font-size:10.5px;letter-spacing:.05em;
+        padding:10px 10px;border-radius:10px;cursor:pointer;margin-top:auto;
+        transition:all .2s ease;
+    }
+    .sidebar-switch-server:hover{border-color:var(--thread);color:var(--gold-light);}
+
+    /* Shift content past the sidebar and let cards flow in columns
+       instead of one long mobile-width stack. */
+    .app{margin-left:230px;max-width:none;padding-bottom:40px;}
+    .page{max-width:1200px;column-count:2;column-gap:16px;}
+    .page-head, .stat-grid, .identity-card, .search-wrap:not(.search-wrap-inline), .chip-row, .cmd-count{column-span:all;}
+    .card{break-inside:avoid-column;}
+    .cmd-card{break-inside:avoid-column;}
+}
+
+@media (min-width: 1440px){
+    .page{column-count:3;max-width:1600px;}
+}
+
+/* panel visibility */
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* divider */
+.divider-sm{display:flex;justify-content:center;margin:22px 0;opacity:.4;}
+.divider-sm svg{width:16px;height:16px;color:var(--gold);}
+
+@media (min-width:520px){
+    .stat-grid{grid-template-columns:repeat(4,1fr);}
+}
+
+/* ============ LOGIN GATE ============ */
+.login-gate{
+    position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+    padding:24px;background:
+        radial-gradient(ellipse at 20% 0%, rgba(156,43,43,.28), transparent 55%),
+        radial-gradient(ellipse at 85% 100%, rgba(31,122,92,.2), transparent 50%),
+        linear-gradient(180deg, var(--night), var(--night-2));
+}
+.login-card{
+    max-width:360px;width:100%;text-align:center;padding:36px 26px 30px;
+    background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;
+    position:relative;overflow:hidden;
+}
+.login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--thread),transparent);}
+.login-emblem{
+    width:64px;height:64px;border-radius:50%;margin:0 auto 18px;
+    background:linear-gradient(135deg,var(--maroon),var(--jade));
+    border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:28px;
+    box-shadow:0 0 30px rgba(252,165,3,.3);
+}
+.login-card h2{font-family:"Cinzel",serif;font-size:20px;color:var(--gold-light);margin-bottom:8px;}
+.login-card p{font-family:"Cormorant Garamond",serif;font-size:16px;color:var(--parchment-dim);font-style:italic;margin-bottom:24px;line-height:1.5;}
+.discord-login-btn{
+    display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+    padding:13px 20px;border-radius:12px;border:none;cursor:pointer;
+    background:linear-gradient(120deg,var(--gold-light),var(--marigold));color:var(--night);
+    font-family:"Cinzel",serif;font-size:12.5px;letter-spacing:.06em;font-weight:700;
+    box-shadow:0 12px 30px -12px rgba(252,165,3,.55);text-decoration:none;
+}
+.login-error{
+    margin-top:16px;padding:10px 14px;border-radius:10px;font-size:12px;
+    background:rgba(156,43,43,.15);border:1px solid rgba(156,43,43,.4);color:#e08080;
+}
+.login-hidden{display:none !important;}
+
+/* ============ SERVER PICKER ============ */
+.server-row{
+    display:flex;align-items:center;gap:12px;padding:12px 13px;border-radius:13px;
+    background:rgba(255,255,255,.03);border:1px solid var(--card-border);cursor:pointer;
+    margin-bottom:9px;transition:all .2s ease;
+}
+.server-row:hover{background:rgba(252,165,3,.08);border-color:var(--thread);}
+.server-row:last-child{margin-bottom:0;}
+.server-icon{width:38px;height:38px;border-radius:50%;flex-shrink:0;object-fit:cover;background:linear-gradient(135deg,var(--maroon),var(--jade));}
+.server-icon-fallback{
+    width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--maroon),var(--jade));font-family:"Cinzel",serif;font-size:14px;color:var(--parchment);
+}
+.server-info{flex:1;min-width:0;text-align:left;}
+.server-info .sname{font-family:"Cinzel",serif;font-size:13.5px;color:var(--parchment);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.server-info .sbadge{font-size:10.5px;color:var(--marigold);margin-top:2px;}
+.server-arrow{color:var(--parchment-faint);font-size:14px;flex-shrink:0;}
+
+/* ============ USER CHIP / LOGOUT ============ */
+.user-chip{display:flex;align-items:center;gap:7px;padding:5px 10px 5px 5px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid var(--card-border);flex-shrink:0;}
+.user-chip img{width:22px;height:22px;border-radius:50%;}
+.user-chip span{font-size:11px;color:var(--parchment-dim);max-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.logout-btn{background:none;border:none;color:var(--parchment-faint);font-size:13px;cursor:pointer;padding:2px 4px;}
+
+/* ============ PERMISSION-GATED STATES ============ */
+.locked-note{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--parchment-faint);margin-top:8px;padding:8px 10px;background:rgba(255,255,255,.02);border-radius:8px;border:1px dashed var(--card-border);}
+.btn:disabled, .toggle.disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.skeleton{background:linear-gradient(100deg,rgba(255,255,255,.03) 30%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.03) 70%);background-size:200% 100%;animation:shimmer 1.4s linear infinite;border-radius:8px;color:transparent !important;}
+
+/* ============ AZKABAN ACTIONS ============ */
+.prisoner-actions{display:flex;gap:6px;margin-top:8px;}
+.sentence-form{margin-top:14px;padding-top:14px;border-top:1px solid rgba(218,165,32,.1);}
+.member-result{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:9px;cursor:pointer;transition:background .2s ease;}
+.member-result:hover{background:rgba(255,255,255,.04);}
+.member-result img{width:26px;height:26px;border-radius:50%;}
+.member-result span{font-size:12.5px;color:var(--parchment);}
+.selected-member{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:10px;background:rgba(252,165,3,.08);border:1px solid var(--thread);margin-bottom:8px;}
+.selected-member img{width:24px;height:24px;border-radius:50%;}
+.selected-member span{font-size:12.5px;color:var(--gold-light);flex:1;}
+.selected-member button{background:none;border:none;color:var(--parchment-faint);font-size:14px;cursor:pointer;}
+
+/* ============ SPARKLINE ============ */
+.spark-bar{flex:1;background:linear-gradient(180deg,var(--gold-light),var(--marigold));border-radius:3px 3px 1px 1px;min-height:3px;position:relative;transition:height .5s ease;}
+.spark-bar.empty{background:rgba(255,255,255,.06);}
+.top-cmd-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(218,165,32,.08);}
+.top-cmd-row:last-child{border-bottom:none;}
+.top-cmd-rank{font-family:"Cinzel",serif;font-size:12px;color:var(--parchment-faint);width:16px;}
+.top-cmd-name{flex:1;font-family:"Cinzel",serif;font-size:12.5px;color:var(--gold-light);}
+.top-cmd-count{font-size:11.5px;color:var(--parchment-dim);}
+.top-cmd-today{font-size:9.5px;color:var(--jade);background:rgba(31,122,92,.15);padding:2px 7px;border-radius:999px;margin-left:6px;}
+
+/* ============ ICONS ============ */
+.icon{flex-shrink:0;vertical-align:-3px;}
+.eicon-wrap{display:inline-flex;align-items:center;justify-content:center;}
+
+/* ============ CUSTOM DROPDOWN (replaces <select>) ============ */
+.dd{position:relative;width:100%;}
+.dd-trigger{
+    width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:11px 14px;border-radius:11px;background:rgba(255,255,255,.03);
+    border:1px solid var(--card-border);color:var(--parchment);font-family:"Poppins",sans-serif;font-size:12.5px;
+    cursor:pointer;text-align:left;transition:border-color .2s ease;box-sizing:border-box;
+}
+.dd-trigger:hover{border-color:var(--thread);}
+.dd-trigger.disabled{opacity:.4;pointer-events:none;}
+.dd-trigger .dd-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--parchment-dim);}
+.dd-trigger .dd-label.filled{color:var(--parchment);}
+.dd-trigger .dd-chevron{color:var(--gold);flex-shrink:0;transition:transform .2s ease;}
+.dd.open .dd-trigger .dd-chevron{transform:rotate(180deg);}
+.dd-panel{
+    position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:40;
+    background:var(--night-2);border:1px solid var(--thread);border-radius:12px;
+    box-shadow:0 20px 40px -10px rgba(0,0,0,.6);max-height:240px;overflow-y:auto;
+    display:none;padding:6px;
+}
+.dd.open .dd-panel{display:block;}
+.dd-search{
+    width:100%;padding:9px 11px;margin-bottom:5px;border-radius:8px;
+    background:rgba(255,255,255,.04);border:1px solid var(--card-border);color:var(--parchment);
+    font-family:"Poppins",sans-serif;font-size:12px;outline:none;box-sizing:border-box;
+}
+.dd-option{
+    padding:9px 11px;border-radius:8px;font-size:12.5px;color:var(--parchment);cursor:pointer;
+    display:flex;align-items:center;gap:8px;transition:background .15s ease;
+}
+.dd-option:hover{background:rgba(252,165,3,.1);}
+.dd-option.selected{background:rgba(252,165,3,.15);color:var(--gold-light);}
+.dd-option .dd-check{margin-left:auto;color:var(--marigold);flex-shrink:0;}
+.dd-empty{padding:12px;font-size:12px;color:var(--parchment-faint);text-align:center;font-style:italic;}
+
+/* ============ CUSTOM MULTI-SELECT (mod channels) ============ */
+.ms-wrap{width:100%;}
+.ms-selected{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;}
+.ms-chip{
+    display:flex;align-items:center;gap:6px;padding:6px 8px 6px 11px;border-radius:999px;
+    background:rgba(252,165,3,.1);border:1px solid var(--thread);color:var(--gold-light);font-size:11.5px;
+}
+.ms-chip button{background:none;border:none;color:var(--parchment-dim);cursor:pointer;display:flex;padding:2px;}
+.ms-chip button:hover{color:#e08080;}
+.ms-empty-note{font-size:11.5px;color:var(--parchment-faint);font-style:italic;margin-bottom:9px;}
+
+/* ============ CONFIRM MODAL ============ */
+.confirm-overlay{
+    position:fixed;inset:0;z-index:150;display:flex;align-items:center;justify-content:center;
+    background:rgba(6,7,16,.72);backdrop-filter:blur(4px);padding:24px;opacity:0;pointer-events:none;
+    transition:opacity .2s ease;
+}
+.confirm-overlay.show{opacity:1;pointer-events:auto;}
+.confirm-card{
+    max-width:340px;width:100%;background:var(--night-2);border:1px solid var(--thread);border-radius:18px;
+    padding:24px 22px 20px;text-align:center;transform:scale(.95);transition:transform .2s ease;
+    box-shadow:0 30px 60px -15px rgba(0,0,0,.7);
+}
+.confirm-overlay.show .confirm-card{transform:scale(1);}
+.confirm-icon{
+    width:46px;height:46px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;
+    background:rgba(156,43,43,.15);border:1px solid rgba(156,43,43,.4);color:#e08080;
+}
+.confirm-card h4{font-family:"Cinzel",serif;font-size:16px;color:var(--parchment);margin-bottom:8px;}
+.confirm-card p{font-size:12.5px;color:var(--parchment-dim);line-height:1.5;margin-bottom:18px;}
+.confirm-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.confirm-btn-row .btn{min-width:0;padding-left:6px;padding-right:6px;}
+
+/* ============ IDENTITY BUTTON GRID (fixes mobile overflow) ============ */
+.identity-subsection{margin-bottom:16px;}
+.identity-subsection:last-child{margin-bottom:0;}
+.identity-subsection-label{font-family:"Cinzel",serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.identity-btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.identity-btn-grid .btn{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;padding:10px 8px;}
+
+/* ============ IMAGE CROPPER MODAL ============ */
+.crop-overlay{
+    position:fixed;inset:0;z-index:160;display:flex;align-items:center;justify-content:center;
+    background:rgba(6,7,16,.82);backdrop-filter:blur(4px);padding:20px;opacity:0;pointer-events:none;
+    transition:opacity .2s ease;
+}
+.crop-overlay.show{opacity:1;pointer-events:auto;}
+.crop-card{
+    max-width:380px;width:100%;background:var(--night-2);border:1px solid var(--thread);border-radius:18px;
+    padding:20px;box-shadow:0 30px 60px -15px rgba(0,0,0,.7);
+    transform:scale(.95);transition:transform .2s ease;
+}
+.crop-overlay.show .crop-card{transform:scale(1);}
+.crop-card h4{font-family:"Cinzel",serif;font-size:15px;color:var(--parchment);margin-bottom:4px;}
+.crop-hint{font-size:11.5px;color:var(--parchment-faint);line-height:1.4;margin-bottom:14px;}
+.crop-viewport{
+    position:relative;width:100%;overflow:hidden;background:repeating-conic-gradient(#1a1d38 0% 25%, #14172e 0% 50%) 0 0/20px 20px;
+    border:1px solid var(--card-border);touch-action:none;cursor:grab;user-select:none;
+}
+.crop-viewport:active{cursor:grabbing;}
+.crop-viewport.ratio-avatar{aspect-ratio:1/1;border-radius:50%;}
+.crop-viewport.ratio-banner{aspect-ratio:5/2;border-radius:16px;}
+.crop-viewport img{position:absolute;top:0;left:0;transform-origin:0 0;max-width:none;pointer-events:none;}
+.crop-zoom-row{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.crop-zoom-row .icon{color:var(--parchment-faint);flex-shrink:0;}
+.crop-zoom-row input[type=range]{flex:1;accent-color:var(--marigold);}
+.crop-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;}
+.crop-btn-row .btn{min-width:0;}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<div class="mandala tl"></div>
+<div class="mandala br"></div>
+
+<!-- LOGIN GATE -->
+<div class="login-gate" id="loginGate">
+    <div class="login-card">
+        <div class="login-emblem"><span data-icon="wand" data-size="26"></span></div>
+        <h2>Headmaster's Office</h2>
+        <p>Sign in with your Discord account to enter your server's mod dashboard.</p>
+        <a class="discord-login-btn" href="/auth/login">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.099.246.197.373.291a.077.077 0 0 1-.006.128 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.106c.36.698.772 1.362 1.225 1.994a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.001-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.062.062 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.096 2.157 2.42 0 1.333-.955 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+            Continue with Discord
+        </a>
+        <div class="login-error login-hidden" id="loginError"></div>
+    </div>
+</div>
+
+<!-- SERVER PICKER -->
+<div class="login-gate login-hidden" id="serverPicker">
+    <div class="login-card" style="max-width:420px;">
+        <div class="login-emblem"><span data-icon="home" data-size="26"></span></div>
+        <h2>Choose a Server</h2>
+        <p id="pickerSubtitle">Signed in as <span id="pickerUsername"></span>. Pick a server to manage.</p>
+        <div id="serverPickerList" style="text-align:left;"></div>
+        <div class="login-error login-hidden" id="pickerError"></div>
+        <button class="logout-btn" style="margin-top:14px;font-size:11px;color:var(--parchment-faint);" onclick="logout()">Sign out instead</button>
+    </div>
+</div>
+
+<div class="sidebar login-hidden" id="desktopSidebar">
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-icon"><span data-icon="wand" data-size="18"></span></div>
+        <span class="sidebar-brand-name">Dumbledore</span>
+    </div>
+    <nav class="sidebar-nav">
+        <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
+            <span class="nicon" data-icon="home" data-size="18"></span><span class="nlabel">Home</span>
+        </button>
+        <button class="nav-btn" data-tab="commands" onclick="switchTab('commands')">
+            <span class="nicon" data-icon="book" data-size="18"></span><span class="nlabel">Commands</span>
+        </button>
+        <button class="nav-btn" data-tab="bot" onclick="switchTab('bot')">
+            <span class="nicon" data-icon="bot" data-size="18"></span><span class="nlabel">Bot</span>
+        </button>
+        <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')">
+            <span class="nicon" data-icon="settings" data-size="18"></span><span class="nlabel">Settings</span>
+        </button>
+    </nav>
+    <button class="sidebar-switch-server" onclick="switchServer()">
+        <span data-icon="chevronRight" data-size="13"></span> Switch server
+    </button>
+</div>
+
+<div class="app login-hidden" id="appRoot">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <div class="bot-mini-avatar" id="topbarBotAvatarWrap"><span data-icon="bot" data-size="18"></span></div>
+        <div class="titles">
+            <h1 id="topbarBotName">Dumbledore</h1>
+            <p><span class="status-dot"></span> Online · watching over the castle</p>
+        </div>
+        <button class="guild-badge" id="guildBadge" onclick="switchServer()" title="Switch server">Server</button>
+        <div class="user-chip" id="userChip">
+            <img id="userAvatar" src="" alt="">
+            <span id="userName"></span>
+            <button class="logout-btn" title="Sign out" onclick="logout()"><span data-icon="power" data-size="14"></span></button>
+        </div>
+    </div>
+
+    <!-- ================= HOME ================= -->
+    <div class="tab-panel active" id="panel-home">
+        <div class="page">
+            <div class="page-head">
+                <p class="eyebrow">Headmaster's Office</p>
+                <h2 id="homeGreeting">Welcome</h2>
+                <p>Here's what's happening in the castle today.</p>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <span class="icon" data-icon="home" data-size="18"></span>
+                    <div class="value" id="statMembers">—</div>
+                    <div class="label">Members</div>
+                    <div class="delta" id="statMembersDelta">—</div>
+                </div>
+                <div class="stat-card">
+                    <span class="icon" data-icon="message" data-size="18"></span>
+                    <div class="value" id="statMessages">—</div>
+                    <div class="label">Messages, last 7 days</div>
+                    <div class="delta" id="statMessagesDelta">—</div>
+                </div>
+                <div class="stat-card">
+                    <span class="icon" data-icon="azkaban" data-size="18"></span>
+                    <div class="value" id="statPrisoners">—</div>
+                    <div class="label">In Azkaban</div>
+                    <div class="delta" id="statPrisonersDelta">—</div>
+                </div>
+                <div class="stat-card">
+                    <span class="icon" data-icon="trophy" data-size="18"></span>
+                    <div class="value" id="statLeader">—</div>
+                    <div class="label">House Cup lead</div>
+                    <div class="delta" id="statLeaderDelta">—</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Message Activity <span class="tag">live · updates ~30min</span></h3>
+                <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:12px;">
+                    <div class="stat-card" style="padding:12px 10px;">
+                        <div class="value" id="anMsgToday" style="font-size:18px;">—</div>
+                        <div class="label">Today</div>
+                    </div>
+                    <div class="stat-card" style="padding:12px 10px;">
+                        <div class="value" id="anMsgWeek" style="font-size:18px;">—</div>
+                        <div class="label">This week</div>
+                    </div>
+                    <div class="stat-card" style="padding:12px 10px;">
+                        <div class="value" id="anMsgMonth" style="font-size:18px;">—</div>
+                        <div class="label">This month</div>
+                    </div>
+                </div>
+                <div id="msgSparkline" style="display:flex;align-items:flex-end;gap:3px;height:56px;margin-bottom:6px;"></div>
+                <p class="field-hint" id="msgSparklineLabel">Last 14 days</p>
+            </div>
+
+            <div class="card">
+                <h3>Most Used Commands <span class="tag">all-time</span></h3>
+                <div id="topCommandsList"></div>
+            </div>
+
+            <div class="card">
+                <h3>Member Growth</h3>
+                <div class="info-list">
+                    <div class="info-row"><span class="ilabel"><span data-icon="calendar" data-size="13"></span> Last 7 days</span><span class="ivalue" id="growthWeek">—</span></div>
+                    <div class="info-row"><span class="ilabel"><span data-icon="calendar" data-size="13"></span> Last 30 days</span><span class="ivalue" id="growthMonth">—</span></div>
+                    <div class="info-row"><span class="ilabel"><span data-icon="join" data-size="13"></span> Total joins</span><span class="ivalue" id="growthJoins">—</span></div>
+                    <div class="info-row"><span class="ilabel"><span data-icon="leave" data-size="13"></span> Total leaves</span><span class="ivalue" id="growthLeaves">—</span></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>House Cup Standings <span class="tag">/house-cup</span></h3>
+                <div id="houseCupList"></div>
+            </div>
+
+            <div class="card">
+                <h3>Top Witches &amp; Wizards <span class="tag">/leaderboard</span></h3>
+                <div id="leaderboardList"></div>
+                <div class="link-row" style="margin-top:8px;">
+                    <span></span>
+                    <button class="view-all" onclick="switchTab('commands')">Full leaderboard →</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Azkaban Watch <span class="tag">/sentence · /pardon</span></h3>
+                <div id="azkabanList"></div>
+                <div class="sentence-form login-hidden" id="sentenceForm">
+                    <div class="params-label">Sentence Someone</div>
+                    <div id="selectedMemberBox"></div>
+                    <div class="search-wrap search-wrap-inline" id="memberSearchWrap" style="margin-bottom:8px;">
+                        <span class="sicon" data-icon="search" data-size="14"></span>
+                        <input type="text" id="memberSearchInput" placeholder="Search member by username..." oninput="searchMembers(this.value)">
+                    </div>
+                    <div id="memberSearchResults"></div>
+                    <div class="field-group" id="reasonGroup" style="display:none;margin-top:8px;">
+                        <input class="field-input" id="sentenceReasonInput" type="text" placeholder="Reason for the sentence...">
+                    </div>
+                    <button class="btn btn-danger btn-block" id="submitSentenceBtn" style="display:none;margin-top:8px;" onclick="submitSentence()"><span data-icon="azkaban" data-size="14"></span> Send to Azkaban</button>
+                </div>
+                <p class="locked-note login-hidden" id="azkabanLock"><span data-icon="lock" data-size="12"></span> Requires Manage Roles permission</p>
+            </div>
+
+            <div class="card">
+                <h3>Recent Activity</h3>
+                <div id="activityFeed"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= COMMANDS ================= -->
+    <div class="tab-panel" id="panel-commands">
+        <div class="page">
+            <div class="page-head">
+                <p class="eyebrow">The Spellbook</p>
+                <h2>Commands</h2>
+                <p>Every incantation Dumbledore knows, and who may cast it.</p>
+            </div>
+
+            <div class="search-wrap">
+                <span class="sicon" data-icon="search" data-size="14"></span>
+                <input type="text" id="cmdSearch" placeholder="Search commands..." oninput="renderCommands()">
+            </div>
+
+            <div class="chip-row" id="categoryChips"></div>
+
+            <p class="cmd-count" id="cmdCount"></p>
+            <div id="cmdList"></div>
+        </div>
+    </div>
+
+    <!-- ================= BOT ================= -->
+    <div class="tab-panel" id="panel-bot">
+        <div class="page">
+            <div class="page-head">
+                <p class="eyebrow">Wand & Robes</p>
+                <h2>Bot Identity</h2>
+                <p>Customize how Dumbledore appears in this server.</p>
+            </div>
+
+            <div class="identity-card">
+                <div class="bot-banner" id="botBannerWrap">
+                    <div class="shimmer"></div>
+                    <button class="bot-banner-edit" id="editBannerBtn">Edit Banner</button>
+                </div>
+                <div class="identity-body">
+                    <div class="bot-avatar-wrap">
+                        <div class="bot-avatar" id="botAvatarWrap"><span data-icon="wand" data-size="28"></span></div>
+                        <div class="avatar-edit-dot" id="editAvatarBtn"><span data-icon="edit" data-size="11"></span></div>
+                    </div>
+                    <div class="bot-name-row">
+                        <h2 id="botDisplayName">Dumbledore</h2>
+                        <span class="bot-verified"><span data-icon="check" data-size="11"></span></span>
+                    </div>
+                    <p class="bot-tag" id="botTag">Loading…</p>
+                </div>
+            </div>
+            <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
+            <input type="file" id="bannerFileInput" accept="image/*" style="display:none;">
+
+            <div class="card">
+                <h3>Server Nickname</h3>
+                <div class="field-group" style="margin-bottom:6px;">
+                    <div class="field-input-row">
+                        <input class="field-input" id="nicknameInput" type="text" placeholder="Dumbledore" maxlength="32">
+                        <button class="btn btn-primary" id="saveNicknameBtn" onclick="saveNickname()">Save</button>
+                    </div>
+                    <p class="field-hint">Shown as the bot's display name in this server only.</p>
+                    <p class="locked-note login-hidden" id="nicknameLock"><span data-icon="lock" data-size="12"></span> Requires Bot Manager access</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Avatar &amp; Banner</h3>
+                <div class="identity-subsection">
+                    <div class="identity-subsection-label"><span data-icon="camera" data-size="12"></span> Avatar</div>
+                    <div class="identity-btn-grid">
+                        <button class="btn btn-ghost btn-sm" id="changeAvatarBtn"><span data-icon="camera" data-size="13"></span> Change</button>
+                        <button class="btn btn-ghost btn-sm" id="resetAvatarBtn"><span data-icon="undo" data-size="13"></span> Reset</button>
+                    </div>
+                </div>
+                <div class="identity-subsection">
+                    <div class="identity-subsection-label"><span data-icon="image" data-size="12"></span> Banner</div>
+                    <div class="identity-btn-grid">
+                        <button class="btn btn-ghost btn-sm" id="changeBannerBtn"><span data-icon="image" data-size="13"></span> Change</button>
+                        <button class="btn btn-ghost btn-sm" id="resetBannerBtn"><span data-icon="undo" data-size="13"></span> Reset</button>
+                    </div>
+                </div>
+                <p class="field-hint" style="margin-top:10px;">Guild-specific avatar/banner changes require Bot Manager access and take effect instantly.</p>
+                <p class="locked-note login-hidden" id="avatarLock"><span data-icon="lock" data-size="12"></span> Requires Bot Manager access</p>
+            </div>
+
+            <div class="card">
+                <h3>Bot Status</h3>
+                <div class="info-list">
+                    <div class="info-row"><span class="ilabel"><span data-icon="home" data-size="13"></span> Server</span><span class="ivalue" id="statServerName">—</span></div>
+                    <div class="info-row"><span class="ilabel"><span data-icon="users" data-size="13"></span> Members</span><span class="ivalue" id="statServerMembers">—</span></div>
+                    <div class="info-row"><span class="ilabel"><span data-icon="hash" data-size="13"></span> Commands</span><span class="ivalue">23</span></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Identity Commands</h3>
+                <div class="cmd-shortcut-row">
+                    <div><div class="cs-name">/set-avatar</div><div class="cs-desc">Upload a new server avatar</div></div>
+                    <button class="copy-btn" onclick="copyCmd('/set-avatar')">Copy</button>
+                </div>
+                <div class="cmd-shortcut-row">
+                    <div><div class="cs-name">/reset-avatar</div><div class="cs-desc">Revert to default avatar</div></div>
+                    <button class="copy-btn" onclick="copyCmd('/reset-avatar')">Copy</button>
+                </div>
+                <div class="cmd-shortcut-row">
+                    <div><div class="cs-name">/set-banner</div><div class="cs-desc">Upload a new server banner</div></div>
+                    <button class="copy-btn" onclick="copyCmd('/set-banner')">Copy</button>
+                </div>
+                <div class="cmd-shortcut-row">
+                    <div><div class="cs-name">/reset-banner</div><div class="cs-desc">Revert to default banner</div></div>
+                    <button class="copy-btn" onclick="copyCmd('/reset-banner')">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SETTINGS ================= -->
+    <div class="tab-panel" id="panel-settings">
+        <div class="page">
+            <div class="page-head">
+                <p class="eyebrow">Ministry Records</p>
+                <h2>Settings</h2>
+                <p>Configure the systems that keep the castle running.</p>
+            </div>
+
+            <div class="card">
+                <h3>Server Systems</h3>
+
+                <div class="setting-row">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="folder" data-size="13"></span> Logging <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-logs</span></div>
+                        <div class="sdesc">Message edits/deletes, joins, leaves, bans &amp; role changes.</div>
+                    </div>
+                    <div class="toggle" id="toggle-logs" onclick="toggleSetting('logs')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-logs">
+                    <div class="sub-panel-inner">
+                        <div class="dd" id="dd-logs"></div>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="join" data-size="13"></span> Welcome Messages <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-welcome</span></div>
+                        <div class="sdesc">Greet new witches and wizards as they arrive.</div>
+                    </div>
+                    <div class="toggle" id="toggle-welcome" onclick="toggleSetting('welcome')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-welcome">
+                    <div class="sub-panel-inner">
+                        <div class="dd" id="dd-welcome"></div>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="star" data-size="13"></span> Starboard <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-starboard</span></div>
+                        <div class="sdesc">Pins messages that earn enough star reactions to a showcase channel.</div>
+                    </div>
+                    <div class="toggle" id="toggle-starboard" onclick="toggleSetting('starboard')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-starboard">
+                    <div class="sub-panel-inner">
+                        <div class="dd" id="dd-starboard"></div>
+                        <p class="field-hint" id="starboardThresholdHint">Threshold: —</p>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="sortinghat" data-size="13"></span> Sorting Hat <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-sorting-hat</span></div>
+                        <div class="sdesc">Lets members run /sortme and get placed into a house.</div>
+                    </div>
+                    <div class="toggle" id="toggle-sortinghat" onclick="toggleSetting('sortinghat')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-sortinghat">
+                    <div class="sub-panel-inner">
+                        <div class="dd" id="dd-sortinghat"></div>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="azkaban" data-size="13"></span> Azkaban <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-azkaban</span></div>
+                        <div class="sdesc">Prison system for sentencing rule-breakers.</div>
+                    </div>
+                    <div class="toggle" id="toggle-azkaban" onclick="toggleSetting('azkaban')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-azkaban">
+                    <div class="sub-panel-inner">
+                        <div class="dd" id="dd-azkaban"></div>
+                    </div>
+                </div>
+                <p class="locked-note login-hidden" id="settingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission — showing read-only</p>
+            </div>
+
+            <div class="card">
+                <h3>Mod Channels <span class="tag">/configure-mod-channels</span></h3>
+                <p class="field-hint" style="margin-top:-4px;margin-bottom:10px;">Channels the Deluminator is allowed to search when used from inside one of them.</p>
+                <div class="ms-wrap" id="modChannelsMultiSelect"></div>
+                <p class="locked-note login-hidden" id="modChannelsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+            </div>
+
+            <div class="card">
+                <h3>Leveling &amp; XP <span class="tag">/guild-settings</span></h3>
+                <div class="field-group">
+                    <label class="field-label">XP per message <span id="xpPerMessageDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="xpPerMessageInput" type="number" min="0" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('xpPerMessage','xpPerMessageInput')">Save</button>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">XP cooldown (seconds) <span id="xpCooldownDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="xpCooldownInput" type="number" min="0" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('xpCooldownSeconds','xpCooldownInput')">Save</button>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">House points per sorting <span id="housePointValueDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="housePointValueInput" type="number" min="0" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('housePointValue','housePointValueInput')">Save</button>
+                    </div>
+                </div>
+                <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label">Starboard threshold (star reactions) <span id="starboardThresholdDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="starboardThresholdInput" type="number" min="1" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('starboardThreshold','starboardThresholdInput')">Save</button>
+                    </div>
+                </div>
+                <p class="locked-note login-hidden" id="xpSettingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+            </div>
+
+            <div class="card">
+                <h3>House Cup Points <span class="tag">/house-cup</span></h3>
+                <div id="housePointControls"></div>
+                <p class="locked-note login-hidden" id="housePointsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+            </div>
+
+            <div class="card">
+                <h3>House Roles <span class="tag">/guild-settings</span></h3>
+                <div class="field-group"><label class="field-label"><span data-icon="lion" data-size="13"></span> Gryffindor</label><div class="dd" id="dd-house-gryffindor"></div></div>
+                <div class="field-group"><label class="field-label"><span data-icon="eagle" data-size="13"></span> Ravenclaw</label><div class="dd" id="dd-house-ravenclaw"></div></div>
+                <div class="field-group"><label class="field-label"><span data-icon="badger" data-size="13"></span> Hufflepuff</label><div class="dd" id="dd-house-hufflepuff"></div></div>
+                <div class="field-group" style="margin-bottom:0;"><label class="field-label"><span data-icon="snake" data-size="13"></span> Slytherin</label><div class="dd" id="dd-house-slytherin"></div></div>
+                <p class="locked-note login-hidden" id="houseRolesLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+            </div>
+
+            <div class="card">
+                <h3>Bot Manager Role <span class="tag">/guild-settings</span></h3>
+                <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label">Bot Manager <span id="botManagerRoleDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="dd" id="dd-botManagerRole"></div>
+                </div>
+                <p class="field-hint" style="margin-top:10px;">Whoever holds this role can sign into this dashboard and use Bot Manager-only commands (/say, /announce, /manage-roles, avatar &amp; banner). If unset, anyone with the native Administrator permission is treated as Bot Manager instead.</p>
+                <p class="locked-note login-hidden" id="accessRolesLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav login-hidden" id="bottomNav">
+    <div class="bottom-nav-inner">
+        <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
+            <span class="nicon" data-icon="home" data-size="19"></span><span class="nlabel">Home</span>
+        </button>
+        <button class="nav-btn" data-tab="commands" onclick="switchTab('commands')">
+            <span class="nicon" data-icon="book" data-size="19"></span><span class="nlabel">Commands</span>
+        </button>
+        <button class="nav-btn" data-tab="bot" onclick="switchTab('bot')">
+            <span class="nicon" data-icon="bot" data-size="19"></span><span class="nlabel">Bot</span>
+        </button>
+        <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')">
+            <span class="nicon" data-icon="settings" data-size="19"></span><span class="nlabel">Settings</span>
+        </button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-card">
+        <div class="confirm-icon" id="confirmIcon"></div>
+        <h4 id="confirmTitle">Are you sure?</h4>
+        <p id="confirmMessage"></p>
+        <div class="confirm-btn-row">
+            <button class="btn btn-ghost btn-block" id="confirmCancelBtn">Cancel</button>
+            <button class="btn btn-danger btn-block" id="confirmOkBtn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<div class="crop-overlay" id="cropOverlay">
+    <div class="crop-card">
+        <h4 id="cropModalTitle">Crop Image</h4>
+        <p class="crop-hint" id="cropModalHint">Drag to reposition, pinch or scroll to zoom.</p>
+        <div class="crop-viewport" id="cropViewport">
+            <img id="cropImage" alt="">
+        </div>
+        <div class="crop-zoom-row">
+            <span class="icon" data-icon="minus" data-size="14"></span>
+            <input type="range" id="cropZoomSlider" min="1" max="4" step="0.01" value="1">
+            <span class="icon" data-icon="plus" data-size="14"></span>
+        </div>
+        <div class="crop-btn-row">
+            <button class="btn btn-ghost btn-block" id="cropCancelBtn">Cancel</button>
+            <button class="btn btn-primary btn-block" id="cropConfirmBtn"><span data-icon="check" data-size="14"></span> Apply</button>
+        </div>
+    </div>
+</div>
+
+<!-- Lucide: real third-party icon library (https://lucide.dev). Loaded
+     synchronously (no defer/async) so window.lucide.icons is populated
+     before our own script below reads from it. -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<!-- Iconify Icon web component (https://iconify.design), used only for
+     the four house emblems. Lucide has no lion/eagle/badger/snake icons,
+     but Iconify's "game-icons" collection (mirroring game-icons.net,
+     CC BY 3.0) has exact matches. The component loads real icon data
+     from Iconify's public API at runtime and self-upgrades once loaded,
+     so it doesn't need to block page script execution like Lucide does. -->
+<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+
+<script>
+/* ============================================================
+   API-WIRED DASHBOARD SCRIPT
+   Talks to the dashboard-server backend (Discord OAuth + the
+   bot's live Postgres database). No mock data below this line.
+   ============================================================ */
+
+/* ---- SVG ICON SYSTEM ----
+   Icon shapes are sourced live from Lucide (https://lucide.dev), loaded
+   via the <script src="https://unpkg.com/lucide"> tag above. This map
+   only translates our own semantic names to Lucide's real icon names —
+   no path data is hand-drawn here. */
+const LUCIDE_ICON_NAMES = {
+    home: 'Home',
+    message: 'MessageCircle',
+    azkaban: 'Lock',
+    trophy: 'Trophy',
+    calendar: 'Calendar',
+    join: 'UserPlus',
+    leave: 'LogOut',
+    edit: 'Pencil',
+    camera: 'Camera',
+    image: 'Image',
+    undo: 'Undo2',
+    close: 'X',
+    closeCircle: 'XCircle',
+    checkCircle: 'CheckCircle2',
+    check: 'Check',
+    alert: 'AlertTriangle',
+    search: 'Search',
+    star: 'Star',
+    shield: 'Shield',
+    wand: 'Wand2',
+    globe: 'Globe',
+    landmark: 'Landmark',
+    users: 'Users',
+    crown: 'Crown',
+    folder: 'Folder',
+    clipboard: 'Clipboard',
+    plus: 'Plus',
+    minus: 'Minus',
+    trendingUp: 'TrendingUp',
+    trendingDown: 'TrendingDown',
+    sortinghat: 'GraduationCap',
+    moon: 'Moon',
+    inbox: 'Inbox',
+    power: 'Power',
+    book: 'BookOpen',
+    settings: 'Settings',
+    bot: 'Bot',
+    key: 'Key',
+    barChart: 'BarChart3',
+    chevronDown: 'ChevronDown',
+    chevronRight: 'ChevronRight',
+    arrowRight: 'ArrowRight',
+    lock: 'Lock',
+    hash: 'Hash',
+    scroll: 'ScrollText',
+};
+
+function lucideNodeToInnerSvg(iconNode){
+    return iconNode.map(([tag, attrs]) => {
+        const attrStr = Object.entries(attrs)
+            .map(([k, v]) => `${k}="${v}"`)
+            .join(' ');
+        return `<${tag} ${attrStr}/>`;
+    }).join('');
+}
+
+/* Lucide doesn't ship lion/eagle/badger/snake, so these four house
+   emblems are hand-drawn to match Lucide's own visual grammar
+   (24x24 grid, 2px stroke, round caps/joins) rather than sourced
+   from the library. Everything else in the app comes from Lucide. */
+/* House emblems come from Iconify's "game-icons" collection (mirrors
+   game-icons.net, CC BY 3.0 by Lorc & Delapouite) — Lucide has no
+   lion/eagle/badger/snake, but these are exact matches for real animals,
+   rendered via <iconify-icon> instead of an inline <svg>. */
+const GAME_ICON_NAMES = {
+    lion: 'game-icons:lion',
+    eagle: 'game-icons:eagle-head',
+    badger: 'game-icons:badger',
+    snake: 'game-icons:snake',
+};
+
+function svg(name, size){
+    const s = size || 16;
+    if (GAME_ICON_NAMES[name]) {
+        return `<iconify-icon class="icon" icon="${GAME_ICON_NAMES[name]}" width="${s}" height="${s}" style="color:currentColor;"></iconify-icon>`;
+    }
+    const lucideName = LUCIDE_ICON_NAMES[name];
+    const iconNode = lucideName && window.lucide && window.lucide.icons[lucideName];
+    const inner = iconNode ? lucideNodeToInnerSvg(iconNode) : '';
+    return `<svg class="icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+}
+
+function hydrateStaticIcons(root){
+    (root || document).querySelectorAll('[data-icon]').forEach(el => {
+        const name = el.getAttribute('data-icon');
+        const size = el.getAttribute('data-size') || 14;
+        const extraClasses = Array.from(el.classList);
+        const temp = document.createElement('div');
+        temp.innerHTML = svg(name, Number(size));
+        const svgEl = temp.firstElementChild;
+        extraClasses.forEach(c => svgEl.classList.add(c));
+        // Carry over any non-class/non-data attributes (e.g. id, title) too.
+        Array.from(el.attributes).forEach(attr => {
+            if (attr.name === 'class' || attr.name === 'data-icon' || attr.name === 'data-size') return;
+            svgEl.setAttribute(attr.name, attr.value);
+        });
+        el.replaceWith(svgEl);
+    });
+}
+
+const HOUSE_META = {
+    gryffindor: { name:'Gryffindor', icon:'lion', color:'#c14545', bg:'rgba(193,69,69,.15)' },
+    ravenclaw:  { name:'Ravenclaw',  icon:'eagle', color:'#5a7fc2', bg:'rgba(90,127,194,.15)' },
+    hufflepuff: { name:'Hufflepuff', icon:'badger', color:'#e5a324', bg:'rgba(229,163,36,.15)' },
+    slytherin:  { name:'Slytherin',  icon:'snake', color:'#1f7a5c', bg:'rgba(31,122,92,.15)' },
+};
+
+const PERM_META = {
+    everyone: { label:'Everyone', cls:'perm-everyone', icon:'globe' },
+    botmanager: { label:'Bot Manager', cls:'perm-manager', icon:'wand' },
+    manageserver: { label:'Manage Server', cls:'perm-server', icon:'landmark' },
+    manageroles: { label:'Manage Roles', cls:'perm-roles', icon:'shield' },
+};
+
+let CURRENT_USER = null;
+let COMMANDS = [];
+let CHANNELS = [];
+let ROLES = [];
+let CMD_USAGE = {};
+let selectedSentenceMember = null;
+
+/* ============================================================
+   FETCH HELPER
+   ============================================================ */
+async function api(path, opts = {}) {
+    const res = await fetch(path, {
+        credentials: 'include',
+        headers: opts.body && !(opts.body instanceof FormData) ? { 'Content-Type': 'application/json' } : undefined,
+        ...opts,
+    });
+
+    if (res.status === 401) {
+        showLoginGate();
+        throw new Error('not_authenticated');
+    }
+
+    if (res.status === 409) {
+        const body = await res.json().catch(() => ({}));
+        if (body.error === 'no_active_guild') {
+            showServerPicker();
+            throw new Error('no_active_guild');
+        }
+    }
+
+    if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `request_failed_${res.status}`);
+    }
+
+    if (res.status === 204) return null;
+    return res.json();
+}
+
+/* ============================================================
+   AUTH / BOOTSTRAP
+   ============================================================ */
+function hideAllGates(){
+    document.getElementById('loginGate').classList.add('login-hidden');
+    document.getElementById('serverPicker').classList.add('login-hidden');
+    document.getElementById('appRoot').classList.add('login-hidden');
+    document.getElementById('bottomNav').classList.add('login-hidden');
+    document.getElementById('desktopSidebar').classList.add('login-hidden');
+}
+
+function showLoginGate(errorMsg) {
+    hideAllGates();
+    document.getElementById('loginGate').classList.remove('login-hidden');
+    if (errorMsg) {
+        const el = document.getElementById('loginError');
+        el.textContent = errorMsg;
+        el.classList.remove('login-hidden');
+    }
+}
+
+async function showServerPicker(errorMsg) {
+    hideAllGates();
+    document.getElementById('serverPicker').classList.remove('login-hidden');
+    document.getElementById('pickerUsername').textContent = CURRENT_USER?.username || '';
+
+    if (errorMsg) {
+        const el = document.getElementById('pickerError');
+        el.textContent = errorMsg;
+        el.classList.remove('login-hidden');
+    } else {
+        document.getElementById('pickerError').classList.add('login-hidden');
+    }
+
+    const listEl = document.getElementById('serverPickerList');
+    listEl.innerHTML = `<p class="no-params">Looking for servers you moderate…</p>`;
+
+    try {
+        const { guilds } = await api('/api/guilds');
+        if (guilds.length === 0) {
+            listEl.innerHTML = `<div class="empty-state"><div class="eicon-wrap">${svg('search',22)}</div><p>No servers found where you have mod access and the bot is installed.</p></div>`;
+            return;
+        }
+        listEl.innerHTML = guilds.map(g => `
+            <div class="server-row" onclick="selectServer('${g.id}')">
+                ${g.iconUrl ? `<img class="server-icon" src="${g.iconUrl}" alt="">` : `<div class="server-icon-fallback">${escapeHtml(g.name.slice(0,2).toUpperCase())}</div>`}
+                <div class="server-info">
+                    <div class="sname">${escapeHtml(g.name)}</div>
+                    <div class="sbadge">${g.isOwner ? svg('crown',11)+' Owner' : g.isBotManager ? svg('wand',11)+' Bot Manager' : svg('shield',11)+' Mod access'}</div>
+                </div>
+                <span class="server-arrow">→</span>
+            </div>
+        `).join('');
+    } catch (err) {
+        listEl.innerHTML = `<div class="empty-state"><div class="eicon-wrap">${svg('alert',22)}</div><p>Couldn't load your servers. Try refreshing.</p></div>`;
+    }
+}
+
+async function selectServer(guildId){
+    try {
+        await api(`/api/guilds/${guildId}/select`, { method:'POST' });
+        location.reload();
+    } catch (err) {
+        showServerPicker(friendlyError(err.message));
+    }
+}
+
+async function switchServer(){
+    try {
+        await api('/api/guilds/deselect', { method:'POST' });
+        location.reload();
+    } catch {
+        location.reload();
+    }
+}
+
+function showApp() {
+    hideAllGates();
+    document.getElementById('appRoot').classList.remove('login-hidden');
+    document.getElementById('bottomNav').classList.remove('login-hidden');
+    document.getElementById('desktopSidebar').classList.remove('login-hidden');
+}
+
+function logout() {
+    showConfirm({
+        title: 'Sign out?',
+        message: "You'll need to sign in with Discord again to get back into this dashboard.",
+        confirmLabel: 'Sign out',
+        onConfirm: () => {
+            api('/auth/logout', { method:'POST' }).finally(() => location.reload());
+        },
+    });
+}
+
+function applyPermissionGates() {
+    const u = CURRENT_USER;
+    if (!u) return;
+
+    document.getElementById('userAvatar').src = u.avatar;
+    document.getElementById('userName').textContent = u.username;
+    document.getElementById('guildBadge').textContent = u.guildName || 'this server';
+    document.getElementById('homeGreeting').textContent = `${timeOfDayGreeting()}, ${u.nickname || u.username}`;
+
+    // Rebuild controls whose disabled-state was baked in at pre-login render time.
+    renderHousePointControls();
+
+    // Bot identity — Bot Manager only
+    const botManagerOk = u.isBotManager;
+    ['editAvatarBtn','editBannerBtn','changeAvatarBtn','resetAvatarBtn','changeBannerBtn','resetBannerBtn','saveNicknameBtn'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = !botManagerOk;
+    });
+    document.getElementById('nicknameInput').disabled = !botManagerOk;
+    document.getElementById('nicknameLock').classList.toggle('login-hidden', botManagerOk);
+    document.getElementById('avatarLock').classList.toggle('login-hidden', botManagerOk);
+
+    // Settings — Manage Server
+    const manageGuildOk = u.canManageGuild;
+    document.querySelectorAll('#panel-settings .toggle').forEach(t => t.classList.toggle('disabled', !manageGuildOk));
+    document.querySelectorAll('#panel-settings input').forEach(i => i.disabled = !manageGuildOk);
+    document.querySelectorAll('#panel-settings .btn-primary').forEach(b => b.disabled = !manageGuildOk);
+    [ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddAzkaban, ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin, ddBotManagerRole].forEach(dd => dd?.setDisabled(!manageGuildOk));
+    modChannelsMS?.setDisabled(!manageGuildOk);
+    document.getElementById('settingsLock').classList.toggle('login-hidden', manageGuildOk);
+    document.getElementById('housePointsLock').classList.toggle('login-hidden', manageGuildOk);
+    document.getElementById('modChannelsLock').classList.toggle('login-hidden', manageGuildOk);
+    document.getElementById('xpSettingsLock').classList.toggle('login-hidden', manageGuildOk);
+    document.getElementById('houseRolesLock').classList.toggle('login-hidden', manageGuildOk);
+    document.getElementById('accessRolesLock').classList.toggle('login-hidden', manageGuildOk);
+
+    // Azkaban — Manage Roles
+    const manageRolesOk = u.canManageRoles;
+    document.getElementById('sentenceForm').classList.toggle('login-hidden', !manageRolesOk);
+    document.getElementById('azkabanLock').classList.toggle('login-hidden', manageRolesOk);
+}
+
+async function bootstrap() {
+    const params = new URLSearchParams(location.search);
+    const authError = params.get('authError');
+    if (authError) {
+        const messages = {
+            invalid_state: "Login expired, please try again.",
+            server_error: "Something went wrong signing you in. Please try again.",
+        };
+        showLoginGate(messages[authError] || 'Could not sign you in. Please try again.');
+        history.replaceState({}, '', location.pathname);
+        return;
+    }
+
+    try {
+        // Raw fetch (not api()) for this very first check: right after a hard
+        // UA-switching reload (e.g. toggling "Desktop site" on Android Chrome)
+        // the session cookie can occasionally lag by a beat. Retry once,
+        // silently, before letting api() flash the login gate over it.
+        let meRes = await fetch('/api/me', { credentials: 'include' });
+        if (meRes.status === 401) {
+            await new Promise(r => setTimeout(r, 300));
+            meRes = await fetch('/api/me', { credentials: 'include' });
+        }
+        if (meRes.status === 401) {
+            showLoginGate();
+            throw new Error('not_authenticated');
+        }
+        if (!meRes.ok) throw new Error(`request_failed_${meRes.status}`);
+        const { user } = await meRes.json();
+        CURRENT_USER = user;
+
+        if (!user.activeGuildId) {
+            showServerPicker();
+            return;
+        }
+
+        showApp();
+        applyPermissionGates();
+        await Promise.all([
+            loadCommands(),
+            loadCommandUsage(),
+            loadChannelsAndRoles(),
+            renderHome(),
+        ]);
+        renderCategoryChips();
+        renderCommands();
+        loadSettings();
+        loadBotIdentity();
+    } catch {
+        showLoginGate();
+    }
+}
+
+/* ============================================================
+   HOME TAB
+   ============================================================ */
+async function renderHome() {
+    try {
+        const [stats, houses, leaderboard, azkaban, activity, overview] = await Promise.all([
+            api('/api/stats'),
+            api('/api/houses'),
+            api('/api/leaderboard?limit=5'),
+            api('/api/azkaban'),
+            api('/api/activity'),
+            api('/api/analytics/overview'),
+        ]);
+
+        document.getElementById('statMembers').textContent = stats.memberCount ?? '—';
+        document.getElementById('statMessages').textContent = stats.messagesLast7Days ?? '—';
+        document.getElementById('statPrisoners').textContent = stats.activePrisoners ?? 0;
+        document.getElementById('statLeader').innerHTML = stats.houseLeader
+            ? `${cap(stats.houseLeader.house)}`
+            : '—';
+
+        document.getElementById('statMembersDelta').innerHTML =
+            overview.members.weeklyGrowth == null ? 'no data yet' : deltaHtml(overview.members.weeklyGrowth) + ' this week';
+        document.getElementById('statMessagesDelta').innerHTML = deltaHtml(stats.messagesWeekDelta) + ' vs previous 7 days';
+        document.getElementById('statPrisonersDelta').textContent = azkaban.active.length > 0 ? 'active now' : 'all clear';
+        document.getElementById('statPrisonersDelta').classList.toggle('down', azkaban.active.length > 0);
+        document.getElementById('statLeaderDelta').textContent = stats.houseLeader ? `${stats.houseLeader.points} points` : '—';
+
+        renderHouseCup(houses.houses);
+        renderLeaderboard(leaderboard.leaderboard);
+        renderAzkaban(azkaban);
+        renderActivity(activity.activity);
+        renderAnalytics(overview);
+    } catch (err) {
+        if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('renderHome failed', err);
+    }
+}
+
+function renderAnalytics(overview){
+    document.getElementById('anMsgToday').textContent = overview.messages.today;
+    document.getElementById('anMsgWeek').textContent = overview.messages.thisWeek;
+    document.getElementById('anMsgMonth').textContent = overview.messages.thisMonth;
+
+    document.getElementById('growthWeek').textContent = overview.members.weeklyGrowth == null ? 'not enough data' : `${overview.members.weeklyGrowth >= 0 ? '+' : ''}${overview.members.weeklyGrowth}`;
+    document.getElementById('growthMonth').textContent = overview.members.monthlyGrowth == null ? 'not enough data' : `${overview.members.monthlyGrowth >= 0 ? '+' : ''}${overview.members.monthlyGrowth}`;
+    document.getElementById('growthJoins').textContent = overview.members.totalJoins;
+    document.getElementById('growthLeaves').textContent = overview.members.totalLeaves;
+
+    if (overview.topCommands.length === 0) {
+        document.getElementById('topCommandsList').innerHTML = `<div class="empty-state"><div class="eicon-wrap">${svg('wand',22)}</div><p>No command usage recorded yet.</p></div>`;
+    } else {
+        const max = Math.max(...overview.topCommands.map(c => c.totalExecutions), 1);
+        document.getElementById('topCommandsList').innerHTML = overview.topCommands.map((c, i) => `
+            <div class="top-cmd-row">
+                <div class="top-cmd-rank">${i+1}</div>
+                <div class="top-cmd-name">/${c.commandName}</div>
+                <div class="top-cmd-count">${c.totalExecutions} uses</div>
+            </div>
+        `).join('');
+    }
+
+    loadMessageSparkline();
+}
+
+async function loadMessageSparkline(){
+    try {
+        const { graph } = await api('/api/analytics/messages/daily?days=14');
+        const el = document.getElementById('msgSparkline');
+        if (graph.length === 0) {
+            el.innerHTML = `<p class="no-params">No message data recorded yet.</p>`;
+            return;
+        }
+        const max = Math.max(...graph.map(g => g.count), 1);
+        el.innerHTML = graph.map(g => {
+            const h = Math.max(3, Math.round((g.count / max) * 56));
+            const d = new Date(g.date).toLocaleDateString(undefined, { month:'short', day:'numeric' });
+            return `<div class="spark-bar ${g.count===0?'empty':''}" style="height:${h}px;" title="${d}: ${g.count} messages"></div>`;
+        }).join('');
+    } catch {}
+}
+
+function renderHouseCup(houses) {
+    const maxPts = Math.max(...houses.map(h => h.points), 1);
+    document.getElementById('houseCupList').innerHTML = houses.map((h,i) => {
+        const meta = HOUSE_META[h.house] || { name: cap(h.house), icon:'shield', color:'#daa520', bg:'rgba(218,165,32,.15)' };
+        return `
+        <div class="house-row">
+            <div class="house-rank">${i+1}</div>
+            <div class="house-emoji" style="background:${meta.bg};">${svg(meta.icon, 16)}</div>
+            <div class="house-info">
+                <div class="hname">${meta.name}</div>
+                <div class="house-bar-track"><div class="house-bar-fill" style="width:${(h.points/maxPts*100)}%; background:${meta.color};"></div></div>
+            </div>
+            <div class="house-pts">${h.points} pts</div>
+        </div>`;
+    }).join('');
+}
+
+function renderLeaderboard(list) {
+    if (list.length === 0) {
+        document.getElementById('leaderboardList').innerHTML = `<div class="empty-state"><div class="eicon-wrap">${svg('trophy',22)}</div><p>No one has earned XP yet.</p></div>`;
+        return;
+    }
+    document.getElementById('leaderboardList').innerHTML = list.map((u,i) => `
+        <div class="lb-row">
+            <div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
+            <img class="lb-avatar" src="${u.avatarUrl}" style="object-fit:cover;" alt="">
+            <div class="lb-info">
+                <div class="lname">${escapeHtml(u.username)}${u.left ? ' <span style="color:var(--parchment-faint);font-size:10px;">(left)</span>' : ''}</div>
+                <div class="lmeta">Level ${u.level} · ${u.messages} messages</div>
+            </div>
+            <div class="lb-xp">${u.xp} XP</div>
+        </div>
+    `).join('');
+}
+
+function renderAzkaban(data) {
+    const { active } = data;
+    if (active.length === 0) {
+        document.getElementById('azkabanList').innerHTML = `<div class="empty-state"><div class="eicon-wrap">${svg('key',22)}</div><p>Azkaban is empty. All is calm in the castle.</p></div>`;
+    } else {
+        document.getElementById('azkabanList').innerHTML = active.map(p => `
+            <div class="feed-item">
+                <div class="feed-icon">${svg('azkaban',14)}</div>
+                <div class="feed-body">
+                    <div class="ftitle"><b>${escapeHtml(p.user.username)}</b> — ${escapeHtml(p.reason)}</div>
+                    <div class="ftime">Sentenced by ${escapeHtml(p.moderator.username)} · ${timeAgo(p.jailedAt)}</div>
+                </div>
+            </div>
+            <div class="prisoner-actions" style="margin-left:42px;">
+                <button class="btn btn-ghost btn-sm" onclick="pardonPrisoner(${p.id})" ${CURRENT_USER?.canManageRoles ? '' : 'disabled'}>${svg('scroll', 13)} Pardon</button>
+            </div>
+        `).join('');
+    }
+}
+
+function renderActivity(events) {
+    if (events.length === 0) {
+        document.getElementById('activityFeed').innerHTML = `<div class="empty-state"><div class="eicon-wrap">${svg('moon',22)}</div><p>No recent activity yet.</p></div>`;
+        return;
+    }
+    document.getElementById('activityFeed').innerHTML = events.map(a => `
+        <div class="feed-item">
+            <div class="feed-icon">${svg(a.icon, 14)}</div>
+            <div class="feed-body">
+                <div class="ftitle">${a.text}</div>
+                <div class="ftime">${timeAgo(a.time)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function pardonPrisoner(id) {
+    try {
+        await api(`/api/azkaban/${id}/pardon`, { method:'POST' });
+        showToast('Prisoner pardoned', 'success');
+        renderHome();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+/* ============================================================
+   SENTENCE FORM (Azkaban)
+   ============================================================ */
+let searchDebounce;
+function searchMembers(q) {
+    clearTimeout(searchDebounce);
+    if (!q.trim()) {
+        document.getElementById('memberSearchResults').innerHTML = '';
+        return;
+    }
+    searchDebounce = setTimeout(async () => {
+        try {
+            const { results } = await api(`/api/members/search?q=${encodeURIComponent(q)}`);
+            document.getElementById('memberSearchResults').innerHTML = results.map(m => `
+                <div class="member-result" onclick='selectSentenceMember(${JSON.stringify(m).replace(/'/g,"&apos;")})'>
+                    <img src="${m.avatarUrl}" alt="">
+                    <span>${escapeHtml(m.username)}</span>
+                </div>
+            `).join('') || `<p class="no-params">No members found.</p>`;
+        } catch {}
+    }, 250);
+}
+
+function selectSentenceMember(m) {
+    selectedSentenceMember = m;
+    document.getElementById('selectedMemberBox').innerHTML = `
+        <div class="selected-member">
+            <img src="${m.avatarUrl}" alt="">
+            <span>${escapeHtml(m.username)}</span>
+            <button onclick="clearSentenceMember()">${svg('close',13)}</button>
+        </div>`;
+    document.getElementById('memberSearchWrap').style.display = 'none';
+    document.getElementById('memberSearchResults').innerHTML = '';
+    document.getElementById('reasonGroup').style.display = 'block';
+    document.getElementById('submitSentenceBtn').style.display = 'block';
+}
+
+function clearSentenceMember() {
+    selectedSentenceMember = null;
+    document.getElementById('selectedMemberBox').innerHTML = '';
+    document.getElementById('memberSearchWrap').style.display = 'block';
+    document.getElementById('memberSearchInput').value = '';
+    document.getElementById('reasonGroup').style.display = 'none';
+    document.getElementById('submitSentenceBtn').style.display = 'none';
+}
+
+async function submitSentence() {
+    const reason = document.getElementById('sentenceReasonInput').value.trim();
+    if (!selectedSentenceMember || !reason) {
+        showToast('Pick a member and enter a reason', 'warn');
+        return;
+    }
+    try {
+        await api('/api/azkaban/sentence', {
+            method: 'POST',
+            body: JSON.stringify({ userId: selectedSentenceMember.id, reason }),
+        });
+        showToast(`${selectedSentenceMember.username} sent to Azkaban`, 'success');
+        clearSentenceMember();
+        document.getElementById('sentenceReasonInput').value = '';
+        renderHome();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+/* ============================================================
+   COMMANDS TAB
+   ============================================================ */
+async function loadCommands() {
+    const { commands } = await api('/api/commands');
+    COMMANDS = commands;
+}
+
+async function loadCommandUsage(){
+    try {
+        const { top, today } = await api('/api/analytics/commands/top?limit=22');
+        const map = {};
+        top.forEach(c => { map[c.commandName] = { total: c.totalExecutions, today: 0 }; });
+        Object.keys(today).forEach(name => {
+            if (!map[name]) map[name] = { total: 0, today: 0 };
+            map[name].today = today[name];
+        });
+        CMD_USAGE = map;
+    } catch (err) {
+        if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadCommandUsage failed', err);
+    }
+}
+
+const CATEGORIES = ['All', 'Community', 'Moderation', 'Server Config', 'Bot Identity', 'Messaging'];
+let activeCategory = 'All';
+let openCmd = null;
+
+function renderCategoryChips(){
+    document.getElementById('categoryChips').innerHTML = CATEGORIES.map(c => `
+        <div class="chip ${c===activeCategory?'active':''}" onclick="setCategory('${c}')">${c}</div>
+    `).join('');
+}
+function setCategory(c){ activeCategory = c; renderCategoryChips(); renderCommands(); }
+
+function renderCommands(){
+    const q = (document.getElementById('cmdSearch').value || '').trim().toLowerCase();
+    let list = COMMANDS.filter(c => {
+        const matchesCategory = activeCategory === 'All' || c.category === activeCategory;
+        const matchesSearch = !q || c.name.includes(q) || c.desc.toLowerCase().includes(q);
+        return matchesCategory && matchesSearch;
+    });
+
+    document.getElementById('cmdCount').textContent = `${list.length} command${list.length===1?'':'s'}`;
+
+    document.getElementById('cmdList').innerHTML = list.map(c => {
+        const pm = PERM_META[c.perm];
+        const isOpen = openCmd === c.name;
+        const paramsHtml = c.params.length === 0
+            ? `<p class="no-params">This command takes no parameters.</p>`
+            : c.params.map(p => `
+                <div class="param-item">
+                    <div class="param-top">
+                        <span class="param-name">${p.name}</span>
+                        <span class="param-type">${p.type}</span>
+                        <span class="${p.required?'param-req':'param-opt'}">${p.required?'REQUIRED':'OPTIONAL'}</span>
+                    </div>
+                    <span class="param-desc">${p.desc}</span>
+                </div>
+            `).join('');
+
+        return `
+        <div class="cmd-card ${isOpen?'open':''}">
+            <div class="cmd-head" onclick="toggleCmd('${c.name}')">
+                <span class="cmd-slash">/</span>
+                <div class="cmd-head-text">
+                    <div class="cname">${c.name}</div>
+                    <div class="cdesc">${c.desc}</div>
+                </div>
+                <span class="perm-badge ${pm.cls}">${svg(pm.icon, 12)} ${pm.label}</span>
+                <span class="cmd-chevron">▾</span>
+            </div>
+            <div class="cmd-body">
+                <div class="cmd-body-inner">
+                    <p class="cmd-full-desc">${c.full}</p>
+                    <div class="cmd-meta-row">
+                        <span class="meta-pill">${svg('folder',11)} ${c.category}</span>
+                        <span class="meta-pill">${svg(pm.icon, 11)} ${pm.label}</span>
+                        ${CMD_USAGE[c.name] ? `<span class="meta-pill">${svg('barChart',11)} ${CMD_USAGE[c.name].total} uses${CMD_USAGE[c.name].today ? ' · ' + CMD_USAGE[c.name].today + ' today' : ''}</span>` : `<span class="meta-pill">${svg('barChart',11)} no usage yet</span>`}
+                    </div>
+                    <div class="params-label">Parameters</div>
+                    ${paramsHtml}
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function toggleCmd(name){
+    openCmd = openCmd === name ? null : name;
+    renderCommands();
+}
+
+/* ============================================================
+   BOT TAB
+   ============================================================ */
+async function loadBotIdentity(){
+    try {
+        const bot = await api('/api/bot');
+        const displayName = bot.nickname || bot.username;
+        document.getElementById('botDisplayName').textContent = displayName;
+        document.getElementById('botTag').textContent = `Headmaster Bot · in ${bot.guildName || 'this server'}`;
+        document.getElementById('nicknameInput').value = bot.nickname || '';
+        document.getElementById('nicknameInput').placeholder = bot.username;
+        document.getElementById('statServerName').textContent = bot.guildName || '—';
+        document.getElementById('statServerMembers').textContent = bot.memberCount ?? '—';
+
+        const avatarUrl = bot.guildAvatarUrl || bot.globalAvatarUrl;
+        if (avatarUrl) {
+            document.getElementById('botAvatarWrap').innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="">`;
+            document.getElementById('topbarBotAvatarWrap').innerHTML = `<img src="${avatarUrl}" alt="">`;
+        }
+        if (bot.guildBannerUrl) {
+            const wrap = document.getElementById('botBannerWrap');
+            wrap.style.backgroundImage = `url(${bot.guildBannerUrl})`;
+            wrap.style.backgroundSize = 'cover';
+            wrap.style.backgroundPosition = 'center';
+        }
+
+        document.getElementById('topbarBotName').textContent = displayName;
+    } catch (err) {
+        if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadBotIdentity failed', err);
+    }
+}
+
+function wireBotIdentityButtons(){
+    document.getElementById('editAvatarBtn').onclick = () => document.getElementById('avatarFileInput').click();
+    document.getElementById('changeAvatarBtn').onclick = () => document.getElementById('avatarFileInput').click();
+    document.getElementById('editBannerBtn').onclick = () => document.getElementById('bannerFileInput').click();
+    document.getElementById('changeBannerBtn').onclick = () => document.getElementById('bannerFileInput').click();
+
+    // --- Cropper temporarily disabled: uploads go straight through. ---
+    // To re-enable, comment the block below back out and uncomment the
+    // openCropper(...) block above it.
+    document.getElementById('avatarFileInput').onchange = (e) => uploadIdentityImage('avatar', e.target.files[0]);
+    document.getElementById('bannerFileInput').onchange = (e) => uploadIdentityImage('banner', e.target.files[0]);
+    /*
+    document.getElementById('avatarFileInput').onchange = (e) => {
+        const file = e.target.files[0];
+        e.target.value = '';
+        if (file) openCropper('avatar', file);
+    };
+    document.getElementById('bannerFileInput').onchange = (e) => {
+        const file = e.target.files[0];
+        e.target.value = '';
+        if (file) openCropper('banner', file);
+    };
+    */
+
+    document.getElementById('resetAvatarBtn').onclick = () => confirmResetIdentityImage('avatar');
+    document.getElementById('resetBannerBtn').onclick = () => confirmResetIdentityImage('banner');
+}
+
+/* ============================================================
+   IMAGE CROPPER (avatar 1:1 / banner 5:2, matching Discord's own
+   upload ratios) — pans via pointer drag, zooms via wheel, pinch,
+   or the slider, then exports the visible crop to a canvas.
+   ============================================================ */
+const CROP_RATIOS = {
+    avatar: { cls: 'ratio-avatar', outW: 512, outH: 512, hint: "Discord avatars are square and shown as a circle — drag to reposition, pinch or scroll to zoom." },
+    banner: { cls: 'ratio-banner', outW: 1200, outH: 480, hint: "Discord banners crop to a 5:2 strip — this is exactly what will show." },
+};
+
+let CROP_STATE = null;
+let cropDrag = null;
+let cropPinch = null;
+const cropPointers = new Map();
+
+function openCropper(kind, file) {
+    const ratio = CROP_RATIOS[kind];
+    const url = URL.createObjectURL(file);
+    const img = document.getElementById('cropImage');
+    const viewport = document.getElementById('cropViewport');
+
+    viewport.className = 'crop-viewport ' + ratio.cls;
+    document.getElementById('cropModalTitle').textContent = kind === 'avatar' ? 'Crop Avatar' : 'Crop Banner';
+    document.getElementById('cropModalHint').textContent = ratio.hint;
+    document.getElementById('cropOverlay').classList.add('show');
+
+    img.onload = () => {
+        const rect = viewport.getBoundingClientRect();
+        const minScale = Math.max(rect.width / img.naturalWidth, rect.height / img.naturalHeight);
+        CROP_STATE = {
+            kind, file, url, ratio,
+            natW: img.naturalWidth, natH: img.naturalHeight,
+            viewportW: rect.width, viewportH: rect.height,
+            scale: minScale, minScale, maxScale: minScale * 4,
+            tx: (rect.width - img.naturalWidth * minScale) / 2,
+            ty: (rect.height - img.naturalHeight * minScale) / 2,
+        };
+        cropClamp();
+        cropApplyTransform();
+
+        const slider = document.getElementById('cropZoomSlider');
+        slider.min = String(minScale);
+        slider.max = String(CROP_STATE.maxScale);
+        slider.step = String((CROP_STATE.maxScale - minScale) / 100 || 0.001);
+        slider.value = String(minScale);
+    };
+    img.src = url;
+}
+
+function closeCropper() {
+    if (CROP_STATE) URL.revokeObjectURL(CROP_STATE.url);
+    CROP_STATE = null;
+    cropDrag = null;
+    cropPinch = null;
+    cropPointers.clear();
+    document.getElementById('cropOverlay').classList.remove('show');
+}
+
+function cropClamp() {
+    const st = CROP_STATE;
+    const dispW = st.natW * st.scale, dispH = st.natH * st.scale;
+    const minTx = Math.min(0, st.viewportW - dispW);
+    const minTy = Math.min(0, st.viewportH - dispH);
+    st.tx = Math.min(0, Math.max(minTx, st.tx));
+    st.ty = Math.min(0, Math.max(minTy, st.ty));
+}
+
+function cropApplyTransform() {
+    document.getElementById('cropImage').style.transform = `translate(${CROP_STATE.tx}px, ${CROP_STATE.ty}px) scale(${CROP_STATE.scale})`;
+}
+
+function cropSetScale(newScale, focalX, focalY) {
+    const st = CROP_STATE;
+    newScale = Math.min(st.maxScale, Math.max(st.minScale, newScale));
+    const imgX = (focalX - st.tx) / st.scale;
+    const imgY = (focalY - st.ty) / st.scale;
+    st.scale = newScale;
+    st.tx = focalX - imgX * newScale;
+    st.ty = focalY - imgY * newScale;
+    cropClamp();
+    cropApplyTransform();
+    document.getElementById('cropZoomSlider').value = String(newScale);
+}
+
+function cropConfirm() {
+    const st = CROP_STATE;
+    if (!st) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = st.ratio.outW;
+    canvas.height = st.ratio.outH;
+    const ctx = canvas.getContext('2d');
+    const sx = (0 - st.tx) / st.scale;
+    const sy = (0 - st.ty) / st.scale;
+    const sW = st.viewportW / st.scale;
+    const sH = st.viewportH / st.scale;
+    ctx.drawImage(document.getElementById('cropImage'), sx, sy, sW, sH, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob((blob) => {
+        if (!blob) {
+            showToast('Could not process that image', 'error');
+            return;
+        }
+        const cropped = new File([blob], `${st.kind}.png`, { type: 'image/png' });
+        const kind = st.kind;
+        closeCropper();
+        uploadIdentityImage(kind, cropped);
+    }, 'image/png', 0.95);
+}
+
+function cropDist(p1, p2) { return Math.hypot(p1.x - p2.x, p1.y - p2.y); }
+function cropMid(p1, p2) { return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 }; }
+
+function wireCropper() {
+    const viewport = document.getElementById('cropViewport');
+
+    document.getElementById('cropCancelBtn').onclick = closeCropper;
+    document.getElementById('cropConfirmBtn').onclick = cropConfirm;
+    document.getElementById('cropOverlay').addEventListener('click', (e) => {
+        if (e.target.id === 'cropOverlay') closeCropper();
+    });
+
+    document.getElementById('cropZoomSlider').oninput = (e) => {
+        if (!CROP_STATE) return;
+        cropSetScale(parseFloat(e.target.value), CROP_STATE.viewportW / 2, CROP_STATE.viewportH / 2);
+    };
+
+    viewport.addEventListener('wheel', (e) => {
+        if (!CROP_STATE) return;
+        e.preventDefault();
+        const rect = viewport.getBoundingClientRect();
+        const factor = Math.exp(-e.deltaY * 0.001);
+        cropSetScale(CROP_STATE.scale * factor, e.clientX - rect.left, e.clientY - rect.top);
+    }, { passive: false });
+
+    viewport.addEventListener('pointerdown', (e) => {
+        if (!CROP_STATE) return;
+        viewport.setPointerCapture(e.pointerId);
+        const rect = viewport.getBoundingClientRect();
+        cropPointers.set(e.pointerId, { x: e.clientX - rect.left, y: e.clientY - rect.top });
+
+        if (cropPointers.size === 1) {
+            const p = [...cropPointers.values()][0];
+            cropDrag = { startX: p.x, startY: p.y, tx0: CROP_STATE.tx, ty0: CROP_STATE.ty };
+            cropPinch = null;
+        } else if (cropPointers.size === 2) {
+            const [p1, p2] = [...cropPointers.values()];
+            const mid = cropMid(p1, p2);
+            cropPinch = {
+                dist: cropDist(p1, p2), scale0: CROP_STATE.scale, mid,
+                imgX: (mid.x - CROP_STATE.tx) / CROP_STATE.scale,
+                imgY: (mid.y - CROP_STATE.ty) / CROP_STATE.scale,
+            };
+            cropDrag = null;
+        }
+    });
+
+    viewport.addEventListener('pointermove', (e) => {
+        if (!CROP_STATE || !cropPointers.has(e.pointerId)) return;
+        const rect = viewport.getBoundingClientRect();
+        cropPointers.set(e.pointerId, { x: e.clientX - rect.left, y: e.clientY - rect.top });
+
+        if (cropPointers.size === 1 && cropDrag) {
+            const p = [...cropPointers.values()][0];
+            CROP_STATE.tx = cropDrag.tx0 + (p.x - cropDrag.startX);
+            CROP_STATE.ty = cropDrag.ty0 + (p.y - cropDrag.startY);
+            cropClamp();
+            cropApplyTransform();
+        } else if (cropPointers.size === 2 && cropPinch) {
+            const [p1, p2] = [...cropPointers.values()];
+            const newScale = Math.min(CROP_STATE.maxScale, Math.max(CROP_STATE.minScale,
+                cropPinch.scale0 * (cropDist(p1, p2) / cropPinch.dist)));
+            CROP_STATE.scale = newScale;
+            CROP_STATE.tx = cropPinch.mid.x - cropPinch.imgX * newScale;
+            CROP_STATE.ty = cropPinch.mid.y - cropPinch.imgY * newScale;
+            cropClamp();
+            cropApplyTransform();
+            document.getElementById('cropZoomSlider').value = String(newScale);
+        }
+    });
+
+    function endPointer(e) {
+        cropPointers.delete(e.pointerId);
+        if (!CROP_STATE) return;
+        if (cropPointers.size === 1) {
+            const p = [...cropPointers.values()][0];
+            cropDrag = { startX: p.x, startY: p.y, tx0: CROP_STATE.tx, ty0: CROP_STATE.ty };
+            cropPinch = null;
+        } else {
+            cropDrag = null;
+            cropPinch = null;
+        }
+    }
+    viewport.addEventListener('pointerup', endPointer);
+    viewport.addEventListener('pointercancel', endPointer);
+    viewport.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') endPointer(e); });
+}
+
+async function uploadIdentityImage(kind, file){
+    if (!file) return;
+    const form = new FormData();
+    form.append('image', file);
+    try {
+        showToast(`Uploading ${kind}…`);
+        await api(`/api/bot/${kind}`, { method:'POST', body: form });
+        showToast(`${cap(kind)} updated`, 'success');
+        loadBotIdentity();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+/* ============================================================
+   CONFIRM MODAL (replaces native confirm())
+   ============================================================ */
+function showConfirm({ title, message, confirmLabel = 'Confirm', onConfirm }) {
+    const overlay = document.getElementById('confirmOverlay');
+    document.getElementById('confirmIcon').innerHTML = svg('alert', 22);
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+
+    const okBtn = document.getElementById('confirmOkBtn');
+    okBtn.textContent = confirmLabel;
+
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+
+    function close(){
+        overlay.classList.remove('show');
+        okBtn.removeEventListener('click', handleOk);
+        cancelBtn.removeEventListener('click', close);
+        overlay.removeEventListener('click', overlayClick);
+    }
+    function handleOk(){ close(); onConfirm(); }
+    function overlayClick(e){ if (e.target === overlay) close(); }
+
+    okBtn.addEventListener('click', handleOk);
+    cancelBtn.addEventListener('click', close);
+    overlay.addEventListener('click', overlayClick);
+
+    overlay.classList.add('show');
+}
+
+async function resetIdentityImage(kind){
+    try {
+        await api(`/api/bot/${kind}`, { method:'DELETE' });
+        showToast(`${cap(kind)} reset to default`, 'success');
+        loadBotIdentity();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+function confirmResetIdentityImage(kind){
+    showConfirm({
+        title: `Reset ${cap(kind)}?`,
+        message: `This will remove the server-specific ${kind} and revert to the bot's default. This can't be undone from here.`,
+        confirmLabel: 'Reset',
+        onConfirm: () => resetIdentityImage(kind),
+    });
+}
+
+async function saveNickname(){
+    const v = document.getElementById('nicknameInput').value.trim();
+    try {
+        await api('/api/bot/nickname', { method:'POST', body: JSON.stringify({ nickname: v }) });
+        showToast(`Nickname saved: ${v || 'default'}`, 'success');
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+function copyCmd(cmd){
+    if(navigator.clipboard) navigator.clipboard.writeText(cmd).catch(()=>{});
+    showToast(`Copied ${cmd}`, 'success');
+}
+
+/* ============================================================
+   SETTINGS TAB
+   ============================================================ */
+/* ============================================================
+   CUSTOM DROPDOWN COMPONENT (replaces native <select>)
+   ============================================================ */
+const ALL_DROPDOWNS = [];
+
+function closeAllDropdowns(except){
+    ALL_DROPDOWNS.forEach(dd => { if (dd !== except) dd.close(); });
+}
+
+function createDropdown(containerId, { placeholder = 'Select…', searchable = true, onChange } = {}) {
+    const container = document.getElementById(containerId);
+    if (!container) return null;
+
+    container.classList.add('dd');
+    container.innerHTML = `
+        <button type="button" class="dd-trigger">
+            <span class="dd-label">${placeholder}</span>
+            <span class="dd-chevron">${svg('chevronDown', 14)}</span>
+        </button>
+        <div class="dd-panel"></div>
+    `;
+
+    const trigger = container.querySelector('.dd-trigger');
+    const label = container.querySelector('.dd-label');
+    const panel = container.querySelector('.dd-panel');
+
+    const state = { options: [], value: null, disabled: false };
+
+    function renderPanel(){
+        const q = state._query?.toLowerCase() || '';
+        const filtered = state.options.filter(o => !q || o.label.toLowerCase().includes(q));
+
+        const searchHtml = searchable && state.options.length > 6
+            ? `<input class="dd-search" type="text" placeholder="Search…" value="${state._query || ''}">`
+            : '';
+
+        const optionsHtml = filtered.length === 0
+            ? `<div class="dd-empty">No matches</div>`
+            : filtered.map(o => `
+                <div class="dd-option ${o.value === state.value ? 'selected' : ''}" data-value="${o.value}">
+                    <span>${o.label}</span>
+                    ${o.value === state.value ? `<span class="dd-check">${svg('check', 13)}</span>` : ''}
+                </div>
+            `).join('');
+
+        panel.innerHTML = searchHtml + optionsHtml;
+
+        const searchInput = panel.querySelector('.dd-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                state._query = e.target.value;
+                renderPanel();
+            });
+            searchInput.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        panel.querySelectorAll('.dd-option').forEach(el => {
+            el.addEventListener('click', () => {
+                const v = el.dataset.value;
+                state.value = v;
+                updateLabel();
+                close();
+                if (onChange) onChange(v);
+            });
+        });
+    }
+
+    function updateLabel(){
+        const match = state.options.find(o => o.value === state.value);
+        label.textContent = match ? match.label : placeholder;
+        label.classList.toggle('filled', !!match);
+    }
+
+    function open(){
+        if (state.disabled) return;
+        closeAllDropdowns(api_);
+        container.classList.add('open');
+        state._query = '';
+        renderPanel();
+    }
+    function close(){ container.classList.remove('open'); }
+    function toggle(){ container.classList.contains('open') ? close() : open(); }
+
+    trigger.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+    container.addEventListener('click', (e) => e.stopPropagation());
+
+    const api_ = {
+        setOptions(options){ state.options = options; updateLabel(); if (container.classList.contains('open')) renderPanel(); },
+        setValue(value){ state.value = value ?? null; updateLabel(); },
+        getValue(){ return state.value; },
+        setDisabled(disabled){
+            state.disabled = disabled;
+            trigger.classList.toggle('disabled', disabled);
+        },
+        close,
+    };
+
+    ALL_DROPDOWNS.push(api_);
+    return api_;
+}
+
+document.addEventListener('click', () => closeAllDropdowns());
+
+/* ============================================================
+   CUSTOM MULTI-SELECT COMPONENT (mod channels)
+   ============================================================ */
+function createMultiSelect(containerId, { onAdd, onRemove } = {}) {
+    const container = document.getElementById(containerId);
+    if (!container) return null;
+
+    container.innerHTML = `
+        <div class="ms-selected"></div>
+        <div class="ms-empty-note" style="display:none;">No mod channels configured yet.</div>
+        <div class="dd" id="${containerId}-picker"></div>
+    `;
+
+    const selectedWrap = container.querySelector('.ms-selected');
+    const emptyNote = container.querySelector('.ms-empty-note');
+
+    let items = []; // [{id, name}]
+    let allOptions = []; // [{value, label}]
+    let disabled = false;
+
+    const picker = createDropdown(`${containerId}-picker`, {
+        placeholder: 'Add a channel…',
+        onChange: (channelId) => {
+            if (!channelId) return;
+            picker.setValue(null);
+            if (onAdd) onAdd(channelId);
+        },
+    });
+
+    function render(){
+        selectedWrap.innerHTML = items.map(it => `
+            <span class="ms-chip">#${escapeHtml(it.name || it.id)}<button data-id="${it.id}">${svg('close', 12)}</button></span>
+        `).join('');
+        emptyNote.style.display = items.length === 0 ? 'block' : 'none';
+
+        selectedWrap.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => { if (!disabled && onRemove) onRemove(btn.dataset.id); });
+        });
+
+        const selectedIds = new Set(items.map(i => i.id));
+        picker.setOptions(allOptions.filter(o => !selectedIds.has(o.value)));
+    }
+
+    return {
+        setItems(newItems){ items = newItems; render(); },
+        setAllOptions(options){ allOptions = options; render(); },
+        setDisabled(d){ disabled = d; picker.setDisabled(d); },
+    };
+}
+
+/* ============================================================
+   INSTANTIATE ALL SETTINGS DROPDOWNS
+   ============================================================ */
+let ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddAzkaban;
+let ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin, ddBotManagerRole;
+let modChannelsMS;
+
+function initSettingsControls(){
+    ddLogs = createDropdown('dd-logs', { placeholder:'— choose a channel —', onChange: v => saveChannelSetting('logs', v) });
+    ddWelcome = createDropdown('dd-welcome', { placeholder:'— choose a channel —', onChange: v => saveChannelSetting('welcome', v) });
+    ddStarboard = createDropdown('dd-starboard', { placeholder:'— choose a channel —', onChange: v => saveChannelSetting('starboard', v) });
+    ddSortingHat = createDropdown('dd-sortinghat', { placeholder:'— choose a channel —', onChange: v => saveChannelSetting('sortinghat', v) });
+    ddAzkaban = createDropdown('dd-azkaban', { placeholder:'— choose a role —', onChange: v => saveRoleSetting('azkaban', v) });
+
+    ddHouseGryffindor = createDropdown('dd-house-gryffindor', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('gryffindorRoleId', v) });
+    ddHouseRavenclaw = createDropdown('dd-house-ravenclaw', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('ravenclawRoleId', v) });
+    ddHouseHufflepuff = createDropdown('dd-house-hufflepuff', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('hufflepuffRoleId', v) });
+    ddHouseSlytherin = createDropdown('dd-house-slytherin', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('slytherinRoleId', v) });
+    ddBotManagerRole = createDropdown('dd-botManagerRole', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('botManagerRoleId', v) });
+
+    modChannelsMS = createMultiSelect('modChannelsMultiSelect', {
+        onAdd: (channelId) => addModChannelUI(channelId),
+        onRemove: (channelId) => removeModChannelUI(channelId),
+    });
+}
+
+async function loadChannelsAndRoles(){
+    try {
+        const [ch, rl] = await Promise.all([api('/api/channels'), api('/api/roles')]);
+        CHANNELS = ch.channels;
+        ROLES = rl.roles;
+
+        const chanOptions = CHANNELS.map(c => ({ value: c.id, label: '#' + c.name }));
+        const roleOptions = ROLES.map(r => ({ value: r.id, label: '@' + r.name }));
+
+        [ddLogs, ddWelcome, ddStarboard, ddSortingHat].forEach(dd => dd?.setOptions(chanOptions));
+        [ddAzkaban, ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin, ddBotManagerRole].forEach(dd => dd?.setOptions(roleOptions));
+        modChannelsMS?.setAllOptions(chanOptions);
+    } catch (err) {
+        if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadChannelsAndRoles failed', err);
+    }
+}
+
+let settingState = { logs:false, welcome:false, starboard:false, azkaban:false, sortinghat:false };
+
+async function loadSettings(){
+    try {
+        const s = await api('/api/settings');
+        settingState = {
+            logs: s.logsEnabled, welcome: s.welcomeEnabled,
+            starboard: s.starboardEnabled, azkaban: s.azkabanEnabled,
+            sortinghat: s.sortingHatEnabled,
+        };
+
+        setToggleUI('logs', s.logsEnabled, ddLogs, s.logChannelId);
+        setToggleUI('welcome', s.welcomeEnabled, ddWelcome, s.welcomeChannelId);
+        setToggleUI('starboard', s.starboardEnabled, ddStarboard, s.starboardChannelId);
+        setToggleUI('azkaban', s.azkabanEnabled, ddAzkaban, s.azkabanRoleId);
+        setToggleUI('sortinghat', s.sortingHatEnabled, ddSortingHat, s.sortingHatChannelId);
+
+        document.getElementById('starboardThresholdHint').textContent = `Threshold: ${s.starboardThreshold} reaction${s.starboardThreshold === 1 ? '' : 's'}`;
+
+        ddHouseGryffindor?.setValue(s.gryffindorRoleId);
+        ddHouseRavenclaw?.setValue(s.ravenclawRoleId);
+        ddHouseHufflepuff?.setValue(s.hufflepuffRoleId);
+        ddHouseSlytherin?.setValue(s.slytherinRoleId);
+        ddBotManagerRole?.setValue(s.botManagerRoleId);
+
+        document.getElementById('xpPerMessageInput').value = s.xpPerMessage;
+        document.getElementById('xpCooldownInput').value = s.xpCooldownSeconds;
+        document.getElementById('housePointValueInput').value = s.housePointValue;
+        document.getElementById('starboardThresholdInput').value = s.starboardThreshold;
+
+        setDefaultHint('xpPerMessageDefault', s.xpPerMessageIsDefault);
+        setDefaultHint('xpCooldownDefault', s.xpCooldownIsDefault);
+        setDefaultHint('housePointValueDefault', s.housePointValueIsDefault);
+        setDefaultHint('starboardThresholdDefault', s.starboardThresholdIsDefault);
+        setDefaultHint('botManagerRoleDefault', !s.botManagerRoleIsSet);
+    } catch (err) {
+        if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadSettings failed', err);
+    }
+
+    loadModChannels();
+}
+
+function setDefaultHint(id, isDefault){
+    const el = document.getElementById(id);
+    if (el) el.textContent = isDefault ? '(using bot default)' : '(custom)';
+}
+
+function setToggleUI(key, enabled, dd, value){
+    document.getElementById('toggle-'+key).classList.toggle('on', enabled);
+    document.getElementById('sub-'+key).classList.toggle('open', enabled);
+    if (dd && value) dd.setValue(value);
+}
+
+async function toggleSetting(key){
+    if (!CURRENT_USER?.canManageGuild) { showToast('Requires Manage Server permission', 'warn'); return; }
+
+    settingState[key] = !settingState[key];
+    document.getElementById('toggle-'+key).classList.toggle('on', settingState[key]);
+    document.getElementById('sub-'+key).classList.toggle('open', settingState[key]);
+
+    const fieldMap = { logs:'logsEnabled', welcome:'welcomeEnabled', starboard:'starboardEnabled', azkaban:'azkabanEnabled', sortinghat:'sortingHatEnabled' };
+    try {
+        await api('/api/settings', { method:'POST', body: JSON.stringify({ [fieldMap[key]]: settingState[key] }) });
+        showToast(settingState[key] ? 'Enabled' : 'Disabled', 'success');
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+        settingState[key] = !settingState[key];
+        document.getElementById('toggle-'+key).classList.toggle('on', settingState[key]);
+        document.getElementById('sub-'+key).classList.toggle('open', settingState[key]);
+    }
+}
+
+async function saveChannelSetting(key, channelId){
+    const fieldMap = { logs:'logChannelId', welcome:'welcomeChannelId', starboard:'starboardChannelId', sortinghat:'sortingHatChannelId' };
+    try {
+        await api('/api/settings', { method:'POST', body: JSON.stringify({ [fieldMap[key]]: channelId }) });
+        showToast('Channel saved', 'success');
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+async function saveRoleSetting(key, roleId){
+    try {
+        await api('/api/settings', { method:'POST', body: JSON.stringify({ azkabanRoleId: roleId }) });
+        showToast('Role saved', 'success');
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+/* Mod Channels list — Deluminator's search scope */
+async function loadModChannels(){
+    try {
+        const { channels } = await api('/api/mod-channels');
+        modChannelsMS?.setItems(channels);
+    } catch (err) {
+        if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadModChannels failed', err);
+    }
+}
+
+async function addModChannelUI(channelId){
+    try {
+        await api('/api/mod-channels', { method:'POST', body: JSON.stringify({ channelId }) });
+        showToast('Mod channel added', 'success');
+        loadModChannels();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+async function removeModChannelUI(channelId){
+    try {
+        await api(`/api/mod-channels/${channelId}`, { method:'DELETE' });
+        showToast('Mod channel removed', 'success');
+        loadModChannels();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+/* Generic role-field save, used by House Roles & Bot Manager Role cards */
+async function saveRoleSetting2(field, roleId){
+    if (!roleId) return;
+    try {
+        await api('/api/settings', { method:'POST', body: JSON.stringify({ [field]: roleId }) });
+        showToast('Role saved', 'success');
+        if (field === 'botManagerRoleId') loadSettings();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+/* Generic numeric-field save, used by Leveling & XP card */
+async function saveNumberSetting(field, inputId){
+    const raw = document.getElementById(inputId).value;
+    const value = Number(raw);
+    if (raw === '' || !Number.isFinite(value) || value < 0) {
+        showToast('Enter a valid number', 'warn');
+        return;
+    }
+    try {
+        await api('/api/settings', { method:'POST', body: JSON.stringify({ [field]: value }) });
+        showToast('Saved', 'success');
+        loadSettings();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+/* House point add/deduct controls — custom amount, same power both directions */
+function renderHousePointControls(){
+    const houses = Object.keys(HOUSE_META);
+    document.getElementById('housePointControls').innerHTML = houses.map(h => `
+        <div class="setting-row">
+            <div class="setting-text"><div class="sname">${svg(HOUSE_META[h].icon, 14)} ${HOUSE_META[h].name}</div></div>
+            <div class="field-input-row" style="max-width:170px;">
+                <input class="field-input" type="number" id="hp-amount-${h}" value="10" min="1" step="1" style="text-align:center;">
+                <button class="btn btn-ghost btn-sm" onclick="adjustHousePointsCustom('${h}', -1)" ${CURRENT_USER?.canManageGuild?'':'disabled'} title="Deduct">${svg('minus',14)}</button>
+                <button class="btn btn-primary btn-sm" onclick="adjustHousePointsCustom('${h}', 1)" ${CURRENT_USER?.canManageGuild?'':'disabled'} title="Add">${svg('plus',14)}</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function adjustHousePointsCustom(house, sign){
+    const input = document.getElementById(`hp-amount-${house}`);
+    const amount = Math.abs(Number(input.value)) || 0;
+    if (amount === 0) { showToast('Enter a point amount first', 'warn'); return; }
+    await adjustHousePoints(house, sign * amount);
+}
+
+async function adjustHousePoints(house, delta){
+    try {
+        const result = await api(`/api/houses/${house}/points`, { method:'POST', body: JSON.stringify({ delta }) });
+        showToast(`${delta > 0 ? '+' : ''}${delta} ${HOUSE_META[house].name}: now ${result.points} pts`, 'success');
+        renderHome();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+/* ============================================================
+   MISC INTERACTIONS
+   ============================================================ */
+function switchTab(tab){
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-'+tab).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    window.scrollTo({top:0, behavior:'smooth'});
+}
+
+let toastTimer;
+function showToast(msg, type){
+    const t = document.getElementById('toast');
+    const iconName = type === 'error' ? 'closeCircle' : type === 'warn' ? 'alert' : type === 'success' ? 'checkCircle' : null;
+    t.innerHTML = (iconName ? svg(iconName, 14) : '') + `<span>${escapeHtml(msg)}</span>`;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function friendlyError(code){
+    const map = {
+        missing_permission: "You don't have permission to do that.",
+        already_imprisoned: 'That member is already in Azkaban.',
+        cannot_sentence_owner: "You can't sentence the server owner.",
+        cannot_sentence_bot: "You can't sentence a bot.",
+        cannot_sentence_self: "You can't sentence yourself.",
+        azkaban_not_configured: 'Azkaban needs a Prisoner role set in Settings first.',
+        member_not_found: 'That member could not be found.',
+        image_required: 'Please choose an image file.',
+        invalid_nickname: 'Nickname must be 32 characters or fewer.',
+        not_found_or_already_released: 'That prisoner was already released.',
+        not_a_member: "You're not a member of that server anymore.",
+        insufficient_permissions: "You don't have mod access to that server.",
+        no_active_guild: 'Pick a server first.',
+    };
+    return map[code] || 'Something went wrong. Please try again.';
+}
+
+function escapeHtml(str){
+    return String(str ?? '').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+function cap(s){ return s ? s[0].toUpperCase() + s.slice(1) : s; }
+function timeOfDayGreeting(){
+    const hour = new Date().getHours();
+    if (hour < 5) return 'Still up, night owl';
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    if (hour < 21) return 'Good evening';
+    return 'Good evening';
+}
+function deltaHtml(delta){
+    if (delta === null || delta === undefined) return '—';
+    const isUp = delta >= 0;
+    const cls = isUp ? '' : 'down';
+    return `<span class="${cls}" style="display:inline-flex;align-items:center;gap:3px;">${svg(isUp ? 'trendingUp' : 'trendingDown', 12)}${Math.abs(delta)}</span>`;
+}
+function timeAgo(ts){
+    const diff = Date.now() - Number(ts);
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
+}
+
+/* ============================================================
+   STARFIELD BACKGROUND
+   ============================================================ */
+(function(){
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function resize(){
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const count = Math.floor((canvas.width * canvas.height) / 9000);
+        stars = Array.from({length: count}, () => ({
+            x: Math.random()*canvas.width,
+            y: Math.random()*canvas.height,
+            r: Math.random()*1.2 + 0.2,
+            s: Math.random()*0.015 + 0.003,
+            o: Math.random()
+        }));
+    }
+    function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        for(const st of stars){
+            st.o += st.s;
+            const alpha = (Math.sin(st.o) + 1) / 2 * 0.6 + 0.1;
+            ctx.beginPath();
+            ctx.arc(st.x, st.y, st.r, 0, Math.PI*2);
+            ctx.fillStyle = `rgba(246,236,217,${alpha})`;
+            ctx.fill();
+        }
+        requestAnimationFrame(draw);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    draw();
+})();
+
+/* ============================================================
+   INIT
+   ============================================================ */
+wireBotIdentityButtons();
+// wireCropper(); // cropper temporarily disabled — see wireBotIdentityButtons()
+initSettingsControls();
+renderHousePointControls();
+hydrateStaticIcons();
+bootstrap();
+
+</script>
+</body>
+</html>
