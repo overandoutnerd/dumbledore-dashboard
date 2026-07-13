@@ -703,8 +703,6 @@ body{
 </head>
 <body>
 
-<div id="debugOverlay" style="position:fixed;bottom:0;left:0;right:0;max-height:45vh;overflow-y:auto;background:rgba(0,0,0,.92);color:#0f0;font:11px/1.4 monospace;padding:8px;z-index:99999;white-space:pre-wrap;"></div>
-
 <canvas id="stars"></canvas>
 <div class="mandala tl"></div>
 <div class="mandala br"></div>
@@ -1515,17 +1513,7 @@ function applyPermissionGates() {
     document.getElementById('azkabanLock').classList.toggle('login-hidden', manageRolesOk);
 }
 
-function debugLog(msg) {
-    const el = document.getElementById('debugOverlay');
-    if (!el) return;
-    const t = new Date().toISOString().slice(11, 23);
-    el.textContent += `[${t}] ${msg}\n`;
-    el.scrollTop = el.scrollHeight;
-}
-debugLog(`script evaluated — visibilityState=${document.visibilityState}`);
-
 async function bootstrap() {
-    debugLog('bootstrap() start');
     const params = new URLSearchParams(location.search);
     const authError = params.get('authError');
     if (authError) {
@@ -1540,7 +1528,6 @@ async function bootstrap() {
         // replayed. Strip it immediately, and only actually show the error
         // message further down if the real /api/me check confirms we're
         // genuinely not authenticated.
-        debugLog(`authError param present in URL ("${authError}") — clearing it, verifying real session before trusting it`);
         history.replaceState({}, '', location.pathname);
     }
 
@@ -1550,15 +1537,12 @@ async function bootstrap() {
         // the session cookie can occasionally lag by a beat. Retry once,
         // silently, before letting api() flash the login gate over it.
         let meRes = await fetch('/api/me', { credentials: 'include' });
-        debugLog(`/api/me attempt 1 -> status ${meRes.status}`);
         for (const delayMs of [300, 600]) {
             if (meRes.status !== 401) break;
             await new Promise(r => setTimeout(r, delayMs));
             meRes = await fetch('/api/me', { credentials: 'include' });
-            debugLog(`/api/me retry (+${delayMs}ms) -> status ${meRes.status}`);
         }
         if (meRes.status === 401) {
-            debugLog('confirmed unauthenticated -> showLoginGate()');
             const messages = {
                 invalid_state: "Login expired, please try again.",
                 server_error: "Something went wrong signing you in. Please try again.",
@@ -1568,7 +1552,6 @@ async function bootstrap() {
         }
         if (!meRes.ok) throw new Error(`request_failed_${meRes.status}`);
         const { user } = await meRes.json();
-        debugLog(`/api/me ok -> user=${user.username} activeGuildId=${user.activeGuildId}`);
         CURRENT_USER = user;
 
         if (!user.activeGuildId) {
@@ -1588,8 +1571,7 @@ async function bootstrap() {
         renderCommands();
         loadSettings();
         loadBotIdentity();
-    } catch (err) {
-        debugLog(`bootstrap() caught: ${err && err.message} -> showLoginGate()`);
+    } catch {
         showLoginGate();
     }
 }
@@ -2757,11 +2739,8 @@ bootstrap();
 // "this is a restore, not a fresh load" — re-run bootstrap() so it
 // re-checks the real auth state instead of showing stale UI.
 window.addEventListener("pageshow", (event) => {
-    debugLog(`pageshow fired — persisted=${event.persisted}`);
     if (event.persisted) bootstrap();
 });
-window.addEventListener("DOMContentLoaded", () => debugLog('DOMContentLoaded fired'));
-document.addEventListener("visibilitychange", () => debugLog(`visibilitychange -> ${document.visibilityState}`));
 
 
 </script>
