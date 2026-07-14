@@ -643,6 +643,8 @@ body{
 .ms-empty-note{font-size:11.5px;color:var(--parchment-faint);font-style:italic;margin-bottom:9px;}
 
 /* ============ CONFIRM MODAL ============ */
+/* Scroll-lock disabled — see the commented-out initModalScrollLock() in
+   the script block. body.modal-open{overflow:hidden;height:100vh;} */
 .confirm-overlay{
     position:fixed;inset:0;z-index:150;display:flex;align-items:center;justify-content:center;
     background:rgba(6,7,16,.72);backdrop-filter:blur(4px);padding:24px;opacity:0;pointer-events:none;
@@ -712,6 +714,98 @@ body{
 .crop-zoom-row input[type=range]{flex:1;accent-color:var(--marigold);}
 .crop-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;}
 .crop-btn-row .btn{min-width:0;}
+/* ============ WELCOME MESSAGE BUILDER ============ */
+.we-list{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.we-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;
+    background:rgba(255,255,255,.03);border:1px solid var(--card-border);
+}
+.we-item-body{flex:1;min-width:0;}
+.we-item-title{font-size:12.5px;color:var(--parchment);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.we-item-sub{font-size:11px;color:var(--parchment-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.we-item-actions{display:flex;gap:6px;flex-shrink:0;}
+.we-item-actions .btn{padding:7px 10px;}
+.we-add-btn{margin-top:10px;}
+.we-empty{font-size:12px;color:var(--parchment-faint);font-style:italic;font-family:"Cormorant Garamond",serif;margin-top:8px;}
+
+.we-editor-card{
+    max-width:520px;width:100%;max-height:88vh;overflow-y:auto;background:var(--night-2);
+    border:1px solid var(--thread);border-radius:18px;padding:22px 20px 20px;
+    box-shadow:0 30px 60px -15px rgba(0,0,0,.7);transform:scale(.95);transition:transform .2s ease;
+    scrollbar-width:none;-ms-overflow-style:none;
+}
+.we-editor-card::-webkit-scrollbar{display:none;}
+.confirm-overlay.show .we-editor-card{transform:scale(1);}
+.we-editor-card h3{font-family:"Cinzel",serif;font-size:16px;color:var(--parchment);margin-bottom:16px;}
+.we-section-label{
+    font-family:"Cinzel",serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--gold);margin:18px 0 10px;padding-top:14px;border-top:1px solid var(--thread);
+}
+.we-section-label:first-of-type{margin-top:0;padding-top:0;border-top:none;}
+.we-toolbar{display:flex;gap:6px;margin-top:8px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;}
+.we-toolbar .btn{flex:0 0 auto;padding:8px 10px;font-size:9.5px;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;}
+.we-toolbar::-webkit-scrollbar{display:none;}
+.we-two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+#weDescription{resize:none;overflow:hidden;min-height:74px;transition:height .1s ease;}
+.we-color-row{display:flex;align-items:center;gap:10px;}
+.we-color-picker{position:relative;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.we-color-swatch{
+    width:38px;height:38px;border-radius:9px;border:1px solid var(--card-border);cursor:pointer;
+    padding:0;box-shadow:inset 0 0 0 2px rgba(0,0,0,.15);flex-shrink:0;
+}
+.we-color-hex{width:96px;flex:none;padding:11px 12px;text-transform:lowercase;font-family:"Poppins",sans-serif;letter-spacing:.02em;}
+.we-color-popover{
+    display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:20;width:242px;
+    background:var(--night-2);border:1px solid var(--thread);border-radius:14px;padding:14px;
+    box-shadow:0 20px 40px -12px rgba(0,0,0,.7);
+}
+.we-color-popover.show{display:block;}
+.we-color-native-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.we-color-native-row input[type=color]{width:36px;height:32px;padding:2px;border-radius:8px;border:1px solid var(--card-border);background:rgba(255,255,255,.03);cursor:pointer;flex-shrink:0;}
+.we-color-group-label{font-family:"Cinzel",serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.we-color-recent-label{margin-top:12px;}
+.we-color-swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;}
+.we-color-chip{
+    width:100%;aspect-ratio:1/1;border-radius:6px;border:1px solid rgba(255,255,255,.12);cursor:pointer;padding:0;
+    transition:transform .15s ease;
+}
+.we-color-chip:hover{transform:scale(1.15);}
+.we-color-chip.active{box-shadow:0 0 0 2px var(--night-2),0 0 0 3px var(--gold-light);}
+.we-image-row{display:flex;gap:8px;align-items:center;}
+.we-image-row .field-input{flex:1;}
+.we-image-preview{width:38px;height:38px;border-radius:9px;object-fit:cover;border:1px solid var(--card-border);flex-shrink:0;display:none;}
+.we-image-preview.show{display:block;}
+
+.we-preview-wrap{margin-top:8px;background:#313338;border-radius:11px;padding:12px 14px;}
+.we-preview-content{color:#dbdee1;font-size:13px;line-height:1.4;margin-bottom:6px;word-break:break-word;}
+.we-preview-mention{color:#c9cdfb;background:rgba(88,101,242,.3);border-radius:3px;padding:0 2px;}
+.we-preview-emoji{width:18px;height:18px;object-fit:contain;vertical-align:-4px;}
+.we-preview-embed{
+    border-left:4px solid #5865f2;background:#2b2d31;border-radius:4px;padding:10px 12px;max-width:420px;
+}
+.we-preview-author{display:flex;align-items:center;gap:6px;font-size:12px;color:#f2f3f5;font-weight:600;margin-bottom:6px;}
+.we-preview-author img{width:18px;height:18px;border-radius:50%;object-fit:cover;}
+.we-preview-title{color:#f2f3f5;font-size:14px;font-weight:700;margin-bottom:4px;}
+.we-preview-desc{color:#dbdee1;font-size:12.5px;line-height:1.4;white-space:pre-wrap;word-break:break-word;}
+.we-preview-image{width:100%;max-width:300px;border-radius:5px;margin-top:8px;display:block;}
+.we-preview-thumb{width:56px;height:56px;border-radius:5px;object-fit:cover;float:right;margin-left:10px;}
+.we-preview-footer{display:flex;align-items:center;gap:6px;font-size:11px;color:#949ba4;margin-top:8px;}
+.we-preview-footer img{width:16px;height:16px;border-radius:50%;object-fit:cover;}
+.we-preview-empty{font-size:11.5px;color:#6d6f78;font-style:italic;}
+
+.we-picker-card{max-width:340px;width:100%;background:var(--night-2);border:1px solid var(--thread);border-radius:18px;padding:18px;max-height:70vh;display:flex;flex-direction:column;transform:scale(.95);transition:transform .2s ease;box-shadow:0 30px 60px -15px rgba(0,0,0,.7);}
+.confirm-overlay.show .we-picker-card{transform:scale(1);}
+.we-picker-card h4{font-family:"Cinzel",serif;font-size:14px;color:var(--parchment);margin-bottom:10px;}
+.we-picker-list{overflow-y:auto;flex:1;margin:0 -4px;padding:0 4px;}
+.we-picker-row{padding:10px 12px;border-radius:9px;font-size:13px;color:var(--parchment);cursor:pointer;display:flex;flex-direction:column;gap:2px;}
+.we-picker-row:hover{background:rgba(255,255,255,.05);}
+.we-picker-row-emoji{flex-direction:row;align-items:center;gap:9px;}
+.we-picker-emoji-icon{width:20px;height:20px;object-fit:contain;flex-shrink:0;}
+.we-picker-row-text{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.we-picker-row .we-macro-desc{font-size:10.5px;color:var(--parchment-faint);}
+.we-picker-empty{font-size:12px;color:var(--parchment-faint);font-style:italic;padding:10px 0;}
+.we-save-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.we-save-row .btn{min-width:0;}
 </style>
 </head>
 <body>
@@ -1046,6 +1140,9 @@ body{
                 <div class="sub-panel" id="sub-welcome">
                     <div class="sub-panel-inner">
                         <div class="dd" id="dd-welcome"></div>
+                        <p class="field-hint" style="margin-top:10px;">The bot picks one of these at random for each new member. No messages yet? It falls back to a built-in rotation.</p>
+                        <div class="we-list" id="welcomeMessagesList"></div>
+                        <button class="btn btn-ghost btn-block we-add-btn" onclick="openWelcomeEditor()"><span data-icon="plus" data-size="12"></span> Add Welcome Message</button>
                     </div>
                 </div>
 
@@ -1180,6 +1277,102 @@ body{
 
 <div class="toast" id="toast"></div>
 
+<!-- WELCOME MESSAGE EDITOR -->
+<div class="confirm-overlay" id="weEditorOverlay" onclick="if(event.target===this) closeWelcomeEditor()">
+    <div class="we-editor-card">
+        <h3 id="weEditorTitle">Add Welcome Message</h3>
+
+        <div class="we-section-label">Outside Message</div>
+        <div class="field-group" style="margin-bottom:6px;">
+            <textarea class="field-input" id="weOutsideMessage" rows="2" placeholder="e.g. {user} just arrived!" onfocus="weSetActiveField(this)"></textarea>
+        </div>
+        <div class="we-toolbar">
+            <button class="btn btn-ghost" onclick="weOpenChannelPicker()"><span data-icon="hash" data-size="12"></span> Channel</button>
+            <button class="btn btn-ghost" onclick="weOpenRolePicker()"><span data-icon="shield" data-size="12"></span> Role</button>
+            <button class="btn btn-ghost" onclick="weOpenEmojiPicker()"><span data-icon="smile" data-size="12"></span> Emoji</button>
+            <button class="btn btn-ghost" onclick="weOpenMacroPicker()"><span data-icon="wand" data-size="12"></span> Macro</button>
+        </div>
+
+        <div class="we-section-label">Embed Author</div>
+        <div class="we-two-col">
+            <input class="field-input" id="weAuthorName" type="text" placeholder="Author name" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+            <input class="field-input" id="weAuthorIcon" type="text" placeholder="Author icon URL" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+        </div>
+
+        <div class="we-section-label">Embed Title</div>
+        <input class="field-input" id="weTitle" type="text" placeholder="e.g. Welcome to {servername}!" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+
+        <div class="we-section-label">Embed Body</div>
+        <textarea class="field-input" id="weDescription" rows="3" placeholder="e.g. Say hi to {user}! We're now {membercount} strong." onfocus="weSetActiveField(this)" oninput="weUpdatePreview(); weAutoGrow(this)"></textarea>
+        <div class="we-toolbar">
+            <button class="btn btn-ghost" onclick="weOpenChannelPicker()"><span data-icon="hash" data-size="12"></span> Channel</button>
+            <button class="btn btn-ghost" onclick="weOpenRolePicker()"><span data-icon="shield" data-size="12"></span> Role</button>
+            <button class="btn btn-ghost" onclick="weOpenEmojiPicker()"><span data-icon="smile" data-size="12"></span> Emoji</button>
+            <button class="btn btn-ghost" onclick="weOpenMacroPicker()"><span data-icon="wand" data-size="12"></span> Macro</button>
+        </div>
+
+        <div class="we-section-label">Embed Color</div>
+        <div class="we-color-row">
+            <div class="we-color-picker" id="weColorPicker">
+                <button type="button" class="we-color-swatch" id="weColorSwatchBtn" style="background:#daa520;" onclick="weToggleColorPicker()" aria-label="Choose embed color"></button>
+                <input class="field-input we-color-hex" id="weColor" type="text" value="#daa520" maxlength="7" spellcheck="false" onfocus="weSetActiveField(this)" oninput="weOnColorHexInput()">
+                <div class="we-color-popover" id="weColorPopover">
+                    <div class="we-color-native-row">
+                        <input type="color" id="weColorNative" value="#daa520" oninput="weSetColor(this.value)" onchange="weSetColor(this.value); weAddRecentColor(this.value)">
+                        <span class="field-hint" style="margin:0;">Pick any shade</span>
+                    </div>
+                    <div class="we-color-group-label">House &amp; Preset Colors</div>
+                    <div class="we-color-swatches" id="weColorPresetSwatches"></div>
+                    <div class="we-color-group-label we-color-recent-label" id="weColorRecentLabel" style="display:none;">Recently Used</div>
+                    <div class="we-color-swatches" id="weColorRecentSwatches"></div>
+                </div>
+            </div>
+            <p class="field-hint" style="margin:0;">The accent bar on the left edge of the embed.</p>
+        </div>
+
+        <div class="we-section-label">Embed Image</div>
+        <div class="we-image-row">
+            <input class="field-input" id="weImageUrl" type="text" placeholder="Image or GIF URL" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+            <!-- Temporarily disabled — file upload paused, link paste only for now.
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('weImageFile').click()"><span data-icon="image" data-size="12"></span></button>
+            <input type="file" id="weImageFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;" onchange="weUploadImage(this.files[0],'weImageUrl')">
+            -->
+        </div>
+
+        <div class="we-section-label">Embed Thumbnail</div>
+        <div class="we-image-row">
+            <input class="field-input" id="weThumbUrl" type="text" placeholder="Thumbnail image URL" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+            <!-- Temporarily disabled — file upload paused, link paste only for now.
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('weThumbFile').click()"><span data-icon="image" data-size="12"></span></button>
+            <input type="file" id="weThumbFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;" onchange="weUploadImage(this.files[0],'weThumbUrl')">
+            -->
+        </div>
+
+        <div class="we-section-label">Embed Footer</div>
+        <div class="we-two-col">
+            <input class="field-input" id="weFooterText" type="text" placeholder="Footer text" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+            <input class="field-input" id="weFooterIcon" type="text" placeholder="Footer icon URL" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+        </div>
+
+        <div class="we-section-label">Preview</div>
+        <div class="we-preview-wrap" id="wePreview"></div>
+
+        <div class="we-save-row" style="margin-top:20px;">
+            <button class="btn btn-ghost" onclick="closeWelcomeEditor()">Cancel</button>
+            <button class="btn btn-primary" onclick="weSave()">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- CHANNEL / ROLE / MACRO PICKERS (shared by outside message + embed fields) -->
+<div class="confirm-overlay" id="wePickerOverlay" onclick="if(event.target===this) weClosePicker()">
+    <div class="we-picker-card">
+        <h4 id="wePickerTitle">Insert</h4>
+        <input class="field-input" id="wePickerSearch" type="text" placeholder="Search..." style="margin-bottom:10px;" oninput="weRenderPickerList()">
+        <div class="we-picker-list" id="wePickerList"></div>
+    </div>
+</div>
+
 <div class="confirm-overlay" id="switchServerOverlay" onclick="if(event.target===this) closeSwitchServerModal()">
     <div class="switch-server-card">
         <div class="login-emblem" style="margin:0 auto 12px;"><span data-icon="home" data-size="24"></span></div>
@@ -1242,6 +1435,25 @@ body{
    bot's live Postgres database). No mock data below this line.
    ============================================================ */
 
+/* ── Lock the main page's scroll while any modal overlay is open ────
+   Disabled — background scroll should stay active even while the
+   welcome message form (or any other overlay) is open. Left commented
+   instead of deleted in case this needs to come back later.
+(function initModalScrollLock(){
+    const overlaySelector = '.confirm-overlay, .crop-overlay';
+    const openSelector = '.confirm-overlay.show, .crop-overlay.show';
+    const syncLock = () => {
+        const anyOpen = document.querySelector(openSelector);
+        document.body.classList.toggle('modal-open', !!anyOpen);
+    };
+    const observer = new MutationObserver(syncLock);
+    document.querySelectorAll(overlaySelector).forEach(el => {
+        observer.observe(el, { attributes: true, attributeFilter: ['class'] });
+    });
+    syncLock();
+})();
+*/
+
 /* ---- SVG ICON SYSTEM ----
    Icon shapes are sourced live from Lucide (https://lucide.dev), loaded
    via the <script src="https://unpkg.com/lucide"> tag above. This map
@@ -1293,6 +1505,7 @@ const LUCIDE_ICON_NAMES = {
     lock: 'Lock',
     hash: 'Hash',
     scroll: 'ScrollText',
+    smile: 'Smile',
 };
 
 function lucideNodeToInnerSvg(iconNode){
@@ -1631,6 +1844,7 @@ async function loadDashboard() {
     renderCommands();
     loadSettings();
     loadBotIdentity();
+    loadWelcomeMessages();
 }
 
 /* ============================================================
@@ -2489,6 +2703,394 @@ async function loadChannelsAndRoles(){
     } catch (err) {
         if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadChannelsAndRoles failed', err);
     }
+
+    // Fetched separately so a hiccup here (e.g. bot missing an emoji scope)
+    // never blocks the channel/role dropdowns above from loading.
+    try {
+        const em = await api('/api/emojis');
+        EMOJIS = em.emojis;
+    } catch (err) {
+        if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadEmojis failed', err);
+    }
+}
+
+/* ============================================================
+   WELCOME MESSAGE BUILDER
+   ============================================================ */
+const WE_MACROS = [
+    { token: '{user}', desc: 'Pings/mentions the new member' },
+    { token: '{username}', desc: "The new member's display name (no ping)" },
+    { token: '{usertag}', desc: "The new member's full Discord username" },
+    { token: '{membercount}', desc: 'Total member count for the server' },
+    { token: '{servername}', desc: "The server's name" },
+    { token: '{time}', desc: 'Current time' },
+    { token: '{date}', desc: 'Current date' },
+    { token: '{joindate}', desc: 'Date the member joined' },
+];
+
+let WELCOME_MESSAGES = [];
+let EMOJIS = [];
+let weEditingId = null;
+let weActiveField = null;
+let wePickerMode = null; // 'channel' | 'role' | 'emoji' | 'macro'
+
+function weSetActiveField(el){ weActiveField = el; }
+
+/* Grows #weDescription to fit its content instead of scrolling inside a
+   fixed box — reset to 'auto' first so it can shrink back down too. */
+function weAutoGrow(el){
+    if (!el || el.tagName !== 'TEXTAREA') return;
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+}
+
+function weInsertAtCursor(text){
+    const field = weActiveField || document.getElementById('weOutsideMessage');
+    const start = field.selectionStart ?? field.value.length;
+    const end = field.selectionEnd ?? field.value.length;
+    field.value = field.value.slice(0, start) + text + field.value.slice(end);
+    field.focus();
+    const cursor = start + text.length;
+    field.setSelectionRange(cursor, cursor);
+    weAutoGrow(field);
+    weUpdatePreview();
+}
+
+async function loadWelcomeMessages(){
+    try {
+        const data = await api('/api/welcome-messages');
+        WELCOME_MESSAGES = data.messages || [];
+        renderWelcomeMessagesList();
+    } catch (err) {
+        if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadWelcomeMessages failed', err);
+    }
+}
+
+function renderWelcomeMessagesList(){
+    const list = document.getElementById('welcomeMessagesList');
+    if (!list) return;
+
+    if (!WELCOME_MESSAGES.length){
+        list.innerHTML = '<p class="we-empty">No custom messages yet — using the built-in rotation.</p>';
+        return;
+    }
+
+    list.innerHTML = WELCOME_MESSAGES.map(m => {
+        const title = m.embedTitle || m.outsideMessage || m.embedDescription || 'Untitled message';
+        const sub = m.embedDescription || m.outsideMessage || '';
+        return `
+        <div class="we-item">
+            <div class="we-item-body">
+                <div class="we-item-title">${escapeHtml(title)}</div>
+                ${sub ? `<div class="we-item-sub">${escapeHtml(sub)}</div>` : ''}
+            </div>
+            <div class="we-item-actions">
+                <button class="btn btn-ghost btn-sm" onclick="openWelcomeEditor(${m.id})"><span data-icon="settings" data-size="12"></span></button>
+                <button class="btn btn-danger btn-sm" onclick="weDelete(${m.id})"><span data-icon="closeCircle" data-size="12"></span></button>
+            </div>
+        </div>`;
+    }).join('');
+
+    hydrateStaticIcons(list);
+}
+
+function openWelcomeEditor(id){
+    weEditingId = id ?? null;
+    // Loose match: ids round-trip through onclick="…(${m.id})" as numbers,
+    // but API responses aren't guaranteed to already be numbers, so compare
+    // as strings rather than risk a silent type-mismatch miss.
+    const msg = id != null ? WELCOME_MESSAGES.find(m => String(m.id) === String(id)) : null;
+
+    document.getElementById('weEditorTitle').textContent = msg ? 'Edit Welcome Message' : 'Add Welcome Message';
+    document.getElementById('weOutsideMessage').value = msg?.outsideMessage || '';
+    document.getElementById('weAuthorName').value = msg?.embedAuthorName || '';
+    document.getElementById('weAuthorIcon').value = msg?.embedAuthorIconUrl || '';
+    document.getElementById('weTitle').value = msg?.embedTitle || '';
+    document.getElementById('weDescription').value = msg?.embedDescription || '';
+    weAutoGrow(document.getElementById('weDescription'));
+    weSetColor(msg?.embedColor || '#daa520');
+    document.getElementById('weImageUrl').value = msg?.embedImageUrl || '';
+    document.getElementById('weThumbUrl').value = msg?.embedThumbnailUrl || '';
+    document.getElementById('weFooterText').value = msg?.embedFooterText || '';
+    document.getElementById('weFooterIcon').value = msg?.embedFooterIconUrl || '';
+
+    weActiveField = document.getElementById('weOutsideMessage');
+    weUpdatePreview();
+
+    document.getElementById('weEditorOverlay').classList.add('show');
+}
+
+function closeWelcomeEditor(){
+    document.getElementById('weEditorOverlay').classList.remove('show');
+}
+
+function weSampleValue(token){
+    const guildName = document.getElementById('guildBadge')?.textContent || 'this server';
+    const memberCount = document.getElementById('statMembers')?.textContent || '128';
+    const now = new Date();
+    switch (token){
+        case '{user}': return '<span class="we-preview-mention">@NewMember</span>';
+        case '{username}': return 'NewMember';
+        case '{usertag}': return 'newmember';
+        case '{membercount}': return memberCount;
+        case '{servername}': return guildName;
+        case '{time}': return now.toLocaleTimeString();
+        case '{date}': return now.toLocaleDateString();
+        case '{joindate}': return now.toLocaleDateString();
+        default: return token;
+    }
+}
+
+function weResolvePreviewText(text){
+    if (!text) return '';
+    let result = escapeHtml(text);
+    // Native Discord mention syntax the channel/role pickers insert.
+    result = result.replace(/&lt;#(\d+)&gt;/g, (_, id) => {
+        const ch = CHANNELS.find(c => c.id === id);
+        return `<span class="we-preview-mention">#${ch ? escapeHtml(ch.name) : 'channel'}</span>`;
+    });
+    result = result.replace(/&lt;@&amp;(\d+)&gt;/g, (_, id) => {
+        const role = ROLES.find(r => r.id === id);
+        return `<span class="we-preview-mention">@${role ? escapeHtml(role.name) : 'role'}</span>`;
+    });
+    // Native Discord custom-emoji syntax the emoji picker inserts.
+    result = result.replace(/&lt;(a?):(\w+):(\d+)&gt;/g, (_, animated, name, id) => {
+        const ext = animated ? 'gif' : 'png';
+        return `<img class="we-preview-emoji" src="https://cdn.discordapp.com/emojis/${id}.${ext}" alt=":${escapeHtml(name)}:" title=":${escapeHtml(name)}:">`;
+    });
+    for (const { token } of WE_MACROS){
+        result = result.split(escapeHtml(token)).join(weSampleValue(token));
+    }
+    return result;
+}
+
+/* ── Advanced embed color picker — swatch + hex + presets + recents ── */
+
+const WE_COLOR_PRESETS = [
+    { label: 'Gold',            value: '#daa520' },
+    { label: 'Gryffindor Red',  value: '#ae0001' },
+    { label: 'Slytherin Green', value: '#2a623d' },
+    { label: 'Ravenclaw Blue',  value: '#222f5b' },
+    { label: 'Hufflepuff Yellow', value: '#ecb939' },
+    { label: 'Discord Blurple', value: '#5865f2' },
+    { label: 'White',           value: '#ffffff' },
+    { label: 'Black',           value: '#1a1a1a' },
+];
+const WE_RECENT_COLORS_KEY = 'we_recent_embed_colors';
+
+function weToggleColorPicker(){
+    const pop = document.getElementById('weColorPopover');
+    const opening = !pop.classList.contains('show');
+    pop.classList.toggle('show', opening);
+    if (opening) weRenderColorSwatches();
+}
+
+function weGetRecentColors(){
+    try { return JSON.parse(localStorage.getItem(WE_RECENT_COLORS_KEY) || '[]'); }
+    catch { return []; }
+}
+
+function weAddRecentColor(hex){
+    if (!/^#[0-9a-f]{6}$/i.test(hex)) return;
+    let recents = weGetRecentColors().filter(c => c.toLowerCase() !== hex.toLowerCase());
+    recents.unshift(hex);
+    recents = recents.slice(0, 8);
+    try { localStorage.setItem(WE_RECENT_COLORS_KEY, JSON.stringify(recents)); } catch {}
+    weRenderColorSwatches();
+}
+
+function weRenderSwatchGroup(containerId, colors){
+    const wrap = document.getElementById(containerId);
+    const current = (document.getElementById('weColor').value || '').toLowerCase();
+    wrap.innerHTML = colors.map(c => {
+        const active = c.toLowerCase() === current ? ' active' : '';
+        return `<button type="button" class="we-color-chip${active}" style="background:${c};" title="${c}" onclick="weSetColor('${c}'); weAddRecentColor('${c}');"></button>`;
+    }).join('');
+}
+
+function weRenderColorSwatches(){
+    weRenderSwatchGroup('weColorPresetSwatches', WE_COLOR_PRESETS.map(p => p.value));
+    const recents = weGetRecentColors();
+    document.getElementById('weColorRecentLabel').style.display = recents.length ? '' : 'none';
+    weRenderSwatchGroup('weColorRecentSwatches', recents);
+}
+
+function weSetColor(hex){
+    if (!/^#[0-9a-f]{6}$/i.test(hex)) return;
+    document.getElementById('weColor').value = hex;
+    document.getElementById('weColorNative').value = hex;
+    document.getElementById('weColorSwatchBtn').style.background = hex;
+    weUpdatePreview();
+}
+
+function weOnColorHexInput(){
+    let v = document.getElementById('weColor').value.trim();
+    if (v && !v.startsWith('#')) v = '#' + v;
+    if (/^#[0-9a-f]{6}$/i.test(v)){
+        document.getElementById('weColorNative').value = v;
+        document.getElementById('weColorSwatchBtn').style.background = v;
+    }
+    weUpdatePreview();
+}
+
+document.addEventListener('click', (e) => {
+    const picker = document.getElementById('weColorPicker');
+    const popover = document.getElementById('weColorPopover');
+    if (!popover || !popover.classList.contains('show')) return;
+    if (picker && !picker.contains(e.target)) popover.classList.remove('show');
+});
+
+function weUpdatePreview(){
+    const outside = document.getElementById('weOutsideMessage').value;
+    const authorName = document.getElementById('weAuthorName').value;
+    const authorIcon = document.getElementById('weAuthorIcon').value;
+    const title = document.getElementById('weTitle').value;
+    const description = document.getElementById('weDescription').value;
+    const color = document.getElementById('weColor').value;
+    const imageUrl = document.getElementById('weImageUrl').value;
+    const thumbUrl = document.getElementById('weThumbUrl').value;
+    const footerText = document.getElementById('weFooterText').value;
+    const footerIcon = document.getElementById('weFooterIcon').value;
+
+    const hasEmbed = title || description || authorName || footerText || imageUrl || thumbUrl;
+
+    let html = '';
+    html += `<div class="we-preview-content">${outside ? weResolvePreviewText(outside) : '<span class="we-preview-empty">(no outside message)</span>'}</div>`;
+
+    if (hasEmbed){
+        html += `<div class="we-preview-embed" style="border-left-color:${escapeHtml(color || '#daa520')};">`;
+        if (authorName){
+            html += `<div class="we-preview-author">${authorIcon ? `<img src="${escapeHtml(authorIcon)}">` : ''}${weResolvePreviewText(authorName)}</div>`;
+        }
+        if (thumbUrl) html += `<img class="we-preview-thumb" src="${escapeHtml(thumbUrl)}">`;
+        if (title) html += `<div class="we-preview-title">${weResolvePreviewText(title)}</div>`;
+        if (description) html += `<div class="we-preview-desc">${weResolvePreviewText(description)}</div>`;
+        if (imageUrl) html += `<img class="we-preview-image" src="${escapeHtml(imageUrl)}">`;
+        if (footerText){
+            html += `<div class="we-preview-footer">${footerIcon ? `<img src="${escapeHtml(footerIcon)}">` : ''}<span>${weResolvePreviewText(footerText)}</span></div>`;
+        }
+        html += `</div>`;
+    }
+
+    document.getElementById('wePreview').innerHTML = html;
+}
+
+async function weSave(){
+    const body = {
+        outsideMessage: document.getElementById('weOutsideMessage').value || null,
+        embedAuthorName: document.getElementById('weAuthorName').value || null,
+        embedAuthorIconUrl: document.getElementById('weAuthorIcon').value || null,
+        embedTitle: document.getElementById('weTitle').value || null,
+        embedDescription: document.getElementById('weDescription').value || null,
+        embedColor: document.getElementById('weColor').value || null,
+        embedImageUrl: document.getElementById('weImageUrl').value || null,
+        embedThumbnailUrl: document.getElementById('weThumbUrl').value || null,
+        embedFooterText: document.getElementById('weFooterText').value || null,
+        embedFooterIconUrl: document.getElementById('weFooterIcon').value || null,
+    };
+
+    try {
+        if (weEditingId){
+            await api(`/api/welcome-messages/${weEditingId}`, { method: 'PATCH', body: JSON.stringify(body) });
+        } else {
+            await api('/api/welcome-messages', { method: 'POST', body: JSON.stringify(body) });
+        }
+        closeWelcomeEditor();
+        showToast('Welcome message saved', 'success');
+        loadWelcomeMessages();
+    } catch (err) {
+        showToast(friendlyError(err.message) || 'Could not save that message.', 'error');
+    }
+}
+
+function weDelete(id){
+    showConfirm({
+        title: 'Delete welcome message?',
+        message: 'This message will no longer be part of the random rotation.',
+        confirmLabel: 'Delete',
+        onConfirm: async () => {
+            try {
+                await api(`/api/welcome-messages/${id}`, { method: 'DELETE' });
+                showToast('Welcome message deleted', 'success');
+                loadWelcomeMessages();
+            } catch (err) {
+                showToast('Could not delete that message.', 'error');
+            }
+        },
+    });
+}
+
+async function weUploadImage(file, targetInputId){
+    if (!file) return;
+    const form = new FormData();
+    form.append('image', file);
+    try {
+        const data = await api('/api/welcome-messages/upload-image', { method: 'POST', body: form });
+        document.getElementById(targetInputId).value = data.url;
+        weUpdatePreview();
+    } catch (err) {
+        showToast('Could not upload that image.', 'error');
+    }
+}
+
+/* ── Channel / role / macro pickers — shared popup, filled per-mode ── */
+
+function weOpenChannelPicker(){ wePickerMode = 'channel'; weOpenPicker('Insert Channel'); }
+function weOpenRolePicker(){ wePickerMode = 'role'; weOpenPicker('Insert Role'); }
+function weOpenEmojiPicker(){ wePickerMode = 'emoji'; weOpenPicker('Insert Emoji'); }
+function weOpenMacroPicker(){ wePickerMode = 'macro'; weOpenPicker('Insert Macro'); }
+
+function weOpenPicker(title){
+    document.getElementById('wePickerTitle').textContent = title;
+    document.getElementById('wePickerSearch').value = '';
+    weRenderPickerList();
+    document.getElementById('wePickerOverlay').classList.add('show');
+}
+
+function weClosePicker(){
+    document.getElementById('wePickerOverlay').classList.remove('show');
+}
+
+function weRenderPickerList(){
+    const query = (document.getElementById('wePickerSearch').value || '').toLowerCase();
+    const listEl = document.getElementById('wePickerList');
+
+    let items = [];
+    if (wePickerMode === 'channel'){
+        items = CHANNELS.filter(c => c.name.toLowerCase().includes(query))
+            .map(c => ({ label: '#' + c.name, sub: '', onSelect: () => weInsertAtCursor(`<#${c.id}>`) }));
+    } else if (wePickerMode === 'role'){
+        items = ROLES.filter(r => r.name.toLowerCase().includes(query))
+            .map(r => ({ label: '@' + r.name, sub: '', onSelect: () => weInsertAtCursor(`<@&${r.id}>`) }));
+    } else if (wePickerMode === 'emoji'){
+        items = EMOJIS.filter(e => e.name.toLowerCase().includes(query))
+            .map(e => ({
+                label: ':' + e.name + ':',
+                sub: '',
+                icon: `https://cdn.discordapp.com/emojis/${e.id}.${e.animated ? 'gif' : 'png'}?size=32`,
+                onSelect: () => weInsertAtCursor(`<${e.animated ? 'a' : ''}:${e.name}:${e.id}>`),
+            }));
+    } else {
+        items = WE_MACROS.filter(m => m.token.toLowerCase().includes(query) || m.desc.toLowerCase().includes(query))
+            .map(m => ({ label: m.token, sub: m.desc, onSelect: () => weInsertAtCursor(m.token) }));
+    }
+
+    if (!items.length){
+        listEl.innerHTML = wePickerMode === 'emoji' && !EMOJIS.length
+            ? '<p class="we-picker-empty">This server has no custom emojis yet.</p>'
+            : '<p class="we-picker-empty">Nothing matches that search.</p>';
+        return;
+    }
+
+    listEl.innerHTML = '';
+    items.forEach((item, i) => {
+        const row = document.createElement('div');
+        row.className = 'we-picker-row' + (item.icon ? ' we-picker-row-emoji' : '');
+        const iconHtml = item.icon ? `<img class="we-picker-emoji-icon" src="${item.icon}" alt="">` : '';
+        row.innerHTML = `${iconHtml}<span class="we-picker-row-text"><span>${escapeHtml(item.label)}</span>${item.sub ? `<span class="we-macro-desc">${escapeHtml(item.sub)}</span>` : ''}</span>`;
+        row.onclick = () => { item.onSelect(); weClosePicker(); };
+        listEl.appendChild(row);
+    });
 }
 
 let settingState = { logs:false, welcome:false, starboard:false, azkaban:false, sortinghat:false };

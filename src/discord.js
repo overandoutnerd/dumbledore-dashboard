@@ -126,6 +126,10 @@ export function getGuildChannels(guildId) {
     return botFetch(`/guilds/${guildId}/channels`);
 }
 
+export function getGuildEmojis(guildId) {
+    return botFetch(`/guilds/${guildId}/emojis`);
+}
+
 export function getGuildMember(guildId, userId) {
     return botFetch(`/guilds/${guildId}/members/${userId}`).catch((err) => {
         if (err.status === 404) return null;

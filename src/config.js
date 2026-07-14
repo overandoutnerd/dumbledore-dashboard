@@ -41,6 +41,21 @@ export const config = {
     sessionSecret: required("SESSION_SECRET"),
     sessionTtlHours: Number(process.env.SESSION_TTL_HOURS || 12),
 
+    // Cloudflare R2 (S3-compatible) — used to store welcome-message embed
+    // images/GIFs so they survive redeploys instead of living on local
+    // disk under public/uploads. All four must be set for uploads to work;
+    // accountId + bucket also build the public bucket URL if PUBLIC_URL
+    // isn't overridden per-file.
+    r2: {
+        accountId: process.env.R2_ACCOUNT_ID || "",
+        accessKeyId: process.env.R2_ACCESS_KEY_ID || "",
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
+        bucket: process.env.R2_BUCKET || "",
+        // The bucket's public URL — either an r2.dev dev subdomain or a
+        // custom domain you've mapped to the bucket. No trailing slash.
+        publicUrl: (process.env.R2_PUBLIC_URL || "").replace(/\/+$/, ""),
+    },
+
     port: Number(process.env.PORT || 3001),
     publicUrl: process.env.PUBLIC_URL || `http://localhost:${process.env.PORT || 3001}`,
     isProd: process.env.NODE_ENV === "production",

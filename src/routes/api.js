@@ -1,5 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
+import crypto from "node:crypto";
 
 import { config } from "../config.js";
 import { db, ensureGuildSettings } from "../db.js";
@@ -14,6 +15,7 @@ import {
     getGuild,
     getGuildChannels,
     getGuildRoles,
+    getGuildEmojis,
     getGuildMember,
     setMemberRoles,
     patchBotProfile,
@@ -22,7 +24,17 @@ import {
 import { ensureFresh, resolveMember, memberCount, searchCached } from "../memberCache.js";
 import { COMMANDS } from "../commands.js";
 import * as analytics from "../analytics.js";
-import { getGuildSettingsSummary, getModChannelIds, addModChannel, removeModChannel } from "../settingsService.js";
+import {
+    getGuildSettingsSummary,
+    getModChannelIds,
+    addModChannel,
+    removeModChannel,
+    listWelcomeMessages,
+    createWelcomeMessage,
+    updateWelcomeMessage,
+    deleteWelcomeMessage,
+} from "../settingsService.js";
+import { uploadImage, isR2Configured } from "../storage.js";
 
 export const apiRouter = Router();
 const upload = multer({ limits: { fileSize: 8 * 1024 * 1024 } }); // 8MB, Discord's own cap
@@ -521,6 +533,22 @@ apiRouter.get("/roles", requireAuth, async (req, res) => {
     }
 });
 
+apiRouter.get("/emojis", requireAuth, async (req, res) => {
+    try {
+        const emojis = await getGuildEmojis(req.guildId);
+
+        const usable = emojis
+            .filter((e) => e.available !== false)
+            .map((e) => ({ id: e.id, name: e.name, animated: !!e.animated }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+        res.json({ emojis: usable });
+    } catch (err) {
+        console.error("[api/emojis]", err);
+        res.status(502).json({ error: "upstream_error" });
+    }
+});
+
 /* ── /api/mod-channels — Deluminator's mod-only search list ──────── */
 
 apiRouter.get("/mod-channels", requireAuth, async (req, res) => {
@@ -601,6 +629,77 @@ apiRouter.post("/bot/nickname", requireBotManager, async (req, res) => {
 function fileToDataUri(file) {
     return `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
 }
+
+/* ── /api/welcome-messages — custom welcome message builder ─────────
+ * Replaces the bot's old hard-coded rotation. Each guild can have any
+ * number of these; the bot picks one at random on every member join. */
+
+apiRouter.get("/welcome-messages", requireAuth, async (req, res) => {
+    const messages = await listWelcomeMessages(req.guildId);
+    res.json({ messages });
+});
+
+apiRouter.post("/welcome-messages", requireManageGuild, async (req, res) => {
+    const message = await createWelcomeMessage(req.guildId, req.body || {});
+    res.json({ message });
+});
+
+apiRouter.patch("/welcome-messages/:id", requireManageGuild, async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) return res.status(400).json({ error: "invalid_id" });
+
+    const message = await updateWelcomeMessage(req.guildId, id, req.body || {});
+    if (!message) return res.status(404).json({ error: "not_found" });
+    res.json({ message });
+});
+
+apiRouter.delete("/welcome-messages/:id", requireManageGuild, async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) return res.status(400).json({ error: "invalid_id" });
+
+    await deleteWelcomeMessage(req.guildId, id);
+    res.json({ ok: true });
+});
+
+// Welcome embed images/GIFs need a real HTTP(S) URL (Discord embeds can't
+// use data: URIs the way the avatar/banner endpoints above do), so these
+// are uploaded to Cloudflare R2 and served from its public bucket URL —
+// keeps them alive across redeploys, unlike the old public/uploads disk
+// storage this replaced.
+const IMAGE_EXT_BY_MIME = {
+    "image/png": ".png",
+    "image/jpeg": ".jpg",
+    "image/gif": ".gif",
+    "image/webp": ".webp",
+};
+
+apiRouter.post(
+    "/welcome-messages/upload-image",
+    requireManageGuild,
+    upload.single("image"),
+    async (req, res) => {
+        const mimetype = req.file?.mimetype;
+        const ext = mimetype && IMAGE_EXT_BY_MIME[mimetype];
+
+        if (!req.file || !ext) {
+            return res.status(400).json({ error: "image_required" });
+        }
+
+        if (!isR2Configured()) {
+            console.error("[api/welcome-messages/upload-image] R2 is not configured");
+            return res.status(503).json({ error: "storage_not_configured" });
+        }
+
+        try {
+            const key = `${crypto.randomUUID()}${ext}`;
+            const url = await uploadImage(req.file.buffer, key, mimetype);
+            res.json({ url });
+        } catch (err) {
+            console.error("[api/welcome-messages/upload-image] R2 upload failed", err);
+            res.status(502).json({ error: "upload_failed" });
+        }
+    },
+);
 
 apiRouter.post("/bot/avatar", requireBotManager, upload.single("image"), async (req, res) => {
     if (!req.file || !req.file.mimetype.startsWith("image/")) {
