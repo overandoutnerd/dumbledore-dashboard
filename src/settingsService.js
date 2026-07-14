@@ -36,6 +36,8 @@ export async function getGuildSettingsSummary(guildId) {
         azkabanRoleId: s.azkaban_role_id,
         sortingHatEnabled: !!s.sorting_hat_enabled,
         sortingHatChannelId: s.sorting_hat_channel_id,
+        bumpEnabled: !!s.bump_enabled,
+        levelingEnabled: !!s.leveling_enabled,
 
         // access — single Bot Manager role, no separate Admin role anymore
         botManagerRoleId: s.bot_manager_role_id ?? null,

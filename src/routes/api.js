@@ -456,6 +456,8 @@ apiRouter.post("/settings", requireManageGuild, async (req, res) => {
         ["azkabanRoleId", "azkaban_role_id", "str"],
         ["sortingHatEnabled", "sorting_hat_enabled", "bool"],
         ["sortingHatChannelId", "sorting_hat_channel_id", "str"],
+        ["bumpEnabled", "bump_enabled", "bool"],
+        ["levelingEnabled", "leveling_enabled", "bool"],
 
         // Access control — same fields /guild-settings edits in Discord.
         ["botManagerRoleId", "bot_manager_role_id", "str"],

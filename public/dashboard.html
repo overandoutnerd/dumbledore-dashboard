@@ -1185,6 +1185,14 @@ body{
                         <div class="dd" id="dd-azkaban"></div>
                     </div>
                 </div>
+
+                <div class="setting-row">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="rocket" data-size="13"></span> Bump Thank System <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-bump</span></div>
+                        <div class="sdesc">Thanks whoever bumps the server and sends a reminder once the cooldown ends.</div>
+                    </div>
+                    <div class="toggle" id="toggle-bump" onclick="toggleSetting('bump')"><div class="knob"></div></div>
+                </div>
                 <p class="locked-note login-hidden" id="settingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission — showing read-only</p>
             </div>
 
@@ -1197,6 +1205,15 @@ body{
 
             <div class="card">
                 <h3>Leveling &amp; XP <span class="tag">/guild-settings</span></h3>
+
+                <div class="setting-row">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="trendingUp" data-size="13"></span> Leveling</div>
+                        <div class="sdesc">Members earn XP from chatting and level up. Turn off to stop awarding XP entirely.</div>
+                    </div>
+                    <div class="toggle" id="toggle-leveling" onclick="toggleSetting('leveling')"><div class="knob"></div></div>
+                </div>
+
                 <div class="field-group">
                     <label class="field-label">XP per message <span id="xpPerMessageDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
                     <div class="field-input-row">
@@ -1490,6 +1507,7 @@ const LUCIDE_ICON_NAMES = {
     minus: 'Minus',
     trendingUp: 'TrendingUp',
     trendingDown: 'TrendingDown',
+    rocket: 'Rocket',
     sortinghat: 'GraduationCap',
     moon: 'Moon',
     inbox: 'Inbox',
@@ -3093,7 +3111,7 @@ function weRenderPickerList(){
     });
 }
 
-let settingState = { logs:false, welcome:false, starboard:false, azkaban:false, sortinghat:false };
+let settingState = { logs:false, welcome:false, starboard:false, azkaban:false, sortinghat:false, bump:false, leveling:false };
 
 async function loadSettings(){
     try {
@@ -3102,6 +3120,7 @@ async function loadSettings(){
             logs: s.logsEnabled, welcome: s.welcomeEnabled,
             starboard: s.starboardEnabled, azkaban: s.azkabanEnabled,
             sortinghat: s.sortingHatEnabled,
+            bump: s.bumpEnabled, leveling: s.levelingEnabled,
         };
 
         setToggleUI('logs', s.logsEnabled, ddLogs, s.logChannelId);
@@ -3109,6 +3128,8 @@ async function loadSettings(){
         setToggleUI('starboard', s.starboardEnabled, ddStarboard, s.starboardChannelId);
         setToggleUI('azkaban', s.azkabanEnabled, ddAzkaban, s.azkabanRoleId);
         setToggleUI('sortinghat', s.sortingHatEnabled, ddSortingHat, s.sortingHatChannelId);
+        setToggleUI('bump', s.bumpEnabled);
+        setToggleUI('leveling', s.levelingEnabled);
 
         document.getElementById('starboardThresholdHint').textContent = `Threshold: ${s.starboardThreshold} reaction${s.starboardThreshold === 1 ? '' : 's'}`;
 
@@ -3142,7 +3163,7 @@ function setDefaultHint(id, isDefault){
 
 function setToggleUI(key, enabled, dd, value){
     document.getElementById('toggle-'+key).classList.toggle('on', enabled);
-    document.getElementById('sub-'+key).classList.toggle('open', enabled);
+    document.getElementById('sub-'+key)?.classList.toggle('open', enabled);
     if (dd && value) dd.setValue(value);
 }
 
@@ -3151,9 +3172,9 @@ async function toggleSetting(key){
 
     settingState[key] = !settingState[key];
     document.getElementById('toggle-'+key).classList.toggle('on', settingState[key]);
-    document.getElementById('sub-'+key).classList.toggle('open', settingState[key]);
+    document.getElementById('sub-'+key)?.classList.toggle('open', settingState[key]);
 
-    const fieldMap = { logs:'logsEnabled', welcome:'welcomeEnabled', starboard:'starboardEnabled', azkaban:'azkabanEnabled', sortinghat:'sortingHatEnabled' };
+    const fieldMap = { logs:'logsEnabled', welcome:'welcomeEnabled', starboard:'starboardEnabled', azkaban:'azkabanEnabled', sortinghat:'sortingHatEnabled', bump:'bumpEnabled', leveling:'levelingEnabled' };
     try {
         await api('/api/settings', { method:'POST', body: JSON.stringify({ [fieldMap[key]]: settingState[key] }) });
         showToast(settingState[key] ? 'Enabled' : 'Disabled', 'success');
@@ -3161,7 +3182,7 @@ async function toggleSetting(key){
         showToast(friendlyError(err.message), 'error');
         settingState[key] = !settingState[key];
         document.getElementById('toggle-'+key).classList.toggle('on', settingState[key]);
-        document.getElementById('sub-'+key).classList.toggle('open', settingState[key]);
+        document.getElementById('sub-'+key)?.classList.toggle('open', settingState[key]);
     }
 }
 
