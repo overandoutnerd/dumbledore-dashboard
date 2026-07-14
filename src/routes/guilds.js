@@ -127,8 +127,8 @@ guildsRouter.post("/guilds/:id/select", requireAuth, async (req, res) => {
             activeGuildId: guildId,
             guildName: guild.name,
             guildIcon: iconUrl(guild),
-            canManageGuild: permissions.canManageGuild,
-            canManageRoles: permissions.canManageRoles,
+            canManageGuild: permissions.canManageGuild || isBotManager,
+            canManageRoles: permissions.canManageRoles || isBotManager,
             isBotManager,
         });
 
