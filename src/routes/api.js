@@ -29,6 +29,8 @@ import {
     getModChannelIds,
     addModChannel,
     removeModChannel,
+    addBotManagerRole,
+    removeBotManagerRole,
     listWelcomeMessages,
     createWelcomeMessage,
     updateWelcomeMessage,
@@ -184,6 +186,22 @@ apiRouter.post("/houses/:house/points", requireManageGuild, async (req, res) => 
     res.json({ house, points: newPoints });
 });
 
+apiRouter.post("/houses/reset", requireManageGuild, async (req, res) => {
+    const ALL_HOUSES = ["gryffindor", "ravenclaw", "hufflepuff", "slytherin"];
+
+    await db.query(
+        `
+        INSERT INTO house_points (guild_id, house_name, points)
+        SELECT $1, house_name, 0
+        FROM unnest($2::text[]) AS house_name
+        ON CONFLICT (guild_id, house_name) DO UPDATE SET points = 0
+        `,
+        [req.guildId, ALL_HOUSES],
+    );
+
+    res.json({ ok: true, houses: ALL_HOUSES.map((house) => ({ house, points: 0 })) });
+});
+
 /* ── /api/leaderboard ────────────────────────────────────────────── */
 
 apiRouter.get("/leaderboard", requireAuth, async (req, res) => {
@@ -217,6 +235,19 @@ apiRouter.get("/leaderboard", requireAuth, async (req, res) => {
     });
 
     res.json({ leaderboard });
+});
+
+apiRouter.post("/leveling/reset", requireManageGuild, async (req, res) => {
+    await db.query(
+        `
+        UPDATE users
+        SET xp = 0, level = 1, messages = 0, last_xp_at = 0
+        WHERE guild_id = $1
+        `,
+        [req.guildId],
+    );
+
+    res.json({ ok: true });
 });
 
 /* ── /api/azkaban ─────────────────────────────────────────────────── */
@@ -459,9 +490,6 @@ apiRouter.post("/settings", requireManageGuild, async (req, res) => {
         ["bumpEnabled", "bump_enabled", "bool"],
         ["levelingEnabled", "leveling_enabled", "bool"],
 
-        // Access control — same fields /guild-settings edits in Discord.
-        ["botManagerRoleId", "bot_manager_role_id", "str"],
-
         // House roles
         ["gryffindorRoleId", "gryffindor_role_id", "str"],
         ["ravenclawRoleId", "ravenclaw_role_id", "str"],
@@ -499,6 +527,22 @@ apiRouter.post("/settings", requireManageGuild, async (req, res) => {
     values.push(req.guildId);
     await db.query(`UPDATE guild_settings SET ${sets.join(", ")} WHERE guild_id = $${i}`, values);
 
+    res.json({ ok: true });
+});
+
+/* ── /api/settings/bot-manager-roles — any number of Bot Manager roles ── */
+
+apiRouter.post("/settings/bot-manager-roles", requireManageGuild, async (req, res) => {
+    const { roleId } = req.body;
+    if (typeof roleId !== "string" || !roleId) {
+        return res.status(400).json({ error: "invalid_role_id" });
+    }
+    await addBotManagerRole(req.guildId, roleId);
+    res.json({ ok: true });
+});
+
+apiRouter.delete("/settings/bot-manager-roles/:roleId", requireManageGuild, async (req, res) => {
+    await removeBotManagerRole(req.guildId, req.params.roleId);
     res.json({ ok: true });
 });
 
@@ -593,16 +637,21 @@ apiRouter.get("/bot", requireAuth, async (req, res) => {
             getGuild(req.guildId),
         ]);
 
+        const ext = (hash) => (hash && hash.startsWith("a_") ? "gif" : "png");
+
         res.json({
             username: me?.user?.username ?? "Dumbledore",
             globalAvatarUrl: me?.user?.avatar
-                ? `https://cdn.discordapp.com/avatars/${me.user.id}/${me.user.avatar}.png?size=128`
+                ? `https://cdn.discordapp.com/avatars/${me.user.id}/${me.user.avatar}.${ext(me.user.avatar)}?size=128`
                 : null,
             guildAvatarUrl: me?.avatar
-                ? `https://cdn.discordapp.com/guilds/${req.guildId}/users/${me.user.id}/avatars/${me.avatar}.png?size=128`
+                ? `https://cdn.discordapp.com/guilds/${req.guildId}/users/${me.user.id}/avatars/${me.avatar}.${ext(me.avatar)}?size=128`
+                : null,
+            globalBannerUrl: me?.user?.banner
+                ? `https://cdn.discordapp.com/banners/${me.user.id}/${me.user.banner}.${ext(me.user.banner)}?size=512`
                 : null,
             guildBannerUrl: me?.banner
-                ? `https://cdn.discordapp.com/guilds/${req.guildId}/users/${me.user.id}/banners/${me.banner}.png?size=512`
+                ? `https://cdn.discordapp.com/guilds/${req.guildId}/users/${me.user.id}/banners/${me.banner}.${ext(me.banner)}?size=512`
                 : null,
             nickname: me?.nick ?? null,
             guildName: guild?.name ?? null,

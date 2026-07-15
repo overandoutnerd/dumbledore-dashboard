@@ -207,13 +207,14 @@ export { DiscordApiError };
 
 /**
  * Exact mirror of the bot's own src/utils/permissions.ts isBotManager().
- * If a guild has configured a Bot Manager role, ONLY that role counts —
- * native Administrator does not override it. If no role is configured,
- * native Administrator is the fallback. No other tier exists.
+ * If a guild has configured one or more Bot Manager roles, holding ANY
+ * one of them counts — native Administrator does not override it. If no
+ * role is configured, native Administrator is the fallback. No other
+ * tier exists.
  */
-export function isBotManagerFor(member, botManagerRoleId, nativeIsAdministrator) {
-    if (botManagerRoleId) {
-        return member.roles.includes(botManagerRoleId);
+export function isBotManagerFor(member, botManagerRoleIds, nativeIsAdministrator) {
+    if (botManagerRoleIds && botManagerRoleIds.length > 0) {
+        return botManagerRoleIds.some((roleId) => member.roles.includes(roleId));
     }
     return nativeIsAdministrator;
 }

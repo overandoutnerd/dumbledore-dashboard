@@ -1243,12 +1243,32 @@ body{
                     </div>
                 </div>
                 <p class="locked-note login-hidden" id="xpSettingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+
+                <div class="danger-zone" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-faint,rgba(212,175,55,0.15));">
+                    <div class="setting-row" style="padding:0;">
+                        <div class="setting-text">
+                            <div class="sname"><span data-icon="alert" data-size="13"></span> Reset Leveling Data</div>
+                            <div class="sdesc">Wipes every member's XP, level and message count back to zero. This can't be undone.</div>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="confirmResetLeveling()" ${CURRENT_USER?.canManageGuild?'':'disabled'}>Reset</button>
+                    </div>
+                </div>
             </div>
 
             <div class="card">
                 <h3>House Cup Points <span class="tag">/house-cup</span></h3>
                 <div id="housePointControls"></div>
                 <p class="locked-note login-hidden" id="housePointsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+
+                <div class="danger-zone" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-faint,rgba(212,175,55,0.15));">
+                    <div class="setting-row" style="padding:0;">
+                        <div class="setting-text">
+                            <div class="sname"><span data-icon="alert" data-size="13"></span> Reset House Cup</div>
+                            <div class="sdesc">Sets every house's points back to zero. This can't be undone.</div>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="confirmResetHouseCup()" ${CURRENT_USER?.canManageGuild?'':'disabled'}>Reset</button>
+                    </div>
+                </div>
             </div>
 
             <div class="card">
@@ -1261,12 +1281,12 @@ body{
             </div>
 
             <div class="card">
-                <h3>Bot Manager Role <span class="tag">/guild-settings</span></h3>
+                <h3>Bot Manager Roles <span class="tag">/guild-settings</span></h3>
                 <div class="field-group" style="margin-bottom:0;">
-                    <label class="field-label">Bot Manager <span id="botManagerRoleDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
-                    <div class="dd" id="dd-botManagerRole"></div>
+                    <label class="field-label">Bot Managers <span id="botManagerRoleDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="ms-wrap" id="botManagerRolesMultiSelect"></div>
                 </div>
-                <p class="field-hint" style="margin-top:10px;">Whoever holds this role can sign into this dashboard and use Bot Manager-only commands (/say, /announce, /manage-roles, avatar &amp; banner). If unset, anyone with the native Administrator permission is treated as Bot Manager instead.</p>
+                <p class="field-hint" style="margin-top:10px;">Anyone holding one of these roles can sign into this dashboard and use Bot Manager-only commands (/say, /announce, /manage-roles, avatar &amp; banner). If none are set, anyone with the native Administrator permission is treated as Bot Manager instead.</p>
                 <p class="locked-note login-hidden" id="accessRolesLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
             </div>
         </div>
@@ -1780,8 +1800,9 @@ function applyPermissionGates() {
     document.querySelectorAll('#panel-settings .toggle').forEach(t => t.classList.toggle('disabled', !manageGuildOk));
     document.querySelectorAll('#panel-settings input').forEach(i => i.disabled = !manageGuildOk);
     document.querySelectorAll('#panel-settings .btn-primary').forEach(b => b.disabled = !manageGuildOk);
-    [ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddAzkaban, ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin, ddBotManagerRole].forEach(dd => dd?.setDisabled(!manageGuildOk));
+    [ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddAzkaban, ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin].forEach(dd => dd?.setDisabled(!manageGuildOk));
     modChannelsMS?.setDisabled(!manageGuildOk);
+    botManagerRolesMS?.setDisabled(!manageGuildOk);
     document.getElementById('settingsLock').classList.toggle('login-hidden', manageGuildOk);
     document.getElementById('housePointsLock').classList.toggle('login-hidden', manageGuildOk);
     document.getElementById('modChannelsLock').classList.toggle('login-hidden', manageGuildOk);
@@ -2208,9 +2229,10 @@ async function loadBotIdentity(){
             document.getElementById('botAvatarWrap').innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="">`;
             document.getElementById('topbarBotAvatarWrap').innerHTML = `<img src="${avatarUrl}" alt="">`;
         }
-        if (bot.guildBannerUrl) {
+        const bannerUrl = bot.guildBannerUrl || bot.globalBannerUrl;
+        if (bannerUrl) {
             const wrap = document.getElementById('botBannerWrap');
-            wrap.style.backgroundImage = `url(${bot.guildBannerUrl})`;
+            wrap.style.backgroundImage = `url(${bannerUrl})`;
             wrap.style.backgroundSize = 'cover';
             wrap.style.backgroundPosition = 'center';
         }
@@ -2509,6 +2531,46 @@ function confirmResetIdentityImage(kind){
     });
 }
 
+function confirmResetHouseCup(){
+    if (!CURRENT_USER?.canManageGuild) { showToast('Requires Manage Server permission', 'warn'); return; }
+    showConfirm({
+        title: 'Reset House Cup?',
+        message: "This sets Gryffindor, Ravenclaw, Hufflepuff and Slytherin's points back to zero. This can't be undone.",
+        confirmLabel: 'Reset',
+        onConfirm: resetHouseCup,
+    });
+}
+
+async function resetHouseCup(){
+    try {
+        await api('/api/houses/reset', { method:'POST' });
+        showToast('House Cup reset', 'success');
+        renderHome();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+function confirmResetLeveling(){
+    if (!CURRENT_USER?.canManageGuild) { showToast('Requires Manage Server permission', 'warn'); return; }
+    showConfirm({
+        title: 'Reset Leveling Data?',
+        message: "This wipes every member's XP, level and message count back to zero. This can't be undone.",
+        confirmLabel: 'Reset',
+        onConfirm: resetLeveling,
+    });
+}
+
+async function resetLeveling(){
+    try {
+        await api('/api/leveling/reset', { method:'POST' });
+        showToast('Leveling data reset', 'success');
+        renderHome();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
 async function saveNickname(){
     const v = document.getElementById('nicknameInput').value.trim();
     try {
@@ -2633,13 +2695,13 @@ document.addEventListener('click', () => closeAllDropdowns());
 /* ============================================================
    CUSTOM MULTI-SELECT COMPONENT (mod channels)
    ============================================================ */
-function createMultiSelect(containerId, { onAdd, onRemove } = {}) {
+function createMultiSelect(containerId, { onAdd, onRemove, prefix = '#', emptyText = 'Nothing configured yet.', addPlaceholder = 'Add…' } = {}) {
     const container = document.getElementById(containerId);
     if (!container) return null;
 
     container.innerHTML = `
         <div class="ms-selected"></div>
-        <div class="ms-empty-note" style="display:none;">No mod channels configured yet.</div>
+        <div class="ms-empty-note" style="display:none;">${escapeHtml(emptyText)}</div>
         <div class="dd" id="${containerId}-picker"></div>
     `;
 
@@ -2651,17 +2713,17 @@ function createMultiSelect(containerId, { onAdd, onRemove } = {}) {
     let disabled = false;
 
     const picker = createDropdown(`${containerId}-picker`, {
-        placeholder: 'Add a channel…',
-        onChange: (channelId) => {
-            if (!channelId) return;
+        placeholder: addPlaceholder,
+        onChange: (id) => {
+            if (!id) return;
             picker.setValue(null);
-            if (onAdd) onAdd(channelId);
+            if (onAdd) onAdd(id);
         },
     });
 
     function render(){
         selectedWrap.innerHTML = items.map(it => `
-            <span class="ms-chip">#${escapeHtml(it.name || it.id)}<button data-id="${it.id}">${svg('close', 12)}</button></span>
+            <span class="ms-chip">${prefix}${escapeHtml(it.name || it.id)}<button data-id="${it.id}">${svg('close', 12)}</button></span>
         `).join('');
         emptyNote.style.display = items.length === 0 ? 'block' : 'none';
 
@@ -2684,8 +2746,8 @@ function createMultiSelect(containerId, { onAdd, onRemove } = {}) {
    INSTANTIATE ALL SETTINGS DROPDOWNS
    ============================================================ */
 let ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddAzkaban;
-let ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin, ddBotManagerRole;
-let modChannelsMS;
+let ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin;
+let modChannelsMS, botManagerRolesMS;
 
 function initSettingsControls(){
     ddLogs = createDropdown('dd-logs', { placeholder:'— choose a channel —', onChange: v => saveChannelSetting('logs', v) });
@@ -2698,11 +2760,21 @@ function initSettingsControls(){
     ddHouseRavenclaw = createDropdown('dd-house-ravenclaw', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('ravenclawRoleId', v) });
     ddHouseHufflepuff = createDropdown('dd-house-hufflepuff', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('hufflepuffRoleId', v) });
     ddHouseSlytherin = createDropdown('dd-house-slytherin', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('slytherinRoleId', v) });
-    ddBotManagerRole = createDropdown('dd-botManagerRole', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('botManagerRoleId', v) });
 
     modChannelsMS = createMultiSelect('modChannelsMultiSelect', {
+        prefix: '#',
+        emptyText: 'No mod channels configured yet.',
+        addPlaceholder: 'Add a channel…',
         onAdd: (channelId) => addModChannelUI(channelId),
         onRemove: (channelId) => removeModChannelUI(channelId),
+    });
+
+    botManagerRolesMS = createMultiSelect('botManagerRolesMultiSelect', {
+        prefix: '@',
+        emptyText: 'No Bot Manager roles configured — falls back to Administrator.',
+        addPlaceholder: 'Add a role…',
+        onAdd: (roleId) => addBotManagerRoleUI(roleId),
+        onRemove: (roleId) => removeBotManagerRoleUI(roleId),
     });
 }
 
@@ -2716,8 +2788,9 @@ async function loadChannelsAndRoles(){
         const roleOptions = ROLES.map(r => ({ value: r.id, label: '@' + r.name }));
 
         [ddLogs, ddWelcome, ddStarboard, ddSortingHat].forEach(dd => dd?.setOptions(chanOptions));
-        [ddAzkaban, ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin, ddBotManagerRole].forEach(dd => dd?.setOptions(roleOptions));
+        [ddAzkaban, ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin].forEach(dd => dd?.setOptions(roleOptions));
         modChannelsMS?.setAllOptions(chanOptions);
+        botManagerRolesMS?.setAllOptions(roleOptions);
     } catch (err) {
         if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadChannelsAndRoles failed', err);
     }
@@ -3137,7 +3210,6 @@ async function loadSettings(){
         ddHouseRavenclaw?.setValue(s.ravenclawRoleId);
         ddHouseHufflepuff?.setValue(s.hufflepuffRoleId);
         ddHouseSlytherin?.setValue(s.slytherinRoleId);
-        ddBotManagerRole?.setValue(s.botManagerRoleId);
 
         document.getElementById('xpPerMessageInput').value = s.xpPerMessage;
         document.getElementById('xpCooldownInput').value = s.xpCooldownSeconds;
@@ -3148,7 +3220,9 @@ async function loadSettings(){
         setDefaultHint('xpCooldownDefault', s.xpCooldownIsDefault);
         setDefaultHint('housePointValueDefault', s.housePointValueIsDefault);
         setDefaultHint('starboardThresholdDefault', s.starboardThresholdIsDefault);
-        setDefaultHint('botManagerRoleDefault', !s.botManagerRoleIsSet);
+        setDefaultHint('botManagerRoleDefault', s.botManagerRoleIds.length === 0);
+
+        renderBotManagerRoles(s.botManagerRoleIds);
     } catch (err) {
         if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadSettings failed', err);
     }
@@ -3235,13 +3309,38 @@ async function removeModChannelUI(channelId){
     }
 }
 
-/* Generic role-field save, used by House Roles & Bot Manager Role cards */
+/* Bot Manager roles — any number of roles, anyone holding one counts */
+function renderBotManagerRoles(roleIds){
+    const items = roleIds.map(id => ({ id, name: ROLES.find(r => r.id === id)?.name || id }));
+    botManagerRolesMS?.setItems(items);
+}
+
+async function addBotManagerRoleUI(roleId){
+    try {
+        await api('/api/settings/bot-manager-roles', { method:'POST', body: JSON.stringify({ roleId }) });
+        showToast('Bot Manager role added', 'success');
+        loadSettings();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+async function removeBotManagerRoleUI(roleId){
+    try {
+        await api(`/api/settings/bot-manager-roles/${roleId}`, { method:'DELETE' });
+        showToast('Bot Manager role removed', 'success');
+        loadSettings();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+/* Generic role-field save, used by House Roles cards */
 async function saveRoleSetting2(field, roleId){
     if (!roleId) return;
     try {
         await api('/api/settings', { method:'POST', body: JSON.stringify({ [field]: roleId }) });
         showToast('Role saved', 'success');
-        if (field === 'botManagerRoleId') loadSettings();
     } catch (err) {
         showToast(friendlyError(err.message), 'error');
     }

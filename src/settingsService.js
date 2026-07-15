@@ -20,7 +20,10 @@ const HOUSE_COLUMNS = {
 export async function getGuildSettingsSummary(guildId) {
     await ensureGuildSettings(guildId);
 
-    const { rows } = await db.query(`SELECT * FROM guild_settings WHERE guild_id = $1`, [guildId]);
+    const [{ rows }, botManagerRoleIds] = await Promise.all([
+        db.query(`SELECT * FROM guild_settings WHERE guild_id = $1`, [guildId]),
+        getBotManagerRoleIds(guildId),
+    ]);
     const s = rows[0] || {};
     const d = config.defaults;
 
@@ -39,9 +42,8 @@ export async function getGuildSettingsSummary(guildId) {
         bumpEnabled: !!s.bump_enabled,
         levelingEnabled: !!s.leveling_enabled,
 
-        // access — single Bot Manager role, no separate Admin role anymore
-        botManagerRoleId: s.bot_manager_role_id ?? null,
-        botManagerRoleIsSet: s.bot_manager_role_id != null,
+        // access — any number of Bot Manager roles, no separate Admin role
+        botManagerRoleIds,
 
         // house roles — no fallback ID, null means "not configured yet"
         gryffindorRoleId: s.gryffindor_role_id ?? null,
@@ -62,12 +64,28 @@ export async function getGuildSettingsSummary(guildId) {
     };
 }
 
-/** Just the Bot Manager role ID — used by the login flow, kept cheap/focused. */
-export async function getBotManagerRoleId(guildId) {
-    const { rows } = await db.query(`SELECT bot_manager_role_id FROM guild_settings WHERE guild_id = $1`, [
+/** Bot Manager role IDs (guild_bot_manager_roles table) — used by the login
+ * flow, kept cheap/focused. Anyone holding ANY one of these roles counts
+ * as a Bot Manager; an empty list falls back to native Administrator. */
+export async function getBotManagerRoleIds(guildId) {
+    const { rows } = await db.query(`SELECT role_id FROM guild_bot_manager_roles WHERE guild_id = $1`, [
         guildId,
     ]);
-    return rows[0]?.bot_manager_role_id ?? null;
+    return rows.map((r) => r.role_id);
+}
+
+export async function addBotManagerRole(guildId, roleId) {
+    await db.query(
+        `INSERT INTO guild_bot_manager_roles (guild_id, role_id) VALUES ($1, $2) ON CONFLICT (guild_id, role_id) DO NOTHING`,
+        [guildId, roleId],
+    );
+}
+
+export async function removeBotManagerRole(guildId, roleId) {
+    await db.query(`DELETE FROM guild_bot_manager_roles WHERE guild_id = $1 AND role_id = $2`, [
+        guildId,
+        roleId,
+    ]);
 }
 
 export function houseColumn(house) {

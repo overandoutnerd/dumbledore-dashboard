@@ -12,7 +12,7 @@ import {
     isBotManagerFor,
     PERMISSIONS,
 } from "../discord.js";
-import { getBotManagerRoleId } from "../settingsService.js";
+import { getBotManagerRoleIds } from "../settingsService.js";
 
 export const guildsRouter = Router();
 
@@ -57,10 +57,10 @@ guildsRouter.get("/guilds", requireAuth, async (req, res) => {
 
                 let isBotManager = false;
                 try {
-                    const botManagerRoleId = await getBotManagerRoleId(g.id);
-                    if (botManagerRoleId) {
+                    const botManagerRoleIds = await getBotManagerRoleIds(g.id);
+                    if (botManagerRoleIds.length > 0) {
                         const member = await getGuildMember(g.id, req.user.sub);
-                        isBotManager = !!member && member.roles.includes(botManagerRoleId);
+                        isBotManager = !!member && botManagerRoleIds.some((id) => member.roles.includes(id));
                     } else {
                         isBotManager = nativeIsAdministrator;
                     }
@@ -96,11 +96,11 @@ guildsRouter.post("/guilds/:id/select", requireAuth, async (req, res) => {
     const guildId = req.params.id;
 
     try {
-        const [member, roles, guild, botManagerRoleId] = await Promise.all([
+        const [member, roles, guild, botManagerRoleIds] = await Promise.all([
             getGuildMember(guildId, req.user.sub),
             getGuildRoles(guildId),
             getGuild(guildId, { withCounts: true }),
-            getBotManagerRoleId(guildId),
+            getBotManagerRoleIds(guildId),
         ]);
 
         if (!member || !guild) {
@@ -108,7 +108,7 @@ guildsRouter.post("/guilds/:id/select", requireAuth, async (req, res) => {
         }
 
         const permissions = computePermissions(member, roles, guild);
-        const isBotManager = isBotManagerFor(member, botManagerRoleId, permissions.isAdministrator);
+        const isBotManager = isBotManagerFor(member, botManagerRoleIds, permissions.isAdministrator);
 
         const hasDashboardAccess = isBotManager || permissions.canManageGuild || permissions.canManageRoles;
 
