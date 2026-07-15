@@ -726,6 +726,7 @@ body{
 .we-item-actions{display:flex;gap:6px;flex-shrink:0;}
 .we-item-actions .btn{padding:7px 10px;}
 .we-add-btn{margin-top:10px;}
+.we-viewall-btn{margin-top:2px;}
 .we-empty{font-size:12px;color:var(--parchment-faint);font-style:italic;font-family:"Cormorant Garamond",serif;margin-top:8px;}
 
 .we-editor-card{
@@ -1132,22 +1133,6 @@ body{
 
                 <div class="setting-row">
                     <div class="setting-text">
-                        <div class="sname"><span data-icon="join" data-size="13"></span> Welcome Messages <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-welcome</span></div>
-                        <div class="sdesc">Greet new witches and wizards as they arrive.</div>
-                    </div>
-                    <div class="toggle" id="toggle-welcome" onclick="toggleSetting('welcome')"><div class="knob"></div></div>
-                </div>
-                <div class="sub-panel" id="sub-welcome">
-                    <div class="sub-panel-inner">
-                        <div class="dd" id="dd-welcome"></div>
-                        <p class="field-hint" style="margin-top:10px;">The bot picks one of these at random for each new member. No messages yet? It falls back to a built-in rotation.</p>
-                        <div class="we-list" id="welcomeMessagesList"></div>
-                        <button class="btn btn-ghost btn-block we-add-btn" onclick="openWelcomeEditor()"><span data-icon="plus" data-size="12"></span> Add Welcome Message</button>
-                    </div>
-                </div>
-
-                <div class="setting-row">
-                    <div class="setting-text">
                         <div class="sname"><span data-icon="star" data-size="13"></span> Starboard <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-starboard</span></div>
                         <div class="sdesc">Pins messages that earn enough star reactions to a showcase channel.</div>
                     </div>
@@ -1194,6 +1179,27 @@ body{
                     <div class="toggle" id="toggle-bump" onclick="toggleSetting('bump')"><div class="knob"></div></div>
                 </div>
                 <p class="locked-note login-hidden" id="settingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission — showing read-only</p>
+            </div>
+
+            <div class="card">
+                <h3>Welcome Messages <span class="tag">/configure-welcome</span></h3>
+                <p class="field-hint" style="margin-top:-4px;margin-bottom:10px;">Greet new witches and wizards as they arrive.</p>
+
+                <div class="setting-row">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="join" data-size="13"></span> Enabled</div>
+                        <div class="sdesc">Turn welcome messages on or off for this server.</div>
+                    </div>
+                    <div class="toggle" id="toggle-welcome" onclick="toggleSetting('welcome')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-welcome">
+                    <div class="sub-panel-inner">
+                        <div class="dd" id="dd-welcome"></div>
+                        <p class="field-hint" style="margin-top:10px;">The bot picks one of these at random for each new member. No messages yet? It falls back to a built-in rotation.</p>
+                        <div class="we-list" id="welcomeMessagesList"></div>
+                        <button class="btn btn-ghost btn-block we-add-btn" onclick="openWelcomeEditor()"><span data-icon="plus" data-size="12"></span> Add Welcome Message</button>
+                    </div>
+                </div>
             </div>
 
             <div class="card">
@@ -2847,14 +2853,23 @@ function weInsertAtCursor(text){
     weUpdatePreview();
 }
 
+const WE_PAGE_SIZE = 5;
+let weListExpanded = false;
+
 async function loadWelcomeMessages(){
     try {
         const data = await api('/api/welcome-messages');
         WELCOME_MESSAGES = data.messages || [];
+        weListExpanded = false;
         renderWelcomeMessagesList();
     } catch (err) {
         if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadWelcomeMessages failed', err);
     }
+}
+
+function weShowAll(){
+    weListExpanded = true;
+    renderWelcomeMessagesList();
 }
 
 function renderWelcomeMessagesList(){
@@ -2866,7 +2881,10 @@ function renderWelcomeMessagesList(){
         return;
     }
 
-    list.innerHTML = WELCOME_MESSAGES.map(m => {
+    const visible = weListExpanded ? WELCOME_MESSAGES : WELCOME_MESSAGES.slice(0, WE_PAGE_SIZE);
+    const remaining = WELCOME_MESSAGES.length - visible.length;
+
+    list.innerHTML = visible.map(m => {
         const title = m.embedTitle || m.outsideMessage || m.embedDescription || 'Untitled message';
         const sub = m.embedDescription || m.outsideMessage || '';
         return `
@@ -2881,6 +2899,10 @@ function renderWelcomeMessagesList(){
             </div>
         </div>`;
     }).join('');
+
+    if (remaining > 0){
+        list.innerHTML += `<button class="btn btn-ghost btn-block we-viewall-btn" onclick="weShowAll()">View All (${WELCOME_MESSAGES.length})</button>`;
+    }
 
     hydrateStaticIcons(list);
 }
