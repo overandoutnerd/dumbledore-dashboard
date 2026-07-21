@@ -534,14 +534,7 @@ body{
     .stat-grid{grid-template-columns:repeat(4,1fr);}
 }
 
-/* ============ LOGIN GATE ============ */
-.login-gate{
-    position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
-    padding:24px;background:
-        radial-gradient(ellipse at 20% 0%, rgba(156,43,43,.28), transparent 55%),
-        radial-gradient(ellipse at 85% 100%, rgba(31,122,92,.2), transparent 50%),
-        linear-gradient(180deg, var(--night), var(--night-2));
-}
+/* ============ LOGIN GATE (server picker card, still used post-login) ============ */
 .login-card{
     max-width:360px;width:100%;text-align:center;padding:36px 26px 30px;
     background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;
@@ -568,6 +561,68 @@ body{
     background:rgba(156,43,43,.15);border:1px solid rgba(156,43,43,.4);color:#e08080;
 }
 .login-hidden{display:none !important;}
+
+/* fixed full-screen wrapper shared by the server-picker overlay */
+.login-gate{
+    position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+    padding:24px;background:
+        radial-gradient(ellipse at 20% 0%, rgba(156,43,43,.28), transparent 55%),
+        radial-gradient(ellipse at 85% 100%, rgba(31,122,92,.2), transparent 50%),
+        linear-gradient(180deg, var(--night), var(--night-2));
+}
+
+/* ============ LANDING PAGE (signed-out home) ============ */
+.landing{
+    position:fixed;inset:0;z-index:200;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    background:
+        radial-gradient(ellipse at 20% 0%, rgba(156,43,43,.28), transparent 55%),
+        radial-gradient(ellipse at 85% 15%, rgba(31,122,92,.2), transparent 50%),
+        linear-gradient(180deg, var(--night), var(--night-2));
+}
+.landing-nav{
+    display:flex;align-items:center;justify-content:space-between;
+    max-width:1040px;margin:0 auto;padding:20px 22px 0;
+}
+.landing-brand{
+    display:flex;align-items:center;gap:10px;
+    font-family:"Cinzel",serif;font-size:14.5px;letter-spacing:.04em;color:var(--gold-light);
+}
+.landing-brand .icon-wrap{
+    width:32px;height:32px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,var(--maroon),var(--jade));
+    border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold-light);
+}
+.landing-hero{max-width:620px;margin:0 auto;text-align:center;padding:44px 24px 12px;position:relative;}
+.landing-hero .hero-emblem{
+    width:72px;height:72px;border-radius:50%;margin:0 auto 20px;
+    background:linear-gradient(135deg,var(--maroon),var(--jade));
+    border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 40px rgba(252,165,3,.32);color:var(--gold-light);
+}
+.landing-hero h1{font-family:"Cinzel",serif;font-size:30px;color:var(--gold-light);margin-bottom:14px;line-height:1.2;}
+.landing-hero .hero-sub{
+    font-family:"Cormorant Garamond",serif;font-size:17px;font-style:italic;
+    color:var(--parchment-dim);line-height:1.6;margin-bottom:26px;
+}
+.landing-hero .discord-login-btn{max-width:300px;margin:0 auto;}
+.landing-hero .login-error{max-width:300px;margin-left:auto;margin-right:auto;text-align:left;}
+.landing-features{
+    max-width:1000px;margin:8px auto 0;padding:24px 22px 0;
+    display:grid;grid-template-columns:1fr;gap:14px;
+}
+@media (min-width:640px){.landing-features{grid-template-columns:1fr 1fr;}}
+@media (min-width:960px){.landing-features{grid-template-columns:repeat(3,1fr);}}
+.feature-card .ficon{
+    width:36px;height:36px;border-radius:10px;margin-bottom:12px;
+    background:rgba(252,165,3,.12);border:1px solid var(--card-border);
+    display:flex;align-items:center;justify-content:center;color:var(--gold-light);
+}
+.feature-card .ftitle{font-family:"Cinzel",serif;font-size:13px;letter-spacing:.03em;color:var(--gold-light);margin-bottom:6px;}
+.feature-card .fdesc{font-family:"Poppins",sans-serif;font-size:12px;color:var(--parchment-dim);line-height:1.55;}
+.landing-footer{
+    max-width:1000px;margin:30px auto 0;padding:20px 22px 34px;text-align:center;
+    font-size:11px;color:var(--parchment-faint);border-top:1px solid var(--card-border);
+}
 
 /* ============ SERVER PICKER ============ */
 .server-row{
@@ -841,18 +896,62 @@ body{
 <div class="mandala tl"></div>
 <div class="mandala br"></div>
 
-<!-- LOGIN GATE -->
-<div class="login-gate" id="loginGate">
-    <div class="login-card">
-        <div class="login-emblem"><span data-icon="wand" data-size="26"></span></div>
-        <h2>Headmaster's Office</h2>
-        <p>Sign in with your Discord account to enter your server's mod dashboard.</p>
+<!-- LANDING PAGE (shown when signed out) -->
+<div class="landing" id="loginGate">
+    <header class="landing-nav">
+        <div class="landing-brand">
+            <div class="icon-wrap"><span data-icon="wand" data-size="16"></span></div>
+            Dumbledore
+        </div>
+        <a class="btn btn-primary btn-sm" href="/auth/login">Sign in</a>
+    </header>
+
+    <section class="landing-hero">
+        <div class="hero-emblem"><span data-icon="wand" data-size="30"></span></div>
+        <p class="eyebrow">Mod Dashboard</p>
+        <h1>Headmaster's Office</h1>
+        <p class="hero-sub">House points, Azkaban sentencing, bot identity, and server settings — all in one place, reading and writing the same live database as the bot itself.</p>
         <a class="discord-login-btn" href="/auth/login">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.099.246.197.373.291a.077.077 0 0 1-.006.128 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.106c.36.698.772 1.362 1.225 1.994a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.001-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.062.062 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.096 2.157 2.42 0 1.333-.955 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
             Continue with Discord
         </a>
         <div class="login-error login-hidden" id="loginError"></div>
-    </div>
+    </section>
+
+    <section class="landing-features">
+        <div class="card feature-card">
+            <div class="ficon"><span data-icon="trophy" data-size="17"></span></div>
+            <div class="ftitle">House Cup &amp; XP</div>
+            <div class="fdesc">Live house points and the XP leaderboard, straight from Postgres — nothing mocked.</div>
+        </div>
+        <div class="card feature-card">
+            <div class="ficon"><span data-icon="azkaban" data-size="17"></span></div>
+            <div class="ftitle">Azkaban</div>
+            <div class="fdesc">Sentence and pardon members with real Discord role changes, plus a full release history.</div>
+        </div>
+        <div class="card feature-card">
+            <div class="ficon"><span data-icon="bot" data-size="17"></span></div>
+            <div class="ftitle">Bot Identity</div>
+            <div class="fdesc">Update the bot's nickname, avatar, and banner through Discord's real REST API.</div>
+        </div>
+        <div class="card feature-card">
+            <div class="ficon"><span data-icon="settings" data-size="17"></span></div>
+            <div class="ftitle">Server Settings</div>
+            <div class="fdesc">Configure logging, starboard, and Sorting Hat channels — changes take effect immediately.</div>
+        </div>
+        <div class="card feature-card">
+            <div class="ficon"><span data-icon="shield" data-size="17"></span></div>
+            <div class="ftitle">Role-Gated Access</div>
+            <div class="fdesc">Only members with Manage Server/Roles or a configured mod role can sign in.</div>
+        </div>
+        <div class="card feature-card">
+            <div class="ficon"><span data-icon="barChart" data-size="17"></span></div>
+            <div class="ftitle">Growth &amp; Activity</div>
+            <div class="fdesc">Track joins, leaves, and member growth over the last 7 and 30 days.</div>
+        </div>
+    </section>
+
+    <footer class="landing-footer">Built for Harry Potter servers</footer>
 </div>
 
 <!-- SERVER PICKER -->
@@ -1203,6 +1302,27 @@ body{
                         <div class="sdesc">Thanks whoever bumps the server and sends a reminder once the cooldown ends.</div>
                     </div>
                     <div class="toggle" id="toggle-bump" onclick="toggleSetting('bump')"><div class="knob"></div></div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="wand" data-size="13"></span> AI Responses</div>
+                        <div class="sdesc">Lets Dumbledore occasionally reply in-character with a fresh AI-generated line instead of a canned quote.</div>
+                    </div>
+                    <div class="toggle" id="toggle-airesponse" onclick="toggleSetting('airesponse')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-airesponse">
+                    <div class="sub-panel-inner">
+                        <div class="field-group" style="margin-bottom:0;">
+                            <label class="field-label">Response probability</label>
+                            <div class="field-input-row">
+                                <input class="field-input" id="aiResponseProbabilityInput" type="number" min="10" max="100" step="1">
+                                <span class="tag" style="color:var(--parchment-faint);">%</span>
+                                <button class="btn btn-primary btn-sm" onclick="saveAiResponseProbability()">Save</button>
+                            </div>
+                            <p class="field-hint">Chance, per eligible message, that Dumbledore uses an AI-generated reply. 10% to 100%.</p>
+                        </div>
+                    </div>
                 </div>
                 <p class="locked-note login-hidden" id="settingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission — showing read-only</p>
             </div>
@@ -3232,7 +3352,7 @@ function weRenderPickerList(){
     });
 }
 
-let settingState = { logs:false, welcome:false, starboard:false, azkaban:false, sortinghat:false, bump:false, leveling:false };
+let settingState = { logs:false, welcome:false, starboard:false, azkaban:false, sortinghat:false, bump:false, leveling:false, airesponse:false };
 
 async function loadSettings(){
     try {
@@ -3242,6 +3362,7 @@ async function loadSettings(){
             starboard: s.starboardEnabled, azkaban: s.azkabanEnabled,
             sortinghat: s.sortingHatEnabled,
             bump: s.bumpEnabled, leveling: s.levelingEnabled,
+            airesponse: s.aiResponseEnabled,
         };
 
         setToggleUI('logs', s.logsEnabled, ddLogs, s.logChannelId);
@@ -3251,6 +3372,9 @@ async function loadSettings(){
         setToggleUI('sortinghat', s.sortingHatEnabled, ddSortingHat, s.sortingHatChannelId);
         setToggleUI('bump', s.bumpEnabled);
         setToggleUI('leveling', s.levelingEnabled);
+        setToggleUI('airesponse', s.aiResponseEnabled);
+
+        document.getElementById('aiResponseProbabilityInput').value = Math.round((s.aiResponseProbability ?? 0.1) * 100);
 
         document.getElementById('starboardThresholdHint').textContent = `Threshold: ${s.starboardThreshold} reaction${s.starboardThreshold === 1 ? '' : 's'}`;
 
@@ -3296,7 +3420,7 @@ async function toggleSetting(key){
     document.getElementById('toggle-'+key).classList.toggle('on', settingState[key]);
     document.getElementById('sub-'+key)?.classList.toggle('open', settingState[key]);
 
-    const fieldMap = { logs:'logsEnabled', welcome:'welcomeEnabled', starboard:'starboardEnabled', azkaban:'azkabanEnabled', sortinghat:'sortingHatEnabled', bump:'bumpEnabled', leveling:'levelingEnabled' };
+    const fieldMap = { logs:'logsEnabled', welcome:'welcomeEnabled', starboard:'starboardEnabled', azkaban:'azkabanEnabled', sortinghat:'sortingHatEnabled', bump:'bumpEnabled', leveling:'levelingEnabled', airesponse:'aiResponseEnabled' };
     try {
         await api('/api/settings', { method:'POST', body: JSON.stringify({ [fieldMap[key]]: settingState[key] }) });
         showToast(settingState[key] ? 'Enabled' : 'Disabled', 'success');
@@ -3404,6 +3528,23 @@ async function saveNumberSetting(field, inputId){
     }
     try {
         await api('/api/settings', { method:'POST', body: JSON.stringify({ [field]: value }) });
+        showToast('Saved', 'success');
+        loadSettings();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+/* AI response probability — stored as a 0.1-1 decimal, edited as a 10-100 percent */
+async function saveAiResponseProbability(){
+    const raw = document.getElementById('aiResponseProbabilityInput').value;
+    const pct = Number(raw);
+    if (raw === '' || !Number.isFinite(pct) || pct < 10 || pct > 100) {
+        showToast('Enter a number between 10 and 100', 'warn');
+        return;
+    }
+    try {
+        await api('/api/settings', { method:'POST', body: JSON.stringify({ aiResponseProbability: pct / 100 }) });
         showToast('Saved', 'success');
         loadSettings();
     } catch (err) {

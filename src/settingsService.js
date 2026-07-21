@@ -41,6 +41,8 @@ export async function getGuildSettingsSummary(guildId) {
         sortingHatChannelId: s.sorting_hat_channel_id,
         bumpEnabled: !!s.bump_enabled,
         levelingEnabled: !!s.leveling_enabled,
+        aiResponseEnabled: !!s.ai_response_enabled,
+        aiResponseProbability: s.ai_response_probability ?? 0.1,
 
         // access — any number of Bot Manager roles, no separate Admin role
         botManagerRoleIds,

@@ -489,6 +489,8 @@ apiRouter.post("/settings", requireManageGuild, async (req, res) => {
         ["sortingHatChannelId", "sorting_hat_channel_id", "str"],
         ["bumpEnabled", "bump_enabled", "bool"],
         ["levelingEnabled", "leveling_enabled", "bool"],
+        ["aiResponseEnabled", "ai_response_enabled", "bool"],
+        ["aiResponseProbability", "ai_response_probability", "prob"],
 
         // House roles
         ["gryffindorRoleId", "gryffindor_role_id", "str"],
@@ -514,6 +516,7 @@ apiRouter.post("/settings", requireManageGuild, async (req, res) => {
         if (kind === "bool" && typeof raw !== "boolean") continue;
         if (kind === "str" && raw !== null && typeof raw !== "string") continue;
         if (kind === "int" && raw !== null && (typeof raw !== "number" || !Number.isFinite(raw))) continue;
+        if (kind === "prob" && (typeof raw !== "number" || !Number.isFinite(raw) || raw < 0.1 || raw > 1)) continue;
 
         sets.push(`${column} = $${i}`);
         values.push(raw);
