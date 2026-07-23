@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Interview Transcript — Dumbledore</title>
+<meta name="theme-color" content="#0c0e1f">
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/css/components.css">
+<link rel="stylesheet" href="/css/tabs.css">
+
+<style>
+    body{
+        min-height:100vh;
+        display:flex;
+        flex-direction:column;
+        background:
+            radial-gradient(ellipse at top, var(--night-3), var(--night) 70%);
+        font-family:"Poppins", sans-serif;
+        color:var(--parchment);
+    }
+
+    .viewer-topbar{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:16px 20px;
+        border-bottom:1px solid var(--card-border);
+        background:rgba(12,14,31,.55);
+        backdrop-filter:blur(6px);
+    }
+
+    .viewer-topbar h1{
+        font-family:"Cinzel", serif;
+        font-size:16px;
+        font-weight:600;
+        color:var(--gold-light);
+        letter-spacing:.02em;
+    }
+
+    .viewer-body{
+        flex:1;
+        display:flex;
+        flex-direction:column;
+    }
+
+    .state-screen{
+        margin:auto;
+        max-width:420px;
+        text-align:center;
+        padding:32px 24px;
+    }
+
+    .state-screen .eicon{
+        font-size:34px;
+        margin-bottom:14px;
+    }
+
+    .state-screen h2{
+        font-family:"Cinzel", serif;
+        font-size:19px;
+        margin-bottom:10px;
+        color:var(--parchment);
+    }
+
+    .state-screen p{
+        font-size:14px;
+        line-height:1.55;
+        color:var(--parchment-dim);
+        margin-bottom:20px;
+    }
+
+    .state-screen .btn-primary{
+        display:inline-block;
+        padding:11px 22px;
+        border-radius:10px;
+        background:linear-gradient(120deg,var(--gold-light),var(--marigold));
+        color:var(--night);
+        font-weight:600;
+        font-size:14px;
+        text-decoration:none;
+        box-shadow:0 10px 26px -12px rgba(252,165,3,.55);
+    }
+
+    #transcriptContainer{
+        flex:1;
+        width:100%;
+        display:none;
+        padding:20px 16px 60px;
+    }
+
+    #transcriptContainer .interview-transcript-wrap{
+        max-width:640px;
+        margin:0 auto;
+    }
+</style>
+</head>
+<body>
+
+<div class="viewer-topbar">
+    <h1>🦉 Interview Transcript</h1>
+</div>
+
+<div class="viewer-body">
+    <div class="state-screen" id="stateScreen">
+        <div class="eicon">⏳</div>
+        <h2 id="stateTitle">Loading transcript…</h2>
+        <p id="stateMessage">One moment.</p>
+        <a class="btn-primary" id="stateAction" style="display:none;"></a>
+    </div>
+
+    <div id="transcriptContainer"></div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="/js/icons.js"></script>
+<script src="/js/transcript-render.js"></script>
+<script src="/js/interview-viewer.js"></script>
+</body>
+</html>

@@ -24,6 +24,7 @@ import {
 import { ensureFresh, resolveMember, memberCount, searchCached } from "../memberCache.js";
 import { COMMANDS } from "../commands.js";
 import * as analytics from "../analytics.js";
+import { listInterviewsForGuild } from "../interviewsService.js";
 import {
     getGuildSettingsSummary,
     getModChannelIds,
@@ -292,6 +293,28 @@ apiRouter.get("/azkaban", requireAuth, async (req, res) => {
     });
 });
 
+/* ── /api/interviews ───────────────────────────────────────────────── */
+
+apiRouter.get("/interviews", requireAuth, async (req, res) => {
+    await ensureFresh(req.guildId);
+
+    const interviews = await listInterviewsForGuild(req.guildId);
+
+    res.json({
+        interviews: interviews.map((interview) => ({
+            id: interview.id,
+            publicId: interview.publicId,
+            number: interview.number,
+            status: interview.status,
+            target: resolveMember(req.guildId, interview.targetUserId),
+            creator: resolveMember(req.guildId, interview.creatorId),
+            mods: interview.modIds.map((id) => resolveMember(req.guildId, id)),
+            openedAt: interview.openedAt ? new Date(interview.openedAt).getTime() : null,
+            closedAt: interview.closedAt ? new Date(interview.closedAt).getTime() : null,
+        })),
+    });
+});
+
 apiRouter.post("/azkaban/:id/pardon", requireManageRoles, async (req, res) => {
     const prisonerId = Number(req.params.id);
 
@@ -487,6 +510,9 @@ apiRouter.post("/settings", requireManageGuild, async (req, res) => {
         ["azkabanRoleId", "azkaban_role_id", "str"],
         ["sortingHatEnabled", "sorting_hat_enabled", "bool"],
         ["sortingHatChannelId", "sorting_hat_channel_id", "str"],
+        ["interviewsEnabled", "interviews_enabled", "bool"],
+        ["interviewLogChannelId", "interview_log_channel_id", "str"],
+        ["interviewCategoryId", "interview_category_id", "str"],
         ["bumpEnabled", "bump_enabled", "bool"],
         ["levelingEnabled", "leveling_enabled", "bool"],
         ["aiResponseEnabled", "ai_response_enabled", "bool"],
@@ -556,12 +582,29 @@ apiRouter.get("/channels", requireAuth, async (req, res) => {
         const channels = await getGuildChannels(req.guildId);
         const textLike = channels
             .filter((c) => [0, 5, 15].includes(c.type)) // text, announcement, forum
-            .map((c) => ({ id: c.id, name: c.name }))
+            .map((c) => ({ id: c.id, name: c.name, parentId: c.parent_id ?? null }))
             .sort((a, b) => a.name.localeCompare(b.name));
 
         res.json({ channels: textLike });
     } catch (err) {
         console.error("[api/channels]", err);
+        res.status(502).json({ error: "upstream_error" });
+    }
+});
+
+/* ── /api/categories — for the Interviews category picker ─────────── */
+
+apiRouter.get("/categories", requireAuth, async (req, res) => {
+    try {
+        const channels = await getGuildChannels(req.guildId);
+        const categories = channels
+            .filter((c) => c.type === 4) // GuildCategory
+            .map((c) => ({ id: c.id, name: c.name }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+        res.json({ categories });
+    } catch (err) {
+        console.error("[api/categories]", err);
         res.status(502).json({ error: "upstream_error" });
     }
 });

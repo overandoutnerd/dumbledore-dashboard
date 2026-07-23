@@ -1,0 +1,103 @@
+/* ============ USER CHIP / LOGOUT ============ */
+.user-chip{display:flex;align-items:center;gap:7px;padding:5px 10px 5px 5px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid var(--card-border);flex-shrink:0;}
+.user-chip img{width:22px;height:22px;border-radius:50%;}
+.user-chip span{font-size:11px;color:var(--parchment-dim);max-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.logout-btn{background:none;border:none;color:var(--parchment-faint);font-size:13px;cursor:pointer;padding:2px 4px;}
+
+/* ============ PERMISSION-GATED STATES ============ */
+.locked-note{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--parchment-faint);margin-top:8px;padding:8px 10px;background:rgba(255,255,255,.02);border-radius:8px;border:1px dashed var(--card-border);}
+.btn:disabled, .toggle.disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.skeleton{background:linear-gradient(100deg,rgba(255,255,255,.03) 30%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.03) 70%);background-size:200% 100%;animation:shimmer 1.4s linear infinite;border-radius:8px;color:transparent !important;}
+
+/* ============ AZKABAN ACTIONS ============ */
+.prisoner-actions{display:flex;gap:6px;margin-top:8px;}
+.sentence-form{margin-top:14px;padding-top:14px;border-top:1px solid rgba(218,165,32,.1);}
+.member-result{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:9px;cursor:pointer;transition:background .2s ease;}
+.member-result:hover{background:rgba(255,255,255,.04);}
+.member-result img{width:26px;height:26px;border-radius:50%;}
+.member-result span{font-size:12.5px;color:var(--parchment);}
+.selected-member{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:10px;background:rgba(252,165,3,.08);border:1px solid var(--thread);margin-bottom:8px;}
+.selected-member img{width:24px;height:24px;border-radius:50%;}
+.selected-member span{font-size:12.5px;color:var(--gold-light);flex:1;}
+.selected-member button{background:none;border:none;color:var(--parchment-faint);font-size:14px;cursor:pointer;}
+
+/* ============ SPARKLINE ============ */
+.spark-bar{flex:1;background:linear-gradient(180deg,var(--gold-light),var(--marigold));border-radius:3px 3px 1px 1px;min-height:3px;position:relative;transition:height .5s ease;}
+.spark-bar.empty{background:rgba(255,255,255,.06);}
+.top-cmd-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(218,165,32,.08);}
+.top-cmd-row:last-child{border-bottom:none;}
+.top-cmd-rank{font-family:"Cinzel",serif;font-size:12px;color:var(--parchment-faint);width:16px;}
+.top-cmd-name{flex:1;font-family:"Cinzel",serif;font-size:12.5px;color:var(--gold-light);}
+.top-cmd-count{font-size:11.5px;color:var(--parchment-dim);}
+.top-cmd-today{font-size:9.5px;color:var(--jade);background:rgba(31,122,92,.15);padding:2px 7px;border-radius:999px;margin-left:6px;}
+
+/* ============ ICONS ============ */
+.icon{flex-shrink:0;vertical-align:-3px;}
+.eicon-wrap{display:inline-flex;align-items:center;justify-content:center;}
+
+/* ============ CUSTOM DROPDOWN (replaces <select>) ============ */
+.dd{position:relative;width:100%;}
+.dd-trigger{
+    width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:11px 14px;border-radius:11px;background:rgba(255,255,255,.03);
+    border:1px solid var(--card-border);color:var(--parchment);font-family:"Poppins",sans-serif;font-size:12.5px;
+    cursor:pointer;text-align:left;transition:border-color .2s ease;box-sizing:border-box;
+}
+.dd-trigger:hover{border-color:var(--thread);}
+.dd-trigger.disabled{opacity:.4;pointer-events:none;}
+.dd-trigger .dd-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--parchment-dim);}
+.dd-trigger .dd-label.filled{color:var(--parchment);}
+.dd-trigger .dd-chevron{color:var(--gold);flex-shrink:0;transition:transform .2s ease;}
+.dd.open .dd-trigger .dd-chevron{transform:rotate(180deg);}
+.dd-panel{
+    position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:40;
+    background:var(--night-2);border:1px solid var(--thread);border-radius:12px;
+    box-shadow:0 20px 40px -10px rgba(0,0,0,.6);max-height:240px;overflow-y:auto;
+    display:none;padding:6px;
+}
+.dd.open .dd-panel{display:block;}
+.dd-search{
+    width:100%;padding:9px 11px;margin-bottom:5px;border-radius:8px;
+    background:rgba(255,255,255,.04);border:1px solid var(--card-border);color:var(--parchment);
+    font-family:"Poppins",sans-serif;font-size:12px;outline:none;box-sizing:border-box;
+}
+.dd-option{
+    padding:9px 11px;border-radius:8px;font-size:12.5px;color:var(--parchment);cursor:pointer;
+    display:flex;align-items:center;gap:8px;transition:background .15s ease;
+}
+.dd-option:hover{background:rgba(252,165,3,.1);}
+.dd-option.selected{background:rgba(252,165,3,.15);color:var(--gold-light);}
+.dd-option .dd-check{margin-left:auto;color:var(--marigold);flex-shrink:0;}
+.dd-empty{padding:12px;font-size:12px;color:var(--parchment-faint);text-align:center;font-style:italic;}
+
+/* ============ CUSTOM MULTI-SELECT (mod channels) ============ */
+.ms-wrap{width:100%;}
+.ms-selected{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;}
+.ms-chip{
+    display:flex;align-items:center;gap:6px;padding:6px 8px 6px 11px;border-radius:999px;
+    background:rgba(252,165,3,.1);border:1px solid var(--thread);color:var(--gold-light);font-size:11.5px;
+}
+.ms-chip button{background:none;border:none;color:var(--parchment-dim);cursor:pointer;display:flex;padding:2px;}
+.ms-chip button:hover{color:#e08080;}
+.ms-empty-note{font-size:11.5px;color:var(--parchment-faint);font-style:italic;margin-bottom:9px;}
+
+
+/* ============ IDENTITY BUTTON GRID (fixes mobile overflow) ============ */
+.identity-subsection{margin-bottom:16px;}
+.identity-subsection:last-child{margin-bottom:0;}
+.identity-subsection-label{font-family:"Cinzel",serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.identity-btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.identity-btn-grid .btn{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;padding:10px 8px;}
+
+
+/* ============ TOUR RETAKE BUTTON (Settings card header) ============ */
+.tour-card-row{display:flex;align-items:center;justify-content:space-between;gap:14px;}
+.tour-retake-btn{
+    flex-shrink:0;width:42px;height:42px;border-radius:13px;border:none;cursor:pointer;
+    background:linear-gradient(120deg,var(--gold-light),var(--marigold));color:var(--night);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 22px -10px rgba(252,165,3,.55);
+    transition:transform .15s ease, box-shadow .15s ease;
+}
+.tour-retake-btn:hover{transform:translateY(-1px);box-shadow:0 14px 28px -10px rgba(252,165,3,.65);}
+.tour-retake-btn:active{transform:translateY(0);}

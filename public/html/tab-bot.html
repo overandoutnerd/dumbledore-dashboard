@@ -1,0 +1,92 @@
+    <!-- ================= BOT ================= -->
+    <div class="tab-panel" id="panel-bot">
+        <div class="page">
+            <div class="page-head">
+                <p class="eyebrow">Wand & Robes</p>
+                <h2>Bot Identity</h2>
+                <p>Customize how Dumbledore appears in this server.</p>
+            </div>
+
+            <div class="identity-card" id="identityCard">
+                <div class="bot-banner" id="botBannerWrap">
+                    <div class="shimmer"></div>
+                    <button class="bot-banner-edit" id="editBannerBtn">Edit Banner</button>
+                </div>
+                <div class="identity-body">
+                    <div class="bot-avatar-wrap">
+                        <div class="bot-avatar" id="botAvatarWrap"><span data-icon="wand" data-size="28"></span></div>
+                        <div class="avatar-edit-dot" id="editAvatarBtn"><span data-icon="edit" data-size="11"></span></div>
+                    </div>
+                    <div class="bot-name-row">
+                        <h2 id="botDisplayName">Dumbledore</h2>
+                        <span class="bot-verified"><span data-icon="check" data-size="11"></span></span>
+                    </div>
+                    <p class="bot-tag" id="botTag">Loading…</p>
+                </div>
+            </div>
+            <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
+            <input type="file" id="bannerFileInput" accept="image/*" style="display:none;">
+
+            <div class="card">
+                <h3>Server Nickname</h3>
+                <div class="field-group" style="margin-bottom:6px;">
+                    <div class="field-input-row">
+                        <input class="field-input" id="nicknameInput" type="text" placeholder="Dumbledore" maxlength="32">
+                        <button class="btn btn-primary" id="saveNicknameBtn" onclick="saveNickname()">Save</button>
+                    </div>
+                    <p class="field-hint">Shown as the bot's display name in this server only.</p>
+                    <p class="locked-note login-hidden" id="nicknameLock"><span data-icon="lock" data-size="12"></span> Requires Bot Manager access</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Avatar &amp; Banner</h3>
+                <div class="identity-subsection">
+                    <div class="identity-subsection-label"><span data-icon="camera" data-size="12"></span> Avatar</div>
+                    <div class="identity-btn-grid">
+                        <button class="btn btn-ghost btn-sm" id="changeAvatarBtn"><span data-icon="camera" data-size="13"></span> Change</button>
+                        <button class="btn btn-ghost btn-sm" id="resetAvatarBtn"><span data-icon="undo" data-size="13"></span> Reset</button>
+                    </div>
+                </div>
+                <div class="identity-subsection">
+                    <div class="identity-subsection-label"><span data-icon="image" data-size="12"></span> Banner</div>
+                    <div class="identity-btn-grid">
+                        <button class="btn btn-ghost btn-sm" id="changeBannerBtn"><span data-icon="image" data-size="13"></span> Change</button>
+                        <button class="btn btn-ghost btn-sm" id="resetBannerBtn"><span data-icon="undo" data-size="13"></span> Reset</button>
+                    </div>
+                </div>
+                <p class="field-hint" style="margin-top:10px;">Guild-specific avatar/banner changes require Bot Manager access and take effect instantly.</p>
+                <p class="locked-note login-hidden" id="avatarLock"><span data-icon="lock" data-size="12"></span> Requires Bot Manager access</p>
+            </div>
+
+            <div class="card">
+                <h3>Bot Status</h3>
+                <div class="info-list">
+                    <div class="info-row"><span class="ilabel"><span data-icon="home" data-size="13"></span> Server</span><span class="ivalue" id="statServerName">—</span></div>
+                    <div class="info-row"><span class="ilabel"><span data-icon="users" data-size="13"></span> Members</span><span class="ivalue" id="statServerMembers">—</span></div>
+                    <div class="info-row"><span class="ilabel"><span data-icon="hash" data-size="13"></span> Commands</span><span class="ivalue">23</span></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Identity Commands</h3>
+                <div class="cmd-shortcut-row">
+                    <div><div class="cs-name">/set-avatar</div><div class="cs-desc">Upload a new server avatar</div></div>
+                    <button class="copy-btn" onclick="copyCmd('/set-avatar')">Copy</button>
+                </div>
+                <div class="cmd-shortcut-row">
+                    <div><div class="cs-name">/reset-avatar</div><div class="cs-desc">Revert to default avatar</div></div>
+                    <button class="copy-btn" onclick="copyCmd('/reset-avatar')">Copy</button>
+                </div>
+                <div class="cmd-shortcut-row">
+                    <div><div class="cs-name">/set-banner</div><div class="cs-desc">Upload a new server banner</div></div>
+                    <button class="copy-btn" onclick="copyCmd('/set-banner')">Copy</button>
+                </div>
+                <div class="cmd-shortcut-row">
+                    <div><div class="cs-name">/reset-banner</div><div class="cs-desc">Revert to default banner</div></div>
+                    <button class="copy-btn" onclick="copyCmd('/reset-banner')">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+

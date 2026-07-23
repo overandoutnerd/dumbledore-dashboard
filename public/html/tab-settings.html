@@ -1,0 +1,253 @@
+    <!-- ================= SETTINGS ================= -->
+    <div class="tab-panel" id="panel-settings">
+        <div class="page">
+            <div class="page-head">
+                <p class="eyebrow">Ministry Records</p>
+                <h2>Settings</h2>
+                <p>Configure the systems that keep the castle running.</p>
+            </div>
+
+            <div class="card">
+                <div class="tour-card-row">
+                    <div>
+                        <h3 style="margin-bottom:2px;">Dumbledore's Tour</h3>
+                        <p class="field-hint">Get shown around the dashboard again, from the top.</p>
+                    </div>
+                    <button class="tour-retake-btn" onclick="startTour()" title="Retake the tour" aria-label="Retake the tour">
+                        <span data-icon="play" data-size="15"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card" id="interviewsCard">
+                <h3>Interviews</h3>
+                <p class="field-hint" style="margin-top:-4px;margin-bottom:10px;">Lets mods open a private interview channel with a member via /interview.</p>
+
+                <div class="setting-row" id="row-interviews">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="scroll" data-size="13"></span> Enabled</div>
+                        <div class="sdesc">Turn the interview system on or off for this server.</div>
+                    </div>
+                    <div class="toggle" id="toggle-interviews" onclick="toggleSetting('interviews')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-interviews">
+                    <div class="sub-panel-inner">
+                        <div class="field-group">
+                            <label class="field-label">Category</label>
+                            <div class="dd" id="dd-interview-category"></div>
+                            <p class="field-hint">New interview channels are created inside this category.</p>
+                        </div>
+                        <div class="field-group" style="margin-bottom:0;">
+                            <label class="field-label">Log channel</label>
+                            <div class="dd" id="dd-interview-log-channel"></div>
+                            <p class="field-hint">Closed transcripts are posted here.</p>
+                        </div>
+                        <button class="btn btn-ghost btn-block" style="margin-top:14px;" onclick="openInterviewsScreen()"><span data-icon="scroll" data-size="12"></span> View Interview Records</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="serverSystemsCard">
+                <h3>Server Systems</h3>
+
+                <div class="setting-row" id="row-logs">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="folder" data-size="13"></span> Logging <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-logs</span></div>
+                        <div class="sdesc">Message edits/deletes, joins, leaves, bans &amp; role changes.</div>
+                    </div>
+                    <div class="toggle" id="toggle-logs" onclick="toggleSetting('logs')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-logs">
+                    <div class="sub-panel-inner">
+                        <div class="dd" id="dd-logs"></div>
+                    </div>
+                </div>
+
+                <div class="setting-row" id="row-starboard">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="star" data-size="13"></span> Starboard <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-starboard</span></div>
+                        <div class="sdesc">Pins messages that earn enough star reactions to a showcase channel.</div>
+                    </div>
+                    <div class="toggle" id="toggle-starboard" onclick="toggleSetting('starboard')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-starboard">
+                    <div class="sub-panel-inner">
+                        <div class="dd" id="dd-starboard"></div>
+                        <p class="field-hint" id="starboardThresholdHint">Threshold: —</p>
+                    </div>
+                </div>
+
+                <div class="setting-row" id="row-sortinghat">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="sortinghat" data-size="13"></span> Sorting Hat <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-sorting-hat</span></div>
+                        <div class="sdesc">Lets members run /sortme and get placed into a house.</div>
+                    </div>
+                    <div class="toggle" id="toggle-sortinghat" onclick="toggleSetting('sortinghat')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-sortinghat">
+                    <div class="sub-panel-inner">
+                        <div class="dd" id="dd-sortinghat"></div>
+                    </div>
+                </div>
+
+                <div class="setting-row" id="row-azkaban-toggle">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="azkaban" data-size="13"></span> Azkaban <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-azkaban</span></div>
+                        <div class="sdesc">Prison system for sentencing rule-breakers.</div>
+                    </div>
+                    <div class="toggle" id="toggle-azkaban" onclick="toggleSetting('azkaban')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-azkaban">
+                    <div class="sub-panel-inner">
+                        <div class="dd" id="dd-azkaban"></div>
+                    </div>
+                </div>
+
+                <div class="setting-row" id="row-bump">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="rocket" data-size="13"></span> Bump Thank System <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-bump</span></div>
+                        <div class="sdesc">Thanks whoever bumps the server and sends a reminder once the cooldown ends.</div>
+                    </div>
+                    <div class="toggle" id="toggle-bump" onclick="toggleSetting('bump')"><div class="knob"></div></div>
+                </div>
+
+                <div class="setting-row" id="row-airesponse">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="wand" data-size="13"></span> AI Responses</div>
+                        <div class="sdesc">Lets Dumbledore occasionally reply in-character with a fresh AI-generated line instead of a canned quote.</div>
+                    </div>
+                    <div class="toggle" id="toggle-airesponse" onclick="toggleSetting('airesponse')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-airesponse">
+                    <div class="sub-panel-inner">
+                        <div class="field-group" style="margin-bottom:0;">
+                            <label class="field-label">Response probability</label>
+                            <div class="field-input-row">
+                                <input class="field-input" id="aiResponseProbabilityInput" type="number" min="10" max="100" step="1">
+                                <span class="tag" style="color:var(--parchment-faint);">%</span>
+                                <button class="btn btn-primary btn-sm" onclick="saveAiResponseProbability()">Save</button>
+                            </div>
+                            <p class="field-hint">Chance, per eligible message, that Dumbledore uses an AI-generated reply. 10% to 100%.</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="locked-note login-hidden" id="settingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission — showing read-only</p>
+            </div>
+
+            <div class="card" id="welcomeCard">
+                <h3>Welcome Messages <span class="tag">/configure-welcome</span></h3>
+                <p class="field-hint" style="margin-top:-4px;margin-bottom:10px;">Greet new witches and wizards as they arrive.</p>
+
+                <div class="setting-row" id="row-welcome">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="join" data-size="13"></span> Enabled</div>
+                        <div class="sdesc">Turn welcome messages on or off for this server.</div>
+                    </div>
+                    <div class="toggle" id="toggle-welcome" onclick="toggleSetting('welcome')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-welcome">
+                    <div class="sub-panel-inner">
+                        <div class="dd" id="dd-welcome"></div>
+                        <p class="field-hint" style="margin-top:10px;">The bot picks one of these at random for each new member. No messages yet? It falls back to a built-in rotation.</p>
+                        <div class="we-list" id="welcomeMessagesList"></div>
+                        <button class="btn btn-ghost btn-block we-add-btn" onclick="openWelcomeEditor()"><span data-icon="plus" data-size="12"></span> Add Welcome Message</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Mod Channels <span class="tag">/configure-mod-channels</span></h3>
+                <p class="field-hint" style="margin-top:-4px;margin-bottom:10px;">Channels the Deluminator is allowed to search when used from inside one of them.</p>
+                <div class="ms-wrap" id="modChannelsMultiSelect"></div>
+                <p class="locked-note login-hidden" id="modChannelsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+            </div>
+
+            <div class="card">
+                <h3>Leveling &amp; XP <span class="tag">/guild-settings</span></h3>
+
+                <div class="setting-row">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="trendingUp" data-size="13"></span> Leveling</div>
+                        <div class="sdesc">Members earn XP from chatting and level up. Turn off to stop awarding XP entirely.</div>
+                    </div>
+                    <div class="toggle" id="toggle-leveling" onclick="toggleSetting('leveling')"><div class="knob"></div></div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">XP per message <span id="xpPerMessageDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="xpPerMessageInput" type="number" min="0" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('xpPerMessage','xpPerMessageInput')">Save</button>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">XP cooldown (seconds) <span id="xpCooldownDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="xpCooldownInput" type="number" min="0" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('xpCooldownSeconds','xpCooldownInput')">Save</button>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">House points per sorting <span id="housePointValueDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="housePointValueInput" type="number" min="0" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('housePointValue','housePointValueInput')">Save</button>
+                    </div>
+                </div>
+                <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label">Starboard threshold (star reactions) <span id="starboardThresholdDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="starboardThresholdInput" type="number" min="1" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('starboardThreshold','starboardThresholdInput')">Save</button>
+                    </div>
+                </div>
+                <p class="locked-note login-hidden" id="xpSettingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+
+                <div class="danger-zone" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-faint,rgba(212,175,55,0.15));">
+                    <div class="setting-row" style="padding:0;">
+                        <div class="setting-text">
+                            <div class="sname"><span data-icon="alert" data-size="13"></span> Reset Leveling Data</div>
+                            <div class="sdesc">Wipes every member's XP, level and message count back to zero. This can't be undone.</div>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="confirmResetLeveling()" ${CURRENT_USER?.canManageGuild?'':'disabled'}>Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>House Cup Points <span class="tag">/house-cup</span></h3>
+                <div id="housePointControls"></div>
+                <p class="locked-note login-hidden" id="housePointsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+
+                <div class="danger-zone" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-faint,rgba(212,175,55,0.15));">
+                    <div class="setting-row" style="padding:0;">
+                        <div class="setting-text">
+                            <div class="sname"><span data-icon="alert" data-size="13"></span> Reset House Cup</div>
+                            <div class="sdesc">Sets every house's points back to zero. This can't be undone.</div>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="confirmResetHouseCup()" ${CURRENT_USER?.canManageGuild?'':'disabled'}>Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>House Roles <span class="tag">/guild-settings</span></h3>
+                <div class="field-group"><label class="field-label"><span data-icon="lion" data-size="13"></span> Gryffindor</label><div class="dd" id="dd-house-gryffindor"></div></div>
+                <div class="field-group"><label class="field-label"><span data-icon="eagle" data-size="13"></span> Ravenclaw</label><div class="dd" id="dd-house-ravenclaw"></div></div>
+                <div class="field-group"><label class="field-label"><span data-icon="badger" data-size="13"></span> Hufflepuff</label><div class="dd" id="dd-house-hufflepuff"></div></div>
+                <div class="field-group" style="margin-bottom:0;"><label class="field-label"><span data-icon="snake" data-size="13"></span> Slytherin</label><div class="dd" id="dd-house-slytherin"></div></div>
+                <p class="locked-note login-hidden" id="houseRolesLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+            </div>
+
+            <div class="card">
+                <h3>Bot Manager Roles <span class="tag">/guild-settings</span></h3>
+                <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label">Bot Managers <span id="botManagerRoleDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="ms-wrap" id="botManagerRolesMultiSelect"></div>
+                </div>
+                <p class="field-hint" style="margin-top:10px;">Anyone holding one of these roles can sign into this dashboard and use Bot Manager-only commands (/say, /announce, /manage-roles, avatar &amp; banner). If none are set, anyone with the native Administrator permission is treated as Bot Manager instead.</p>
+                <p class="locked-note login-hidden" id="accessRolesLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+            </div>
+        </div>
+    </div>
+

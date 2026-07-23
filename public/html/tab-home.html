@@ -1,0 +1,111 @@
+    <!-- ================= HOME ================= -->
+    <div class="tab-panel active" id="panel-home">
+        <div class="page">
+            <div class="page-head">
+                <p class="eyebrow">Headmaster's Office</p>
+                <h2 id="homeGreeting">Welcome</h2>
+                <p>Here's what's happening in the castle today.</p>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <span class="icon" data-icon="home" data-size="18"></span>
+                    <div class="value" id="statMembers">—</div>
+                    <div class="label">Members</div>
+                    <div class="delta" id="statMembersDelta">—</div>
+                </div>
+                <div class="stat-card">
+                    <span class="icon" data-icon="message" data-size="18"></span>
+                    <div class="value" id="statMessages">—</div>
+                    <div class="label">Messages, last 7 days</div>
+                    <div class="delta" id="statMessagesDelta">—</div>
+                </div>
+                <div class="stat-card">
+                    <span class="icon" data-icon="azkaban" data-size="18"></span>
+                    <div class="value" id="statPrisoners">—</div>
+                    <div class="label">In Azkaban</div>
+                    <div class="delta" id="statPrisonersDelta">—</div>
+                </div>
+                <div class="stat-card">
+                    <span class="icon" data-icon="trophy" data-size="18"></span>
+                    <div class="value" id="statLeader">—</div>
+                    <div class="label">House Cup lead</div>
+                    <div class="delta" id="statLeaderDelta">—</div>
+                </div>
+            </div>
+
+            <div class="card" id="analyticsCard" style="contain:layout;">
+                <h3>Message Activity <span class="tag">live · updates ~30min</span></h3>
+                <div class="stat-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:12px;">
+                    <div class="stat-card" style="padding:12px 10px;">
+                        <div class="value" id="anMsgToday" style="font-size:18px;">—</div>
+                        <div class="label">Today</div>
+                    </div>
+                    <div class="stat-card" style="padding:12px 10px;">
+                        <div class="value" id="anMsgWeek" style="font-size:18px;">—</div>
+                        <div class="label">This week</div>
+                    </div>
+                    <div class="stat-card" style="padding:12px 10px;">
+                        <div class="value" id="anMsgMonth" style="font-size:18px;">—</div>
+                        <div class="label">This month</div>
+                    </div>
+                </div>
+                <div id="msgSparkline" style="display:flex;align-items:flex-end;gap:3px;height:56px;margin-bottom:6px;"></div>
+                <p class="field-hint" id="msgSparklineLabel">Last 14 days</p>
+            </div>
+
+            <div class="card">
+                <h3>Most Used Commands <span class="tag">all-time</span></h3>
+                <div id="topCommandsList"></div>
+            </div>
+
+            <div class="card">
+                <h3>Member Growth</h3>
+                <div class="info-list">
+                    <div class="info-row"><span class="ilabel"><span data-icon="calendar" data-size="13"></span> Last 7 days</span><span class="ivalue" id="growthWeek">—</span></div>
+                    <div class="info-row"><span class="ilabel"><span data-icon="calendar" data-size="13"></span> Last 30 days</span><span class="ivalue" id="growthMonth">—</span></div>
+                    <div class="info-row"><span class="ilabel"><span data-icon="join" data-size="13"></span> Total joins</span><span class="ivalue" id="growthJoins">—</span></div>
+                    <div class="info-row"><span class="ilabel"><span data-icon="leave" data-size="13"></span> Total leaves</span><span class="ivalue" id="growthLeaves">—</span></div>
+                </div>
+            </div>
+
+            <div class="card" id="houseCupCard">
+                <h3>House Cup Standings <span class="tag">/house-cup</span></h3>
+                <div id="houseCupList"></div>
+            </div>
+
+            <div class="card">
+                <h3>Top Witches &amp; Wizards <span class="tag">/leaderboard</span></h3>
+                <div id="leaderboardList"></div>
+                <div class="link-row" style="margin-top:8px;">
+                    <span></span>
+                    <button class="view-all" onclick="switchTab('commands')">Full leaderboard →</button>
+                </div>
+            </div>
+
+            <div class="card" id="azkabanCard">
+                <h3>Azkaban Watch <span class="tag">/sentence · /pardon</span></h3>
+                <div id="azkabanList"></div>
+                <div class="sentence-form login-hidden" id="sentenceForm">
+                    <div class="params-label">Sentence Someone</div>
+                    <div id="selectedMemberBox"></div>
+                    <div class="search-wrap search-wrap-inline" id="memberSearchWrap" style="margin-bottom:8px;">
+                        <span class="sicon" data-icon="search" data-size="14"></span>
+                        <input type="text" id="memberSearchInput" placeholder="Search member by username..." oninput="searchMembers(this.value)">
+                    </div>
+                    <div id="memberSearchResults"></div>
+                    <div class="field-group" id="reasonGroup" style="display:none;margin-top:8px;">
+                        <input class="field-input" id="sentenceReasonInput" type="text" placeholder="Reason for the sentence...">
+                    </div>
+                    <button class="btn btn-danger btn-block" id="submitSentenceBtn" style="display:none;margin-top:8px;" onclick="submitSentence()"><span data-icon="azkaban" data-size="14"></span> Send to Azkaban</button>
+                </div>
+                <p class="locked-note login-hidden" id="azkabanLock"><span data-icon="lock" data-size="12"></span> Requires Manage Roles permission</p>
+            </div>
+
+            <div class="card" id="recentActivityCard">
+                <h3>Recent Activity</h3>
+                <div id="activityFeed"></div>
+            </div>
+        </div>
+    </div>
+

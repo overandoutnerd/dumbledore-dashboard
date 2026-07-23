@@ -1,0 +1,23 @@
+<div class="sidebar login-hidden" id="desktopSidebar">
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-icon"><span data-icon="wand" data-size="18"></span></div>
+        <span class="sidebar-brand-name">Dumbledore</span>
+    </div>
+    <nav class="sidebar-nav">
+        <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
+            <span class="nicon" data-icon="home" data-size="18"></span><span class="nlabel">Home</span>
+        </button>
+        <button class="nav-btn" data-tab="commands" onclick="switchTab('commands')">
+            <span class="nicon" data-icon="book" data-size="18"></span><span class="nlabel">Commands</span>
+        </button>
+        <button class="nav-btn" data-tab="bot" onclick="switchTab('bot')">
+            <span class="nicon" data-icon="bot" data-size="18"></span><span class="nlabel">Bot</span>
+        </button>
+        <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')">
+            <span class="nicon" data-icon="settings" data-size="18"></span><span class="nlabel">Settings</span>
+        </button>
+    </nav>
+    <button class="sidebar-switch-server" onclick="openSwitchServerModal()">
+        <span data-icon="chevronRight" data-size="13"></span> Switch server
+    </button>
+</div>

@@ -1,0 +1,36 @@
+    <!-- ================= INTERVIEWS (reached via Settings → Interviews,
+         not a top-level nav tab) ================= -->
+    <div class="tab-panel" id="panel-interviews">
+        <div class="page">
+            <button class="subpage-back" onclick="backToSettings()">
+                <span data-icon="chevronLeft" data-size="13"></span> Settings
+            </button>
+
+            <div class="page-head">
+                <p class="eyebrow">Pensieve Records</p>
+                <h2>Interviews</h2>
+                <p>Every member interview opened by a mod in this server.</p>
+            </div>
+
+            <p class="cmd-count" id="interviewCount"></p>
+            <div id="interviewList"></div>
+        </div>
+    </div>
+
+    <!-- ================= INTERVIEW TRANSCRIPT (drill-in from the list
+         above — same shell, same background, no new tab/page) ============= -->
+    <div class="tab-panel" id="panel-interview-detail">
+        <div class="page">
+            <button class="subpage-back" onclick="backToInterviewsList()">
+                <span data-icon="chevronLeft" data-size="13"></span> Interviews
+            </button>
+
+            <div class="page-head">
+                <p class="eyebrow">Pensieve Records</p>
+                <h2 id="interviewDetailTitle">Interview</h2>
+                <p id="interviewDetailSubtitle"></p>
+            </div>
+
+            <div id="interviewDetailBody"></div>
+        </div>
+    </div>

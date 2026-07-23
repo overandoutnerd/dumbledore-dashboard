@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dumbledore — Mod Dashboard</title>
+<meta name="theme-color" content="#0c0e1f">
+
+<!-- All CSS/JS/partial paths below are relative (css/..., js/..., html/...).
+     That's fine at "/", but this same file is also served at
+     /interviews/:publicId (see server.js) so a mod's "Read Transcript"
+     link lands in this app directly — without this <base>, the browser
+     would resolve those relative paths against /interviews/ instead of
+     the site root and everything would 404. -->
+<base href="/">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Modular stylesheets — split by concern, loaded in cascade order. -->
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/tabs.css">
+<link rel="stylesheet" href="css/landing.css">
+<link rel="stylesheet" href="css/modals.css">
+<link rel="stylesheet" href="css/tour.css">
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<div class="mandala tl"></div>
+<div class="mandala br"></div>
+
+<!-- Each mount-* placeholder is filled at load time with the matching
+     fragment from /html/*.html — see js/partials.js. -->
+<div id="mount-landing"></div>
+<div id="mount-server-picker"></div>
+<div id="mount-sidebar"></div>
+
+<div class="app login-hidden" id="appRoot">
+    <div id="mount-topbar"></div>
+    <div id="mount-tab-home"></div>
+    <div id="mount-tab-commands"></div>
+    <div id="mount-tab-bot"></div>
+    <div id="mount-tab-interviews"></div>
+    <div id="mount-tab-settings"></div>
+</div>
+
+<div id="mount-bottom-nav"></div>
+<div id="mount-overlays"></div>
+<div id="mount-tour"></div>
+
+<!-- Lucide: real third-party icon library (https://lucide.dev). Loaded
+     synchronously (no defer/async) so window.lucide.icons is populated
+     before our own script below reads from it. -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<!-- Iconify Icon web component (https://iconify.design), used only for
+     the four house emblems. Lucide has no lion/eagle/badger/snake icons,
+     but Iconify's "game-icons" collection (mirroring game-icons.net,
+     CC BY 3.0) has exact matches. The component loads real icon data
+     from Iconify's public API at runtime and self-upgrades once loaded,
+     so it doesn't need to block page script execution like Lucide does. -->
+<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+
+<!-- Modular app scripts — order matters: each later file calls functions
+     declared in earlier ones. partials.js must load before app.js since
+     app.js's initApp() calls loadPartials(). -->
+<script src="js/icons.js"></script>
+<script src="js/state.js"></script>
+<script src="js/api.js"></script>
+<script src="js/partials.js"></script>
+<script src="js/landing.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/tour.js"></script>
+<script src="js/tab-home.js"></script>
+<script src="js/tab-commands.js"></script>
+<script src="js/tab-bot.js"></script>
+<script src="js/transcript-render.js"></script>
+<script src="js/tab-interviews.js"></script>
+<script src="js/modals.js"></script>
+<script src="js/tab-settings.js"></script>
+<script src="js/welcome-editor.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

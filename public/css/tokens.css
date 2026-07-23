@@ -1,0 +1,85 @@
+/* ============ RESET & TOKENS (core visual language for the dashboard) ============ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+:root{
+    --night:#0c0e1f;
+    --night-2:#14172e;
+    --night-3:#1a1d38;
+
+    --marigold:#fca503;
+    --gold:#daa520;
+    --gold-light:#ffd873;
+
+    --maroon:#9c2b2b;
+    --jade:#1f7a5c;
+    --ravenclaw:#2a4d8f;
+    --ravenclaw-light:#5a7fc2;
+    --hufflepuff:#e5a324;
+
+    --parchment:#f6ecd9;
+    --parchment-dim:#cfc4ab;
+    --parchment-faint:#9089a0;
+
+    --thread:rgba(252,165,3,.35);
+    --card-bg:rgba(20,23,46,.55);
+    --card-border:rgba(218,165,32,.22);
+    --danger:#c0392b;
+    --safe:#3d9970;
+}
+@media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+}
+
+/* ============ MAGICAL SCROLL INDICATOR (replaces default scrollbar everywhere) ============ */
+*{
+    scrollbar-width:thin;
+    scrollbar-color:var(--gold) rgba(12,14,31,.5);
+}
+*::-webkit-scrollbar{width:11px;height:11px;}
+*::-webkit-scrollbar-track{
+    background:linear-gradient(180deg, rgba(20,23,46,.65), rgba(12,14,31,.65));
+    border-radius:99px;
+}
+*::-webkit-scrollbar-thumb{
+    background:
+        linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 45%, var(--marigold) 100%);
+    background-clip:padding-box;
+    border:2.5px solid transparent;
+    border-radius:99px;
+    box-shadow:0 0 6px rgba(252,165,3,.4), inset 0 0 3px rgba(255,255,255,.35);
+    transition:box-shadow .2s ease;
+}
+*::-webkit-scrollbar-thumb:hover{
+    box-shadow:0 0 11px rgba(252,165,3,.7), inset 0 0 3px rgba(255,255,255,.5);
+}
+*::-webkit-scrollbar-thumb:active{
+    background:linear-gradient(180deg, var(--marigold) 0%, var(--gold) 100%);
+    background-clip:padding-box;
+}
+*::-webkit-scrollbar-corner{background:transparent;}
+body{
+    min-height:100vh;
+    font-family:"Poppins",sans-serif;
+    color:var(--parchment);
+    background:
+        radial-gradient(ellipse at 15% -10%, rgba(156,43,43,.22), transparent 55%),
+        radial-gradient(ellipse at 90% 5%, rgba(31,122,92,.16), transparent 50%),
+        linear-gradient(180deg, var(--night), var(--night-2));
+    position:relative;
+    overflow-x:hidden;
+    -webkit-tap-highlight-color:transparent;
+}
+
+/* ============ AMBIENT BACKGROUND ============ */
+#stars{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+.mandala{position:fixed;width:340px;height:340px;border-radius:50%;pointer-events:none;opacity:.08;z-index:0;
+    background:radial-gradient(circle,transparent 40%,var(--gold) 41%,transparent 42%),
+    repeating-conic-gradient(from 0deg,var(--gold) 0deg 4deg,transparent 4deg 18deg);
+    mix-blend-mode:screen;}
+.mandala.tl{top:-140px;left:-160px;animation:spinSlow 100s linear infinite;}
+.mandala.br{bottom:-120px;right:-160px;animation:spinSlowRev 120s linear infinite;}
+@keyframes spinSlow{to{transform:rotate(360deg);}}
+@keyframes spinSlowRev{to{transform:rotate(-360deg);}}
+@keyframes shimmer{0%{background-position:-150% 0;}100%{background-position:250% 0;}}
+@keyframes floatIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+

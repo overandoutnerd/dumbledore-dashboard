@@ -1,0 +1,144 @@
+<div class="toast" id="toast"></div>
+<div class="we-ac-dropdown login-hidden" id="weAcDropdown"></div>
+
+<!-- WELCOME MESSAGE EDITOR -->
+<div class="confirm-overlay sheet-overlay" id="weEditorOverlay" onclick="if(event.target===this) closeWelcomeEditor()">
+    <div class="we-editor-card sheet-card">
+        <div class="we-sheet-handle" aria-hidden="true"></div>
+        <button class="sheet-close-btn" onclick="closeWelcomeEditor()" aria-label="Close"><span data-icon="close" data-size="15"></span></button>
+        <h3 id="weEditorTitle">Add Welcome Message</h3>
+
+        <div class="we-section-label">Outside Message</div>
+        <div class="field-group" style="margin-bottom:6px;">
+            <textarea class="field-input" id="weOutsideMessage" rows="2" placeholder="e.g. {user} just arrived!" onfocus="weSetActiveField(this)"></textarea>
+        </div>
+        <div class="we-toolbar">
+            <button class="btn btn-ghost" onclick="weOpenChannelPicker()"><span data-icon="hash" data-size="12"></span> Channel</button>
+            <button class="btn btn-ghost" onclick="weOpenRolePicker()"><span data-icon="shield" data-size="12"></span> Role</button>
+            <button class="btn btn-ghost" onclick="weOpenEmojiPicker()"><span data-icon="smile" data-size="12"></span> Emoji</button>
+            <button class="btn btn-ghost" onclick="weOpenMacroPicker()"><span data-icon="wand" data-size="12"></span> Macro</button>
+        </div>
+
+        <div class="we-section-label">Embed Author</div>
+        <div class="we-two-col">
+            <input class="field-input" id="weAuthorName" type="text" placeholder="Author name" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+            <input class="field-input" id="weAuthorIcon" type="text" placeholder="Author icon URL" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+        </div>
+
+        <div class="we-section-label">Embed Title</div>
+        <input class="field-input" id="weTitle" type="text" placeholder="e.g. Welcome to {servername}!" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+
+        <div class="we-section-label">Embed Body</div>
+        <textarea class="field-input" id="weDescription" rows="3" placeholder="e.g. Say hi to {user}! We're now {membercount} strong." onfocus="weSetActiveField(this)" oninput="weUpdatePreview(); weAutoGrow(this)"></textarea>
+        <div class="we-toolbar">
+            <button class="btn btn-ghost" onclick="weOpenChannelPicker()"><span data-icon="hash" data-size="12"></span> Channel</button>
+            <button class="btn btn-ghost" onclick="weOpenRolePicker()"><span data-icon="shield" data-size="12"></span> Role</button>
+            <button class="btn btn-ghost" onclick="weOpenEmojiPicker()"><span data-icon="smile" data-size="12"></span> Emoji</button>
+            <button class="btn btn-ghost" onclick="weOpenMacroPicker()"><span data-icon="wand" data-size="12"></span> Macro</button>
+        </div>
+
+        <div class="we-section-label">Embed Color</div>
+        <div class="we-color-row">
+            <div class="we-color-picker" id="weColorPicker">
+                <button type="button" class="we-color-swatch" id="weColorSwatchBtn" style="background:#daa520;" onclick="weToggleColorPicker()" aria-label="Choose embed color"></button>
+                <input class="field-input we-color-hex" id="weColor" type="text" value="#daa520" maxlength="7" spellcheck="false" onfocus="weSetActiveField(this)" oninput="weOnColorHexInput()">
+                <div class="we-color-popover" id="weColorPopover">
+                    <div class="we-color-native-row">
+                        <input type="color" id="weColorNative" value="#daa520" oninput="weSetColor(this.value)" onchange="weSetColor(this.value); weAddRecentColor(this.value)">
+                        <span class="field-hint" style="margin:0;">Pick any shade</span>
+                    </div>
+                    <div class="we-color-group-label">House &amp; Preset Colors</div>
+                    <div class="we-color-swatches" id="weColorPresetSwatches"></div>
+                    <div class="we-color-group-label we-color-recent-label" id="weColorRecentLabel" style="display:none;">Recently Used</div>
+                    <div class="we-color-swatches" id="weColorRecentSwatches"></div>
+                </div>
+            </div>
+            <p class="field-hint" style="margin:0;">The accent bar on the left edge of the embed.</p>
+        </div>
+
+        <div class="we-section-label">Embed Image</div>
+        <div class="we-image-row">
+            <input class="field-input" id="weImageUrl" type="text" placeholder="Image or GIF URL" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+            <!-- Temporarily disabled — file upload paused, link paste only for now.
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('weImageFile').click()"><span data-icon="image" data-size="12"></span></button>
+            <input type="file" id="weImageFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;" onchange="weUploadImage(this.files[0],'weImageUrl')">
+            -->
+        </div>
+
+        <div class="we-section-label">Embed Thumbnail</div>
+        <div class="we-image-row">
+            <input class="field-input" id="weThumbUrl" type="text" placeholder="Thumbnail image URL" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+            <!-- Temporarily disabled — file upload paused, link paste only for now.
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('weThumbFile').click()"><span data-icon="image" data-size="12"></span></button>
+            <input type="file" id="weThumbFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;" onchange="weUploadImage(this.files[0],'weThumbUrl')">
+            -->
+        </div>
+
+        <div class="we-section-label">Embed Footer</div>
+        <div class="we-two-col">
+            <input class="field-input" id="weFooterText" type="text" placeholder="Footer text" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+            <input class="field-input" id="weFooterIcon" type="text" placeholder="Footer icon URL" onfocus="weSetActiveField(this)" oninput="weUpdatePreview()">
+        </div>
+
+        <div class="we-section-label">Preview</div>
+        <div class="we-preview-wrap" id="wePreview"></div>
+
+        <div class="we-save-row" style="margin-top:20px;">
+            <button class="btn btn-ghost" onclick="closeWelcomeEditor()">Cancel</button>
+            <button class="btn btn-primary" onclick="weSave()">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- CHANNEL / ROLE / MACRO PICKERS (shared by outside message + embed fields) -->
+<div class="confirm-overlay sheet-overlay" id="wePickerOverlay" onclick="if(event.target===this) weClosePicker()">
+    <div class="we-picker-card sheet-card">
+        <div class="we-sheet-handle" aria-hidden="true"></div>
+        <button class="sheet-close-btn" onclick="weClosePicker()" aria-label="Close"><span data-icon="close" data-size="15"></span></button>
+        <h4 id="wePickerTitle">Insert</h4>
+        <input class="field-input" id="wePickerSearch" type="text" placeholder="Search..." style="margin-bottom:10px;" oninput="weRenderPickerList()">
+        <div class="we-picker-list" id="wePickerList"></div>
+    </div>
+</div>
+
+<div class="confirm-overlay" id="switchServerOverlay" onclick="if(event.target===this) closeSwitchServerModal()">
+    <div class="switch-server-card">
+        <div class="login-emblem" style="margin:0 auto 12px;"><span data-icon="home" data-size="24"></span></div>
+        <h2>Switch Server</h2>
+        <p>Pick another server to manage. Your current session stays put until you choose one.</p>
+        <div class="server-picker-list" id="switchServerList"></div>
+        <div class="login-error login-hidden" id="switchServerError"></div>
+        <button class="switch-server-close" onclick="closeSwitchServerModal()">Cancel</button>
+    </div>
+</div>
+
+<div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-card">
+        <div class="confirm-icon" id="confirmIcon"></div>
+        <h4 id="confirmTitle">Are you sure?</h4>
+        <p id="confirmMessage"></p>
+        <div class="confirm-btn-row">
+            <button class="btn btn-ghost btn-block" id="confirmCancelBtn">Cancel</button>
+            <button class="btn btn-danger btn-block" id="confirmOkBtn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<div class="crop-overlay" id="cropOverlay">
+    <div class="crop-card">
+        <h4 id="cropModalTitle">Crop Image</h4>
+        <p class="crop-hint" id="cropModalHint">Drag to reposition, pinch or scroll to zoom.</p>
+        <div class="crop-viewport" id="cropViewport">
+            <img id="cropImage" alt="">
+        </div>
+        <div class="crop-zoom-row">
+            <span class="icon" data-icon="minus" data-size="14"></span>
+            <input type="range" id="cropZoomSlider" min="1" max="4" step="0.01" value="1">
+            <span class="icon" data-icon="plus" data-size="14"></span>
+        </div>
+        <div class="crop-btn-row">
+            <button class="btn btn-ghost btn-block" id="cropCancelBtn">Cancel</button>
+            <button class="btn btn-primary btn-block" id="cropConfirmBtn"><span data-icon="check" data-size="14"></span> Apply</button>
+        </div>
+    </div>
+</div>
