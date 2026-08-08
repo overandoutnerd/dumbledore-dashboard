@@ -25,14 +25,14 @@ export const COMMANDS = [
     },
     {
         name: "profile", category: "Community", perm: "everyone",
-        desc: "View your XP, level and rank.",
-        full: "Shows an ephemeral card with your current level, XP, server rank, title and total messages sent, plus progress toward your next level.",
+        desc: "View your XP, rank and house.",
+        full: "Shows an ephemeral card with your current XP, server rank, total messages sent, and — if you've been sorted — how much XP you've banked for your house in the House Cup.",
         params: [],
     },
     {
         name: "sortme", category: "Community", perm: "everyone",
         desc: "Let the Sorting Hat choose your house.",
-        full: "Starts an interactive Sorting Hat quiz. Based on your answers, you're placed into Gryffindor, Ravenclaw, Hufflepuff or Slytherin and awarded the matching role plus House Cup points.",
+        full: "Starts an interactive Sorting Hat quiz. Based on your answers, you're placed into Gryffindor, Ravenclaw, Hufflepuff or Slytherin and awarded the matching role. From then on, your message and star-reaction XP feeds that house's House Cup average.",
         params: [],
     },
     {
@@ -52,14 +52,24 @@ export const COMMANDS = [
     {
         name: "leaderboard", category: "Community", perm: "everyone",
         desc: "View the server XP leaderboard.",
-        full: "Displays the top 10 members ranked by level and XP earned from chatting.",
+        full: "Displays the top 10 members ranked by XP earned from chatting and star reactions.",
         params: [],
     },
     {
-        name: "house-cup", category: "Community", perm: "everyone",
-        desc: "View House Cup point standings.",
-        full: "Shows current standings for all four Hogwarts houses, sorted by total points, with the current leader highlighted.",
+        name: "house-cup", category: "Server Config", perm: "botmanager",
+        desc: "Post/update the House Cup board.",
+        full: "Mods only. Posts the House Cup standings embed in the configured board channel, or updates it in place if one's already posted there. Each house's points are its members' average XP (earned from chatting and star reactions) plus any bonus points a mod has awarded, sorted with the current leader highlighted. The board keeps itself fresh afterwards without needing this command re-run.",
         params: [],
+    },
+    {
+        name: "configure-house-cup", category: "Server Config", perm: "manageserver",
+        desc: "Configure the House Cup system.",
+        full: "Enables or disables House Cup XP (earned from chatting and star reactions) and sets the board channel /house-cup posts to, plus a log channel where manual bonus-point awards are recorded with who awarded them, to which house, how much, and why.",
+        params: [
+            { name: "enabled", type: "boolean", required: true, desc: "Turn House Cup XP on or off" },
+            { name: "channel", type: "channel", required: false, desc: "Channel for the live House Cup standings board" },
+            { name: "logs_channel", type: "channel", required: false, desc: "Channel where bonus-point awards are logged" },
+        ],
     },
     {
         name: "configure-roles", category: "Community", perm: "everyone",
@@ -178,7 +188,7 @@ export const COMMANDS = [
     {
         name: "guild-settings", category: "Server Config", perm: "manageserver",
         desc: "Open the full server settings dashboard.",
-        full: "Opens an interactive in-Discord dashboard for configuring access roles (Admin/Bot Manager), house roles, XP rate and cooldown, House Cup point value, and starboard threshold — the same settings this web dashboard's Settings tab edits.",
+        full: "Opens an interactive in-Discord dashboard for configuring access roles (Admin/Bot Manager), house roles, XP rate and cooldown, XP per star reaction, and starboard threshold — the same settings this web dashboard's Settings tab edits.",
         params: [],
     },
 ];

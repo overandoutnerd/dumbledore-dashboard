@@ -43,7 +43,12 @@ export async function getGuildSettingsSummary(guildId) {
         interviewLogChannelId: s.interview_log_channel_id,
         interviewCategoryId: s.interview_category_id,
         bumpEnabled: !!s.bump_enabled,
-        levelingEnabled: !!s.leveling_enabled,
+        // Column is still named leveling_enabled in Postgres (predates the
+        // House Cup rework) — see the bot's guildSettingsService.ts for
+        // why it wasn't renamed. Exposed here as houseCupEnabled since it
+        // now gates all House Cup XP gain (messages + star reactions),
+        // not a standalone leveling system.
+        houseCupEnabled: !!s.leveling_enabled,
         aiResponseEnabled: !!s.ai_response_enabled,
         aiResponseProbability: s.ai_response_probability ?? 0.1,
 
@@ -59,12 +64,15 @@ export async function getGuildSettingsSummary(guildId) {
         // numeric tunables — these DO have hard-coded fallback defaults on the bot
         xpPerMessage: s.xp_per_message ?? d.xpPerMessage,
         xpCooldownSeconds: s.xp_cooldown_seconds ?? d.xpCooldownSeconds,
-        housePointValue: s.house_point_value ?? d.housePointValue,
+        starXpValue: s.star_xp_value ?? d.starXpValue,
         starboardThreshold: s.starboard_threshold ?? d.starboardThreshold,
+
+        houseCupChannelId: s.house_cup_channel_id ?? null,
+        houseCupLogChannelId: s.house_cup_log_channel_id ?? null,
 
         xpPerMessageIsDefault: s.xp_per_message == null,
         xpCooldownIsDefault: s.xp_cooldown_seconds == null,
-        housePointValueIsDefault: s.house_point_value == null,
+        starXpValueIsDefault: s.star_xp_value == null,
         starboardThresholdIsDefault: s.starboard_threshold == null,
     };
 }

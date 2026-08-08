@@ -50,8 +50,8 @@ function confirmResetIdentityImage(kind){
 function confirmResetHouseCup(){
     if (!CURRENT_USER?.canManageGuild) { showToast('Requires Manage Server permission', 'warn'); return; }
     showConfirm({
-        title: 'Reset House Cup?',
-        message: "This sets Gryffindor, Ravenclaw, Hufflepuff and Slytherin's points back to zero. This can't be undone.",
+        title: 'Reset Bonus Points?',
+        message: "This sets Gryffindor, Ravenclaw, Hufflepuff and Slytherin's mod-awarded bonus points back to zero. Each house's XP average is unaffected. This can't be undone.",
         confirmLabel: 'Reset',
         onConfirm: resetHouseCup,
     });
@@ -60,7 +60,7 @@ function confirmResetHouseCup(){
 async function resetHouseCup(){
     try {
         await api('/api/houses/reset', { method:'POST' });
-        showToast('House Cup reset', 'success');
+        showToast('Bonus points reset', 'success');
         renderHome();
     } catch (err) {
         showToast(friendlyError(err.message), 'error');
@@ -70,8 +70,8 @@ async function resetHouseCup(){
 function confirmResetLeveling(){
     if (!CURRENT_USER?.canManageGuild) { showToast('Requires Manage Server permission', 'warn'); return; }
     showConfirm({
-        title: 'Reset Leveling Data?',
-        message: "This wipes every member's XP, level and message count back to zero. This can't be undone.",
+        title: 'Reset XP Data?',
+        message: "This wipes every member's XP and message count back to zero, including whatever they've already banked towards their house's House Cup average. This can't be undone.",
         confirmLabel: 'Reset',
         onConfirm: resetLeveling,
     });
@@ -79,8 +79,8 @@ function confirmResetLeveling(){
 
 async function resetLeveling(){
     try {
-        await api('/api/leveling/reset', { method:'POST' });
-        showToast('Leveling data reset', 'success');
+        await api('/api/housecup/reset-xp', { method:'POST' });
+        showToast('XP data reset', 'success');
         renderHome();
     } catch (err) {
         showToast(friendlyError(err.message), 'error');

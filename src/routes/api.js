@@ -25,6 +25,7 @@ import { ensureFresh, resolveMember, memberCount, searchCached } from "../member
 import { COMMANDS } from "../commands.js";
 import * as analytics from "../analytics.js";
 import { listInterviewsForGuild } from "../interviewsService.js";
+import { getHouseCupStandings, logHousePointsAward, refreshHouseCupBoardIfExists } from "../houseCupService.js";
 import {
     getGuildSettingsSummary,
     getModChannelIds,
@@ -65,12 +66,9 @@ apiRouter.get("/stats", requireAuth, async (req, res) => {
     try {
         await ensureFresh(req.guildId);
 
-        const [guild, houseRes, prisonerRes, messageStats, summonStats] = await Promise.all([
+        const [guild, standings, prisonerRes, messageStats, summonStats] = await Promise.all([
             getGuild(req.guildId).catch(() => null),
-            db.query(
-                `SELECT house_name, points FROM house_points WHERE guild_id = $1 ORDER BY points DESC`,
-                [req.guildId],
-            ),
+            getHouseCupStandings(req.guildId),
             db.query(
                 `SELECT COUNT(*)::int AS count FROM azkaban_prisoners WHERE guild_id = $1 AND is_active = TRUE`,
                 [req.guildId],
@@ -79,7 +77,7 @@ apiRouter.get("/stats", requireAuth, async (req, res) => {
             analytics.getSummonStats(req.guildId),
         ]);
 
-        const leader = houseRes.rows[0] || null;
+        const leader = standings[0] || null;
         const cachedCount = memberCount(req.guildId);
 
         res.json({
@@ -92,7 +90,7 @@ apiRouter.get("/stats", requireAuth, async (req, res) => {
             messagesTotal: messageStats.total,
             summonsToday: summonStats.today,
             activePrisoners: prisonerRes.rows[0]?.count ?? 0,
-            houseLeader: leader ? { house: leader.house_name, points: Number(leader.points) } : null,
+            houseLeader: leader ? { house: leader.house, points: leader.totalPoints } : null,
         });
     } catch (err) {
         console.error("[api/stats]", err);
@@ -142,30 +140,30 @@ apiRouter.get("/analytics/commands/top", requireAuth, async (req, res) => {
 /* ── /api/houses — House Cup standings ──────────────────────────── */
 
 apiRouter.get("/houses", requireAuth, async (req, res) => {
-    const { rows } = await db.query(
-        `SELECT house_name, points FROM house_points WHERE guild_id = $1 ORDER BY points DESC, house_name ASC`,
-        [req.guildId],
-    );
+    await ensureFresh(req.guildId);
 
-    const ALL_HOUSES = ["gryffindor", "ravenclaw", "hufflepuff", "slytherin"];
-    const byName = new Map(rows.map((r) => [r.house_name, Number(r.points)]));
-
-    const houses = ALL_HOUSES.map((name) => ({ house: name, points: byName.get(name) ?? 0 })).sort(
-        (a, b) => b.points - a.points,
-    );
+    const houses = await getHouseCupStandings(req.guildId);
 
     res.json({ houses });
 });
 
 apiRouter.post("/houses/:house/points", requireManageGuild, async (req, res) => {
     const { house } = req.params;
-    const { delta } = req.body;
+    const { delta, reason } = req.body;
 
     if (!["gryffindor", "ravenclaw", "hufflepuff", "slytherin"].includes(house)) {
         return res.status(400).json({ error: "invalid_house" });
     }
-    if (typeof delta !== "number" || !Number.isFinite(delta)) {
+    if (typeof delta !== "number" || !Number.isFinite(delta) || delta === 0) {
         return res.status(400).json({ error: "invalid_delta" });
+    }
+    if (typeof reason !== "string" || reason.trim().length === 0) {
+        return res.status(400).json({ error: "reason_required" });
+    }
+
+    const settings = await getGuildSettingsSummary(req.guildId);
+    if (!settings.houseCupEnabled) {
+        return res.status(400).json({ error: "house_cup_disabled" });
     }
 
     const current = await db.query(
@@ -184,9 +182,23 @@ apiRouter.post("/houses/:house/points", requireManageGuild, async (req, res) => 
         [req.guildId, house, newPoints],
     );
 
+    // Fire-and-forget: neither should block the response to the mod.
+    logHousePointsAward(req.guildId, {
+        moderator: { id: req.user.sub, username: req.user.username },
+        house,
+        delta,
+        reason: reason.trim(),
+        newTotal: newPoints,
+    }).catch(() => {});
+    refreshHouseCupBoardIfExists(req.guildId).catch(() => {});
+
     res.json({ house, points: newPoints });
 });
 
+// Resets only the manual bonus points (house_points) — NOT each house's
+// banked XP (house_xp), which is earned automatically from members
+// chatting/star-reacting and isn't something a mod would "reset" the same
+// way. To wipe XP entirely, use /api/housecup/reset-xp below.
 apiRouter.post("/houses/reset", requireManageGuild, async (req, res) => {
     const ALL_HOUSES = ["gryffindor", "ravenclaw", "hufflepuff", "slytherin"];
 
@@ -212,7 +224,7 @@ apiRouter.get("/leaderboard", requireAuth, async (req, res) => {
 
     const { rows } = await db.query(
         `
-        SELECT user_id, xp, level, messages
+        SELECT user_id, xp, messages
         FROM users
         WHERE guild_id = $1
         ORDER BY xp DESC
@@ -230,7 +242,6 @@ apiRouter.get("/leaderboard", requireAuth, async (req, res) => {
             avatarUrl: member.avatarUrl,
             left: !!member.left,
             xp: Number(row.xp),
-            level: Number(row.level),
             messages: Number(row.messages),
         };
     });
@@ -238,15 +249,21 @@ apiRouter.get("/leaderboard", requireAuth, async (req, res) => {
     res.json({ leaderboard });
 });
 
-apiRouter.post("/leveling/reset", requireManageGuild, async (req, res) => {
+// Wipes every member's XP (and the House Cup XP banked from it, in
+// house_xp) back to zero for this guild. Deliberately separate from
+// /api/houses/reset, which only zeroes the manual bonus points — these
+// are two different numbers on the House Cup standings now.
+apiRouter.post("/housecup/reset-xp", requireManageGuild, async (req, res) => {
     await db.query(
         `
         UPDATE users
-        SET xp = 0, level = 1, messages = 0, last_xp_at = 0
+        SET xp = 0, messages = 0, last_xp_at = 0
         WHERE guild_id = $1
         `,
         [req.guildId],
     );
+
+    await db.query(`DELETE FROM house_xp WHERE guild_id = $1`, [req.guildId]);
 
     res.json({ ok: true });
 });
@@ -514,7 +531,7 @@ apiRouter.post("/settings", requireManageGuild, async (req, res) => {
         ["interviewLogChannelId", "interview_log_channel_id", "str"],
         ["interviewCategoryId", "interview_category_id", "str"],
         ["bumpEnabled", "bump_enabled", "bool"],
-        ["levelingEnabled", "leveling_enabled", "bool"],
+        ["houseCupEnabled", "leveling_enabled", "bool"],
         ["aiResponseEnabled", "ai_response_enabled", "bool"],
         ["aiResponseProbability", "ai_response_probability", "prob"],
 
@@ -527,8 +544,10 @@ apiRouter.post("/settings", requireManageGuild, async (req, res) => {
         // Tunables
         ["xpPerMessage", "xp_per_message", "int"],
         ["xpCooldownSeconds", "xp_cooldown_seconds", "int"],
-        ["housePointValue", "house_point_value", "int"],
+        ["starXpValue", "star_xp_value", "int"],
         ["starboardThreshold", "starboard_threshold", "int"],
+        ["houseCupChannelId", "house_cup_channel_id", "str"],
+        ["houseCupLogChannelId", "house_cup_log_channel_id", "str"],
     ];
 
     const sets = [];

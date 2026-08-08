@@ -91,6 +91,8 @@ function friendlyError(code){
         not_a_member: "You're not a member of that server anymore.",
         insufficient_permissions: "You don't have mod access to that server.",
         no_active_guild: 'Pick a server first.',
+        house_cup_disabled: 'The House Cup is currently disabled — enable it in Settings first.',
+        reason_required: 'Please give a reason for the points award.',
     };
     return map[code] || 'Something went wrong. Please try again.';
 }

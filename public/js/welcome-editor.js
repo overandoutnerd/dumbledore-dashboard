@@ -585,7 +585,7 @@ function weRenderPickerList(){
     });
 }
 
-let settingState = { logs:false, welcome:false, starboard:false, azkaban:false, sortinghat:false, interviews:false, bump:false, leveling:false, airesponse:false };
+let settingState = { logs:false, welcome:false, starboard:false, azkaban:false, sortinghat:false, interviews:false, bump:false, housecup:false, airesponse:false };
 
 async function loadSettings(){
     try {
@@ -595,7 +595,7 @@ async function loadSettings(){
             starboard: s.starboardEnabled, azkaban: s.azkabanEnabled,
             sortinghat: s.sortingHatEnabled,
             interviews: s.interviewsEnabled,
-            bump: s.bumpEnabled, leveling: s.levelingEnabled,
+            bump: s.bumpEnabled, housecup: s.houseCupEnabled,
             airesponse: s.aiResponseEnabled,
         };
 
@@ -608,7 +608,9 @@ async function loadSettings(){
         ddInterviewCategory?.setValue(s.interviewCategoryId);
         ddInterviewLogChannel?.setValue(s.interviewLogChannelId);
         setToggleUI('bump', s.bumpEnabled);
-        setToggleUI('leveling', s.levelingEnabled);
+        setToggleUI('housecup', s.houseCupEnabled);
+        ddHouseCupBoard?.setValue(s.houseCupChannelId);
+        ddHouseCupLogs?.setValue(s.houseCupLogChannelId);
         setToggleUI('airesponse', s.aiResponseEnabled);
 
         document.getElementById('aiResponseProbabilityInput').value = Math.round((s.aiResponseProbability ?? 0.1) * 100);
@@ -622,12 +624,12 @@ async function loadSettings(){
 
         document.getElementById('xpPerMessageInput').value = s.xpPerMessage;
         document.getElementById('xpCooldownInput').value = s.xpCooldownSeconds;
-        document.getElementById('housePointValueInput').value = s.housePointValue;
+        document.getElementById('starXpValueInput').value = s.starXpValue;
         document.getElementById('starboardThresholdInput').value = s.starboardThreshold;
 
         setDefaultHint('xpPerMessageDefault', s.xpPerMessageIsDefault);
         setDefaultHint('xpCooldownDefault', s.xpCooldownIsDefault);
-        setDefaultHint('housePointValueDefault', s.housePointValueIsDefault);
+        setDefaultHint('starXpValueDefault', s.starXpValueIsDefault);
         setDefaultHint('starboardThresholdDefault', s.starboardThresholdIsDefault);
         setDefaultHint('botManagerRoleDefault', s.botManagerRoleIds.length === 0);
 
@@ -657,7 +659,7 @@ async function toggleSetting(key){
     document.getElementById('toggle-'+key).classList.toggle('on', settingState[key]);
     document.getElementById('sub-'+key)?.classList.toggle('open', settingState[key]);
 
-    const fieldMap = { logs:'logsEnabled', welcome:'welcomeEnabled', starboard:'starboardEnabled', azkaban:'azkabanEnabled', sortinghat:'sortingHatEnabled', interviews:'interviewsEnabled', bump:'bumpEnabled', leveling:'levelingEnabled', airesponse:'aiResponseEnabled' };
+    const fieldMap = { logs:'logsEnabled', welcome:'welcomeEnabled', starboard:'starboardEnabled', azkaban:'azkabanEnabled', sortinghat:'sortingHatEnabled', interviews:'interviewsEnabled', bump:'bumpEnabled', housecup:'houseCupEnabled', airesponse:'aiResponseEnabled' };
     try {
         await api('/api/settings', { method:'POST', body: JSON.stringify({ [fieldMap[key]]: settingState[key] }) });
         showToast(settingState[key] ? 'Enabled' : 'Disabled', 'success');
@@ -670,7 +672,7 @@ async function toggleSetting(key){
 }
 
 async function saveChannelSetting(key, channelId){
-    const fieldMap = { logs:'logChannelId', welcome:'welcomeChannelId', starboard:'starboardChannelId', sortinghat:'sortingHatChannelId', interviews:'interviewLogChannelId' };
+    const fieldMap = { logs:'logChannelId', welcome:'welcomeChannelId', starboard:'starboardChannelId', sortinghat:'sortingHatChannelId', interviews:'interviewLogChannelId', housecup:'houseCupChannelId', housecuplogs:'houseCupLogChannelId' };
     try {
         await api('/api/settings', { method:'POST', body: JSON.stringify({ [fieldMap[key]]: channelId }) });
         showToast('Channel saved', 'success');
@@ -764,7 +766,7 @@ async function saveRoleSetting2(field, roleId){
     }
 }
 
-/* Generic numeric-field save, used by Leveling & XP card */
+/* Generic numeric-field save, used by the XP & House Cup card */
 async function saveNumberSetting(field, inputId){
     const raw = document.getElementById(inputId).value;
     const value = Number(raw);
@@ -802,8 +804,11 @@ async function saveAiResponseProbability(){
 function renderHousePointControls(){
     const houses = Object.keys(HOUSE_META);
     document.getElementById('housePointControls').innerHTML = houses.map(h => `
-        <div class="setting-row">
+        <div class="setting-row" style="flex-direction:column;align-items:stretch;gap:8px;">
             <div class="setting-text"><div class="sname">${svg(HOUSE_META[h].icon, 14)} ${HOUSE_META[h].name}</div></div>
+            <div class="field-input-row">
+                <input class="field-input" type="text" id="hp-reason-${h}" placeholder="Reason (e.g. won the trivia event)" maxlength="200">
+            </div>
             <div class="field-input-row" style="max-width:170px;">
                 <input class="field-input" type="number" id="hp-amount-${h}" value="10" min="1" step="1" style="text-align:center;">
                 <button class="btn btn-ghost btn-sm" onclick="adjustHousePointsCustom('${h}', -1)" ${CURRENT_USER?.canManageGuild?'':'disabled'} title="Deduct">${svg('minus',14)}</button>
@@ -817,13 +822,19 @@ async function adjustHousePointsCustom(house, sign){
     const input = document.getElementById(`hp-amount-${house}`);
     const amount = Math.abs(Number(input.value)) || 0;
     if (amount === 0) { showToast('Enter a point amount first', 'warn'); return; }
-    await adjustHousePoints(house, sign * amount);
+
+    const reasonInput = document.getElementById(`hp-reason-${house}`);
+    const reason = (reasonInput?.value || '').trim();
+    if (!reason) { showToast('Enter a reason first', 'warn'); reasonInput?.focus(); return; }
+
+    await adjustHousePoints(house, sign * amount, reason);
+    if (reasonInput) reasonInput.value = '';
 }
 
-async function adjustHousePoints(house, delta){
+async function adjustHousePoints(house, delta, reason){
     try {
-        const result = await api(`/api/houses/${house}/points`, { method:'POST', body: JSON.stringify({ delta }) });
-        showToast(`${delta > 0 ? '+' : ''}${delta} ${HOUSE_META[house].name}: now ${result.points} pts`, 'success');
+        const result = await api(`/api/houses/${house}/points`, { method:'POST', body: JSON.stringify({ delta, reason }) });
+        showToast(`${delta > 0 ? '+' : ''}${delta} ${HOUSE_META[house].name}: now ${result.points} bonus pts`, 'success');
         renderHome();
     } catch (err) {
         showToast(friendlyError(err.message), 'error');

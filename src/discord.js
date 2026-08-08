@@ -154,6 +154,22 @@ export function setMemberRoles(guildId, userId, roleIds) {
     });
 }
 
+/* ── Channel messages (House Cup board + log posts) ────────────── */
+
+export function createMessage(channelId, payload) {
+    return botFetch(`/channels/${channelId}/messages`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+    });
+}
+
+export function editMessage(channelId, messageId, payload) {
+    return botFetch(`/channels/${channelId}/messages/${messageId}`, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+    });
+}
+
 export function patchBotProfile(guildId, patch) {
     // patch: { nick?, avatar?: dataUri|null, banner?: dataUri|null }
     return botFetch(`/guilds/${guildId}/members/@me`, {

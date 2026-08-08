@@ -24,7 +24,7 @@ async function renderHome() {
         document.getElementById('statMessagesDelta').innerHTML = deltaHtml(stats.messagesWeekDelta) + ' vs previous 7 days';
         document.getElementById('statPrisonersDelta').textContent = azkaban.active.length > 0 ? 'active now' : 'all clear';
         document.getElementById('statPrisonersDelta').classList.toggle('down', azkaban.active.length > 0);
-        document.getElementById('statLeaderDelta').textContent = stats.houseLeader ? `${stats.houseLeader.points} points` : '—';
+        document.getElementById('statLeaderDelta').textContent = stats.houseLeader ? `${fmtPts(stats.houseLeader.points)} points` : '—';
 
         renderHouseCup(houses.houses);
         renderLeaderboard(leaderboard.leaderboard);
@@ -80,20 +80,26 @@ async function loadMessageSparkline(){
 }
 
 function renderHouseCup(houses) {
-    const maxPts = Math.max(...houses.map(h => h.points), 1);
+    const maxPts = Math.max(...houses.map(h => h.totalPoints), 1);
     document.getElementById('houseCupList').innerHTML = houses.map((h,i) => {
         const meta = HOUSE_META[h.house] || { name: cap(h.house), icon:'shield', color:'#daa520', bg:'rgba(218,165,32,.15)' };
+        const bonusNote = h.bonusPoints ? ` + ${fmtPts(h.bonusPoints)} bonus` : '';
         return `
         <div class="house-row">
             <div class="house-rank">${i+1}</div>
             <div class="house-emoji" style="background:${meta.bg};">${svg(meta.icon, 16)}</div>
             <div class="house-info">
                 <div class="hname">${meta.name}</div>
-                <div class="house-bar-track"><div class="house-bar-fill" style="width:${(h.points/maxPts*100)}%; background:${meta.color};"></div></div>
+                <div class="house-bar-track"><div class="house-bar-fill" style="width:${(h.totalPoints/maxPts*100)}%; background:${meta.color};"></div></div>
+                <div class="field-hint" style="margin-top:2px;">${fmtPts(h.averageXp)} avg XP${bonusNote} · ${h.memberCount} member${h.memberCount===1?'':'s'}</div>
             </div>
-            <div class="house-pts">${h.points} pts</div>
+            <div class="house-pts">${fmtPts(h.totalPoints)} pts</div>
         </div>`;
     }).join('');
+}
+
+function fmtPts(n) {
+    return Math.round(n * 10) / 10;
 }
 
 function renderLeaderboard(list) {
@@ -107,7 +113,7 @@ function renderLeaderboard(list) {
             <img class="lb-avatar" src="${u.avatarUrl}" style="object-fit:cover;" alt="">
             <div class="lb-info">
                 <div class="lname">${escapeHtml(u.username)}${u.left ? ' <span style="color:var(--parchment-faint);font-size:10px;">(left)</span>' : ''}</div>
-                <div class="lmeta">Level ${u.level} · ${u.messages} messages</div>
+                <div class="lmeta">${u.messages} messages</div>
             </div>
             <div class="lb-xp">${u.xp} XP</div>
         </div>

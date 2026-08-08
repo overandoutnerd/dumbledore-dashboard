@@ -34,7 +34,7 @@ export const config = {
     defaults: {
         xpPerMessage: 5,
         xpCooldownSeconds: 60,
-        housePointValue: 50,
+        starXpValue: 10,
         starboardThreshold: 1,
     },
 

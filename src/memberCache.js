@@ -42,6 +42,12 @@ async function refresh(guildId, bucket) {
             handle: m.user.username,
             avatarUrl: avatarUrlFor(m.user),
             bot: !!m.user.bot,
+            // Role IDs this member currently holds — used by
+            // houseCupService.js to figure out which house (if any) a
+            // member belongs to, the same way the bot does it
+            // (utils/house.ts:getMemberHouse), without a second Discord
+            // API round-trip.
+            roles: m.roles || [],
         });
     }
 
@@ -84,6 +90,25 @@ export function resolveMember(guildId, userId) {
 export function memberCount(guildId) {
     const bucket = getBucket(guildId);
     return [...bucket.members.values()].filter((m) => !m.bot).length;
+}
+
+/**
+ * Counts non-bot members currently holding a given role — used for the
+ * House Cup's "average XP per current house member" calculation. Mirrors
+ * the bot's houseCupService.ts, which does the same count from its own
+ * (equally capped) guild member cache.
+ */
+export function countMembersWithRole(guildId, roleId) {
+    if (!roleId) return 0;
+
+    const bucket = getBucket(guildId);
+    let count = 0;
+
+    for (const m of bucket.members.values()) {
+        if (!m.bot && m.roles.includes(roleId)) count++;
+    }
+
+    return count;
 }
 
 export function searchCached(guildId, query, limit = 8) {

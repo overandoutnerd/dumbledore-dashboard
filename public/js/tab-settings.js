@@ -158,6 +158,7 @@ function createMultiSelect(containerId, { onAdd, onRemove, prefix = '#', emptyTe
    INSTANTIATE ALL SETTINGS DROPDOWNS
    ============================================================ */
 let ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddAzkaban;
+let ddHouseCupBoard, ddHouseCupLogs;
 let ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin;
 let ddInterviewCategory, ddInterviewLogChannel;
 let modChannelsMS, botManagerRolesMS;
@@ -168,6 +169,9 @@ function initSettingsControls(){
     ddStarboard = createDropdown('dd-starboard', { placeholder:'— choose a channel —', onChange: v => saveChannelSetting('starboard', v) });
     ddSortingHat = createDropdown('dd-sortinghat', { placeholder:'— choose a channel —', onChange: v => saveChannelSetting('sortinghat', v) });
     ddAzkaban = createDropdown('dd-azkaban', { placeholder:'— choose a role —', onChange: v => saveRoleSetting('azkaban', v) });
+
+    ddHouseCupBoard = createDropdown('dd-housecup-board', { placeholder:'— choose a channel —', onChange: v => saveChannelSetting('housecup', v) });
+    ddHouseCupLogs = createDropdown('dd-housecup-logs', { placeholder:'— choose a channel —', onChange: v => saveChannelSetting('housecuplogs', v) });
 
     ddHouseGryffindor = createDropdown('dd-house-gryffindor', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('gryffindorRoleId', v) });
     ddHouseRavenclaw = createDropdown('dd-house-ravenclaw', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('ravenclawRoleId', v) });
@@ -211,7 +215,7 @@ async function loadChannelsAndRoles(){
         const roleOptions = ROLES.map(r => ({ value: r.id, label: '@' + r.name }));
         const categoryOptions = INTERVIEW_CATEGORIES.map(c => ({ value: c.id, label: c.name }));
 
-        [ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddInterviewLogChannel].forEach(dd => dd?.setOptions(chanOptions));
+        [ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddInterviewLogChannel, ddHouseCupBoard, ddHouseCupLogs].forEach(dd => dd?.setOptions(chanOptions));
         [ddAzkaban, ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin].forEach(dd => dd?.setOptions(roleOptions));
         ddInterviewCategory?.setOptions(categoryOptions);
         modChannelsMS?.setAllOptions(chanOptions);
