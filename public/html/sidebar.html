@@ -16,6 +16,13 @@
         <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')">
             <span class="nicon" data-icon="settings" data-size="18"></span><span class="nlabel">Settings</span>
         </button>
+        <div class="sidebar-subnav" id="settingsSubnav">
+            <button class="subnav-btn active" data-subpage="settings" onclick="switchTab('settings')">Overview</button>
+            <button class="subnav-btn" data-subpage="welcome" onclick="openWelcomeScreen()">Welcome Messages</button>
+            <button class="subnav-btn" data-subpage="house-config" onclick="openHouseConfigScreen()">House Configuration</button>
+            <button class="subnav-btn" data-subpage="house-cup" onclick="openHouseCupScreen()">House Cup &amp; XP</button>
+            <button class="subnav-btn" data-subpage="interviews" onclick="openInterviewsScreen()">Interviews</button>
+        </div>
     </nav>
     <button class="sidebar-switch-server" onclick="openSwitchServerModal()">
         <span data-icon="chevronRight" data-size="13"></span> Switch server

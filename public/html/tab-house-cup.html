@@ -1,0 +1,87 @@
+    <!-- ================= HOUSE CUP & XP (reached via Settings → House Cup
+         & XP, not a top-level nav tab) ================= -->
+    <div class="tab-panel" id="panel-house-cup">
+        <div class="page">
+            <button class="subpage-back" onclick="backToSettings()">
+                <span data-icon="chevronLeft" data-size="13"></span> Settings
+            </button>
+
+            <div class="page-head">
+                <p class="eyebrow">Ministry Records</p>
+                <h2>House Cup &amp; XP</h2>
+                <p>Members earn XP from chatting and star reactions, feeding their house's House Cup average. Mods post the live board with /house-cup.</p>
+            </div>
+
+            <div class="card">
+                <div class="setting-row" id="row-housecup">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="trophy" data-size="13"></span> Enabled <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-house-cup</span></div>
+                        <div class="sdesc">Turn House Cup XP (chatting + star reactions) on or off for this server.</div>
+                    </div>
+                    <div class="toggle" id="toggle-housecup" onclick="toggleSetting('housecup')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-housecup">
+                    <div class="sub-panel-inner">
+                        <label class="field-label" style="margin-bottom:4px;">Board channel <span class="field-hint">— where /house-cup posts the live standings</span></label>
+                        <div class="dd" id="dd-housecup-board"></div>
+                        <label class="field-label" style="margin:10px 0 4px;">Log channel <span class="field-hint">— where manual bonus-point awards are logged</span></label>
+                        <div class="dd" id="dd-housecup-logs"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>XP Rates</h3>
+
+                <div class="field-group">
+                    <label class="field-label">XP per message <span id="xpPerMessageDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="xpPerMessageInput" type="number" min="0" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('xpPerMessage','xpPerMessageInput')">Save</button>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">XP cooldown (seconds) <span id="xpCooldownDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="xpCooldownInput" type="number" min="0" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('xpCooldownSeconds','xpCooldownInput')">Save</button>
+                    </div>
+                </div>
+                <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label">XP per ⭐ reaction <span id="starXpValueDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="starXpValueInput" type="number" min="0" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('starXpValue','starXpValueInput')">Save</button>
+                    </div>
+                </div>
+                <p class="locked-note login-hidden" id="xpSettingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+
+                <div class="danger-zone" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-faint,rgba(212,175,55,0.15));">
+                    <div class="setting-row" style="padding:0;">
+                        <div class="setting-text">
+                            <div class="sname"><span data-icon="alert" data-size="13"></span> Reset XP Data</div>
+                            <div class="sdesc">Wipes every member's XP and message count back to zero, including what they've banked towards their house. This can't be undone.</div>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="confirmResetLeveling()" ${CURRENT_USER?.canManageGuild?'':'disabled'}>Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Bonus Points <span class="tag">/house-points</span></h3>
+                <p class="field-hint" style="margin-top:-4px;margin-bottom:10px;">Each house's House Cup points are its members' average XP, plus whatever bonus you award here. Bonus points are separate from XP and don't affect any individual member's stats.</p>
+                <div id="housePointControls"></div>
+                <p class="locked-note login-hidden" id="housePointsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+
+                <div class="danger-zone" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-faint,rgba(212,175,55,0.15));">
+                    <div class="setting-row" style="padding:0;">
+                        <div class="setting-text">
+                            <div class="sname"><span data-icon="alert" data-size="13"></span> Reset Bonus Points</div>
+                            <div class="sdesc">Sets every house's bonus points back to zero. Each house's XP average is unaffected. This can't be undone.</div>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="confirmResetHouseCup()" ${CURRENT_USER?.canManageGuild?'':'disabled'}>Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

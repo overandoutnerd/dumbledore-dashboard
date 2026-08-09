@@ -615,8 +615,6 @@ async function loadSettings(){
 
         document.getElementById('aiResponseProbabilityInput').value = Math.round((s.aiResponseProbability ?? 0.1) * 100);
 
-        document.getElementById('starboardThresholdHint').textContent = `Threshold: ${s.starboardThreshold} reaction${s.starboardThreshold === 1 ? '' : 's'}`;
-
         ddHouseGryffindor?.setValue(s.gryffindorRoleId);
         ddHouseRavenclaw?.setValue(s.ravenclawRoleId);
         ddHouseHufflepuff?.setValue(s.hufflepuffRoleId);

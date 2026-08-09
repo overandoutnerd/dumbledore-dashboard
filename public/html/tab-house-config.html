@@ -1,0 +1,93 @@
+    <!-- ================= HOUSE CONFIGURATION (reached via Settings →
+         House Configuration, not a top-level nav tab) ================= -->
+    <div class="tab-panel" id="panel-house-config">
+        <div class="page">
+            <button class="subpage-back" onclick="backToSettings()">
+                <span data-icon="chevronLeft" data-size="13"></span> Settings
+            </button>
+
+            <div class="page-head">
+                <p class="eyebrow">Ministry Records</p>
+                <h2>House Configuration</h2>
+                <p>Role, home channel, and emoji for each house. The emoji shows up on the House Cup board buttons and everywhere else the bot displays a house.</p>
+            </div>
+
+            <div class="card">
+                <div class="house-config-block">
+                    <div class="field-label" style="margin-bottom:6px;"><span data-icon="lion" data-size="13"></span> Gryffindor</div>
+                    <div class="field-group"><label class="field-label">Role</label><div class="dd" id="dd-house-gryffindor"></div></div>
+                    <div class="field-group"><label class="field-label">Channel</label><div class="dd" id="dd-house-channel-gryffindor"></div></div>
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label class="field-label">Emoji</label>
+                        <div class="field-input-row">
+                            <div class="field-with-icon-btn">
+                                <input class="field-input" id="house-emoji-gryffindor" type="text" placeholder="🦁 or pick a custom emoji" maxlength="60">
+                                <button type="button" class="field-icon-btn" onclick="toggleHouseEmojiPicker('gryffindor')" title="Pick a custom server emoji"><span data-icon="smile" data-size="16"></span></button>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="saveHouseEmoji('gryffindor')">Save</button>
+                        </div>
+                        <div class="dd" id="house-emoji-dd-gryffindor" style="margin-top:6px;"><div class="dd-panel" id="house-emoji-panel-gryffindor"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="house-config-block">
+                    <div class="field-label" style="margin-bottom:6px;"><span data-icon="eagle" data-size="13"></span> Ravenclaw</div>
+                    <div class="field-group"><label class="field-label">Role</label><div class="dd" id="dd-house-ravenclaw"></div></div>
+                    <div class="field-group"><label class="field-label">Channel</label><div class="dd" id="dd-house-channel-ravenclaw"></div></div>
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label class="field-label">Emoji</label>
+                        <div class="field-input-row">
+                            <div class="field-with-icon-btn">
+                                <input class="field-input" id="house-emoji-ravenclaw" type="text" placeholder="🦅 or pick a custom emoji" maxlength="60">
+                                <button type="button" class="field-icon-btn" onclick="toggleHouseEmojiPicker('ravenclaw')" title="Pick a custom server emoji"><span data-icon="smile" data-size="16"></span></button>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="saveHouseEmoji('ravenclaw')">Save</button>
+                        </div>
+                        <div class="dd" id="house-emoji-dd-ravenclaw" style="margin-top:6px;"><div class="dd-panel" id="house-emoji-panel-ravenclaw"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="house-config-block">
+                    <div class="field-label" style="margin-bottom:6px;"><span data-icon="badger" data-size="13"></span> Hufflepuff</div>
+                    <div class="field-group"><label class="field-label">Role</label><div class="dd" id="dd-house-hufflepuff"></div></div>
+                    <div class="field-group"><label class="field-label">Channel</label><div class="dd" id="dd-house-channel-hufflepuff"></div></div>
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label class="field-label">Emoji</label>
+                        <div class="field-input-row">
+                            <div class="field-with-icon-btn">
+                                <input class="field-input" id="house-emoji-hufflepuff" type="text" placeholder="🦡 or pick a custom emoji" maxlength="60">
+                                <button type="button" class="field-icon-btn" onclick="toggleHouseEmojiPicker('hufflepuff')" title="Pick a custom server emoji"><span data-icon="smile" data-size="16"></span></button>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="saveHouseEmoji('hufflepuff')">Save</button>
+                        </div>
+                        <div class="dd" id="house-emoji-dd-hufflepuff" style="margin-top:6px;"><div class="dd-panel" id="house-emoji-panel-hufflepuff"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="house-config-block">
+                    <div class="field-label" style="margin-bottom:6px;"><span data-icon="snake" data-size="13"></span> Slytherin</div>
+                    <div class="field-group"><label class="field-label">Role</label><div class="dd" id="dd-house-slytherin"></div></div>
+                    <div class="field-group"><label class="field-label">Channel</label><div class="dd" id="dd-house-channel-slytherin"></div></div>
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label class="field-label">Emoji</label>
+                        <div class="field-input-row">
+                            <div class="field-with-icon-btn">
+                                <input class="field-input" id="house-emoji-slytherin" type="text" placeholder="🐍 or pick a custom emoji" maxlength="60">
+                                <button type="button" class="field-icon-btn" onclick="toggleHouseEmojiPicker('slytherin')" title="Pick a custom server emoji"><span data-icon="smile" data-size="16"></span></button>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="saveHouseEmoji('slytherin')">Save</button>
+                        </div>
+                        <div class="dd" id="house-emoji-dd-slytherin" style="margin-top:6px;"><div class="dd-panel" id="house-emoji-panel-slytherin"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="locked-note login-hidden" id="houseRolesLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
+        </div>
+    </div>

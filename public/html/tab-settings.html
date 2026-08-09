@@ -47,6 +47,35 @@
                 </div>
             </div>
 
+            <div class="card" id="navPagesCard">
+                <h3>Configuration Pages</h3>
+                <p class="field-hint" style="margin-top:-4px;margin-bottom:6px;">These systems get their own page since they can grow — messages, houses, and bonus-point history.</p>
+
+                <button class="settings-link-row" onclick="openWelcomeScreen()">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="join" data-size="13"></span> Welcome Messages</div>
+                        <div class="sdesc">Enable/disable, pick a channel, and manage the message rotation.</div>
+                    </div>
+                    <span class="settings-link-chevron" data-icon="chevronRight" data-size="16"></span>
+                </button>
+
+                <button class="settings-link-row" onclick="openHouseConfigScreen()">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="lion" data-size="13"></span> House Configuration</div>
+                        <div class="sdesc">Role, channel, and emoji for each of the four houses.</div>
+                    </div>
+                    <span class="settings-link-chevron" data-icon="chevronRight" data-size="16"></span>
+                </button>
+
+                <button class="settings-link-row" onclick="openHouseCupScreen()">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="trophy" data-size="13"></span> House Cup &amp; XP</div>
+                        <div class="sdesc">Enable/disable, board &amp; log channels, XP rates, and bonus points.</div>
+                    </div>
+                    <span class="settings-link-chevron" data-icon="chevronRight" data-size="16"></span>
+                </button>
+            </div>
+
             <div class="card" id="serverSystemsCard">
                 <h3>Server Systems</h3>
 
@@ -73,7 +102,13 @@
                 <div class="sub-panel" id="sub-starboard">
                     <div class="sub-panel-inner">
                         <div class="dd" id="dd-starboard"></div>
-                        <p class="field-hint" id="starboardThresholdHint">Threshold: —</p>
+                        <div class="field-group" style="margin-top:10px;margin-bottom:0;">
+                            <label class="field-label">Threshold (star reactions) <span id="starboardThresholdDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
+                            <div class="field-input-row">
+                                <input class="field-input" id="starboardThresholdInput" type="number" min="1" step="1">
+                                <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('starboardThreshold','starboardThresholdInput')">Save</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -87,22 +122,6 @@
                 <div class="sub-panel" id="sub-sortinghat">
                     <div class="sub-panel-inner">
                         <div class="dd" id="dd-sortinghat"></div>
-                    </div>
-                </div>
-
-                <div class="setting-row" id="row-housecup">
-                    <div class="setting-text">
-                        <div class="sname"><span data-icon="trophy" data-size="13"></span> House Cup <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-house-cup</span></div>
-                        <div class="sdesc">Members earn XP from chatting and star reactions, feeding their house's House Cup average.</div>
-                    </div>
-                    <div class="toggle" id="toggle-housecup" onclick="toggleSetting('housecup')"><div class="knob"></div></div>
-                </div>
-                <div class="sub-panel" id="sub-housecup">
-                    <div class="sub-panel-inner">
-                        <label class="field-label" style="margin-bottom:4px;">Board channel <span class="field-hint">— where /house-cup posts the live standings</span></label>
-                        <div class="dd" id="dd-housecup-board"></div>
-                        <label class="field-label" style="margin:10px 0 4px;">Log channel <span class="field-hint">— where manual bonus-point awards are logged</span></label>
-                        <div class="dd" id="dd-housecup-logs"></div>
                     </div>
                 </div>
 
@@ -150,103 +169,11 @@
                 <p class="locked-note login-hidden" id="settingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission — showing read-only</p>
             </div>
 
-            <div class="card" id="welcomeCard">
-                <h3>Welcome Messages <span class="tag">/configure-welcome</span></h3>
-                <p class="field-hint" style="margin-top:-4px;margin-bottom:10px;">Greet new witches and wizards as they arrive.</p>
-
-                <div class="setting-row" id="row-welcome">
-                    <div class="setting-text">
-                        <div class="sname"><span data-icon="join" data-size="13"></span> Enabled</div>
-                        <div class="sdesc">Turn welcome messages on or off for this server.</div>
-                    </div>
-                    <div class="toggle" id="toggle-welcome" onclick="toggleSetting('welcome')"><div class="knob"></div></div>
-                </div>
-                <div class="sub-panel" id="sub-welcome">
-                    <div class="sub-panel-inner">
-                        <div class="dd" id="dd-welcome"></div>
-                        <p class="field-hint" style="margin-top:10px;">The bot picks one of these at random for each new member. No messages yet? It falls back to a built-in rotation.</p>
-                        <div class="we-list" id="welcomeMessagesList"></div>
-                        <button class="btn btn-ghost btn-block we-add-btn" onclick="openWelcomeEditor()"><span data-icon="plus" data-size="12"></span> Add Welcome Message</button>
-                    </div>
-                </div>
-            </div>
-
             <div class="card">
                 <h3>Mod Channels <span class="tag">/configure-mod-channels</span></h3>
                 <p class="field-hint" style="margin-top:-4px;margin-bottom:10px;">Channels the Deluminator is allowed to search when used from inside one of them.</p>
                 <div class="ms-wrap" id="modChannelsMultiSelect"></div>
                 <p class="locked-note login-hidden" id="modChannelsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
-            </div>
-
-            <div class="card">
-                <h3>XP &amp; House Cup <span class="tag">/guild-settings</span></h3>
-                <p class="field-hint" style="margin-top:-4px;margin-bottom:10px;">Turn House Cup on/off and set its channels under Server Systems above. These are the underlying XP tunables.</p>
-
-                <div class="field-group">
-                    <label class="field-label">XP per message <span id="xpPerMessageDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
-                    <div class="field-input-row">
-                        <input class="field-input" id="xpPerMessageInput" type="number" min="0" step="1">
-                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('xpPerMessage','xpPerMessageInput')">Save</button>
-                    </div>
-                </div>
-                <div class="field-group">
-                    <label class="field-label">XP cooldown (seconds) <span id="xpCooldownDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
-                    <div class="field-input-row">
-                        <input class="field-input" id="xpCooldownInput" type="number" min="0" step="1">
-                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('xpCooldownSeconds','xpCooldownInput')">Save</button>
-                    </div>
-                </div>
-                <div class="field-group">
-                    <label class="field-label">XP per ⭐ reaction <span id="starXpValueDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
-                    <div class="field-input-row">
-                        <input class="field-input" id="starXpValueInput" type="number" min="0" step="1">
-                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('starXpValue','starXpValueInput')">Save</button>
-                    </div>
-                </div>
-                <div class="field-group" style="margin-bottom:0;">
-                    <label class="field-label">Starboard threshold (star reactions) <span id="starboardThresholdDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
-                    <div class="field-input-row">
-                        <input class="field-input" id="starboardThresholdInput" type="number" min="1" step="1">
-                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('starboardThreshold','starboardThresholdInput')">Save</button>
-                    </div>
-                </div>
-                <p class="locked-note login-hidden" id="xpSettingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
-
-                <div class="danger-zone" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-faint,rgba(212,175,55,0.15));">
-                    <div class="setting-row" style="padding:0;">
-                        <div class="setting-text">
-                            <div class="sname"><span data-icon="alert" data-size="13"></span> Reset XP Data</div>
-                            <div class="sdesc">Wipes every member's XP and message count back to zero, including what they've banked towards their house. This can't be undone.</div>
-                        </div>
-                        <button class="btn btn-danger btn-sm" onclick="confirmResetLeveling()" ${CURRENT_USER?.canManageGuild?'':'disabled'}>Reset</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>House Cup Bonus Points <span class="tag">/house-cup</span></h3>
-                <p class="field-hint" style="margin-top:-4px;margin-bottom:10px;">Each house's House Cup points are its members' average XP, plus whatever bonus you award here. Bonus points are separate from XP and don't affect any individual member's stats.</p>
-                <div id="housePointControls"></div>
-                <p class="locked-note login-hidden" id="housePointsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
-
-                <div class="danger-zone" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-faint,rgba(212,175,55,0.15));">
-                    <div class="setting-row" style="padding:0;">
-                        <div class="setting-text">
-                            <div class="sname"><span data-icon="alert" data-size="13"></span> Reset Bonus Points</div>
-                            <div class="sdesc">Sets every house's bonus points back to zero. Each house's XP average is unaffected. This can't be undone.</div>
-                        </div>
-                        <button class="btn btn-danger btn-sm" onclick="confirmResetHouseCup()" ${CURRENT_USER?.canManageGuild?'':'disabled'}>Reset</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>House Roles <span class="tag">/guild-settings</span></h3>
-                <div class="field-group"><label class="field-label"><span data-icon="lion" data-size="13"></span> Gryffindor</label><div class="dd" id="dd-house-gryffindor"></div></div>
-                <div class="field-group"><label class="field-label"><span data-icon="eagle" data-size="13"></span> Ravenclaw</label><div class="dd" id="dd-house-ravenclaw"></div></div>
-                <div class="field-group"><label class="field-label"><span data-icon="badger" data-size="13"></span> Hufflepuff</label><div class="dd" id="dd-house-hufflepuff"></div></div>
-                <div class="field-group" style="margin-bottom:0;"><label class="field-label"><span data-icon="snake" data-size="13"></span> Slytherin</label><div class="dd" id="dd-house-slytherin"></div></div>
-                <p class="locked-note login-hidden" id="houseRolesLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>
             </div>
 
             <div class="card">

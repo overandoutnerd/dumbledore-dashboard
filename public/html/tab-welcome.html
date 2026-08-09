@@ -1,0 +1,40 @@
+    <!-- ================= WELCOME MESSAGES (reached via Settings → Welcome
+         Messages, not a top-level nav tab) ================= -->
+    <div class="tab-panel" id="panel-welcome">
+        <div class="page">
+            <button class="subpage-back" onclick="backToSettings()">
+                <span data-icon="chevronLeft" data-size="13"></span> Settings
+            </button>
+
+            <div class="page-head">
+                <p class="eyebrow">Ministry Records</p>
+                <h2>Welcome Messages</h2>
+                <p>Greet new witches and wizards as they arrive.</p>
+            </div>
+
+            <div class="card" id="welcomeCard">
+                <div class="setting-row" id="row-welcome">
+                    <div class="setting-text">
+                        <div class="sname"><span data-icon="join" data-size="13"></span> Enabled <span class="tag" style="color:var(--parchment-faint);font-size:10px;">/configure-welcome</span></div>
+                        <div class="sdesc">Turn welcome messages on or off for this server.</div>
+                    </div>
+                    <div class="toggle" id="toggle-welcome" onclick="toggleSetting('welcome')"><div class="knob"></div></div>
+                </div>
+                <div class="sub-panel" id="sub-welcome">
+                    <div class="sub-panel-inner">
+                        <div class="field-group" style="margin-bottom:0;">
+                            <label class="field-label">Channel</label>
+                            <div class="dd" id="dd-welcome"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Message Rotation</h3>
+                <p class="field-hint" style="margin-top:-4px;margin-bottom:10px;">The bot picks one of these at random for each new member. No messages yet? It falls back to a built-in rotation.</p>
+                <div class="we-list" id="welcomeMessagesList"></div>
+                <button class="btn btn-ghost btn-block we-add-btn" onclick="openWelcomeEditor()"><span data-icon="plus" data-size="12"></span> Add Welcome Message</button>
+            </div>
+        </div>
+    </div>

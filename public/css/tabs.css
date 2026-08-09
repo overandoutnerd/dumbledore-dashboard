@@ -109,6 +109,20 @@
 .field-group{margin-bottom:16px;}
 .field-label{font-family:"Cinzel",serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:block;}
 .field-input-row{display:flex;gap:8px;min-width:0;}
+
+/* Icon button anchored inside a text field (e.g. the custom emoji picker
+   trigger in House Configuration) rather than as a separate button next
+   to it. */
+.field-with-icon-btn{position:relative;flex:1;min-width:0;}
+.field-with-icon-btn .field-input{padding-right:36px;width:100%;}
+.field-icon-btn{
+    position:absolute;top:50%;right:6px;transform:translateY(-50%);
+    display:flex;align-items:center;justify-content:center;
+    width:26px;height:26px;padding:0;border:none;border-radius:6px;
+    background:none;color:var(--parchment-faint);cursor:pointer;
+    transition:color .2s ease, background .2s ease;
+}
+.field-icon-btn:hover{color:var(--gold-light);background:rgba(255,255,255,.06);}
 .field-input{
     flex:1;min-width:0;width:100%;padding:11px 14px;border-radius:11px;background:rgba(255,255,255,.03);
     border:1px solid var(--card-border);color:var(--parchment);font-family:"Poppins",sans-serif;font-size:13px;outline:none;

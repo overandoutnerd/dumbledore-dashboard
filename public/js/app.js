@@ -7,6 +7,17 @@ function switchTab(tab, opts = {}){
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('panel-'+tab).classList.add('active');
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+
+    const subnav = document.getElementById('settingsSubnav');
+    if (subnav) {
+        if (tab === 'settings') {
+            subnav.classList.add('open');
+            subnav.querySelectorAll('.subnav-btn').forEach(b => b.classList.toggle('active', b.dataset.subpage === 'settings'));
+        } else {
+            subnav.classList.remove('open');
+        }
+    }
+
     window.scrollTo({top:0, behavior:'smooth'});
     if (!opts.skipHistory) {
         const path = TAB_PATHS[tab] || '/';
@@ -16,15 +27,18 @@ function switchTab(tab, opts = {}){
 
 /* ============================================================
    ROUTING
-   The nav tabs (Home/Commands/Bot/Settings), the Interviews list, and an
-   individual interview transcript each get their own URL (/, /commands,
-   /bot, /settings, /interviews, /interviews/:publicId) via
-   history.pushState in switchTab()/openInterviewsScreen()/
-   openInterviewDetail(). routeFromLocation() is the reverse of that: given
-   whatever's currently in the address bar, show the matching screen. It
-   runs once after the dashboard finishes its initial load (so a reload —
-   or a Discord embed link — lands on the right screen instead of always
-   Home) and again on browser back/forward.
+   The nav tabs (Home/Commands/Bot/Settings), the Interviews list, an
+   individual interview transcript, and the Welcome/House Configuration/
+   House Cup & XP settings sub-pages each get their own URL (/, /commands,
+   /bot, /settings, /interviews, /interviews/:publicId, /welcome,
+   /house-config, /house-cup) via history.pushState in
+   switchTab()/openInterviewsScreen()/openInterviewDetail()/
+   openWelcomeScreen()/openHouseConfigScreen()/openHouseCupScreen().
+   routeFromLocation() is the reverse of that: given whatever's currently
+   in the address bar, show the matching screen. It runs once after the
+   dashboard finishes its initial load (so a reload — or a Discord embed
+   link — lands on the right screen instead of always Home) and again on
+   browser back/forward.
    ============================================================ */
 function routeFromLocation(opts = {}){
     const path = window.location.pathname;
@@ -37,6 +51,21 @@ function routeFromLocation(opts = {}){
 
     if (path === '/interviews' || path === '/interviews/') {
         openInterviewsScreen({ skipHistory: true });
+        return;
+    }
+
+    if (path === '/welcome' || path === '/welcome/') {
+        openWelcomeScreen({ skipHistory: true });
+        return;
+    }
+
+    if (path === '/house-config' || path === '/house-config/') {
+        openHouseConfigScreen({ skipHistory: true });
+        return;
+    }
+
+    if (path === '/house-cup' || path === '/house-cup/') {
+        openHouseCupScreen({ skipHistory: true });
         return;
     }
 

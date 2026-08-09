@@ -53,16 +53,27 @@ function renderInterviews(interviews) {
 /* ---- Sub-screen navigation ----
    These panels aren't tied to a nav-btn (Interviews isn't a top-level
    tab), so switching to them keeps "Settings" highlighted in the nav —
-   conceptually you're still inside Settings, just a level deeper. */
-function openSubPanel(panelId) {
+   conceptually you're still inside Settings, just a level deeper. On
+   desktop, subnavKey also highlights the matching entry in the sidebar's
+   nested Settings sub-nav (see sidebar.html/#settingsSubnav) so a mod can
+   jump between these pages without detouring back through the Settings
+   overview. */
+function openSubPanel(panelId, subnavKey) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.getElementById(panelId).classList.add('active');
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'settings'));
+
+    const subnav = document.getElementById('settingsSubnav');
+    if (subnav && subnavKey) {
+        subnav.classList.add('open');
+        subnav.querySelectorAll('.subnav-btn').forEach(b => b.classList.toggle('active', b.dataset.subpage === subnavKey));
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function openInterviewsScreen(opts = {}) {
-    openSubPanel('panel-interviews');
+    openSubPanel('panel-interviews', 'interviews');
     if (!opts.skipHistory && window.location.pathname !== '/interviews') {
         history.pushState({ view: 'interviews' }, '', '/interviews');
     }
@@ -77,7 +88,7 @@ function backToInterviewsList() {
 }
 
 async function openInterviewDetail(publicId, opts = {}) {
-    openSubPanel('panel-interview-detail');
+    openSubPanel('panel-interview-detail', 'interviews');
 
     const path = `/interviews/${encodeURIComponent(publicId)}`;
     if (!opts.skipHistory && window.location.pathname !== path) {

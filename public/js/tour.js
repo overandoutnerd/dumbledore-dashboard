@@ -69,11 +69,16 @@ const TOUR_STEPS = [
     },
     {
         tab: 'settings',
-        target: '#row-welcome',
-        line: "And this turns Welcome Messages on or off — greeting new witches and wizards automatically the moment they arrive.",
+        target: '#navPagesCard',
+        line: "Welcome Messages, House Configuration, and House Cup & XP each get their own page now — they tend to grow (message lists, house-by-house setup, bonus-point history), so they don't crowd this overview. These rows take you straight there, and on desktop you'll see the same pages listed under Settings in the sidebar.",
     },
     {
-        tab: 'settings',
+        subpage: 'welcome',
+        target: '#row-welcome',
+        line: "This turns Welcome Messages on or off — greeting new witches and wizards automatically the moment they arrive.",
+    },
+    {
+        subpage: 'welcome',
         target: '.we-add-btn',
         line: "Add a few messages of your own here and the bot picks one at random for each new arrival. Leave it empty and it falls back to a built-in rotation instead.",
     },
@@ -187,7 +192,14 @@ function unlockBackgroundScroll(){
 
 function renderTourStep(){
     const step = TOUR_STEPS[tourState.index];
-    if (step.tab) switchTab(step.tab);
+    const subpageOpeners = {
+        welcome: openWelcomeScreen,
+        'house-config': openHouseConfigScreen,
+        'house-cup': openHouseCupScreen,
+        interviews: openInterviewsScreen,
+    };
+    if (step.subpage && subpageOpeners[step.subpage]) subpageOpeners[step.subpage]();
+    else if (step.tab) switchTab(step.tab);
 
     document.getElementById('tourLine').textContent = step.line;
     document.getElementById('tourStepLabel').textContent = `Step ${tourState.index + 1} of ${TOUR_STEPS.length}`;

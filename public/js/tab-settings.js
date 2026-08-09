@@ -1,6 +1,33 @@
 /* ============================================================
    SETTINGS TAB
    ============================================================ */
+
+/* ---- Settings sub-pages: Welcome / House Configuration / House Cup & XP
+   Same shell as the Interviews sub-screens (openSubPanel in
+   tab-interviews.js) — their own URL, "Settings" stays highlighted in the
+   nav, and the matching entry lights up in the sidebar's Settings
+   sub-nav on desktop. ---- */
+function openWelcomeScreen(opts = {}) {
+    openSubPanel('panel-welcome', 'welcome');
+    if (!opts.skipHistory && window.location.pathname !== '/welcome') {
+        history.pushState({ view: 'welcome' }, '', '/welcome');
+    }
+}
+
+function openHouseConfigScreen(opts = {}) {
+    openSubPanel('panel-house-config', 'house-config');
+    if (!opts.skipHistory && window.location.pathname !== '/house-config') {
+        history.pushState({ view: 'house-config' }, '', '/house-config');
+    }
+}
+
+function openHouseCupScreen(opts = {}) {
+    openSubPanel('panel-house-cup', 'house-cup');
+    if (!opts.skipHistory && window.location.pathname !== '/house-cup') {
+        history.pushState({ view: 'house-cup' }, '', '/house-cup');
+    }
+}
+
 /* ============================================================
    CUSTOM DROPDOWN COMPONENT (replaces native <select>)
    ============================================================ */
@@ -160,6 +187,7 @@ function createMultiSelect(containerId, { onAdd, onRemove, prefix = '#', emptyTe
 let ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddAzkaban;
 let ddHouseCupBoard, ddHouseCupLogs;
 let ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin;
+let ddHouseChannelGryffindor, ddHouseChannelRavenclaw, ddHouseChannelHufflepuff, ddHouseChannelSlytherin;
 let ddInterviewCategory, ddInterviewLogChannel;
 let modChannelsMS, botManagerRolesMS;
 
@@ -177,6 +205,11 @@ function initSettingsControls(){
     ddHouseRavenclaw = createDropdown('dd-house-ravenclaw', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('ravenclawRoleId', v) });
     ddHouseHufflepuff = createDropdown('dd-house-hufflepuff', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('hufflepuffRoleId', v) });
     ddHouseSlytherin = createDropdown('dd-house-slytherin', { placeholder:'— choose a role —', onChange: v => saveRoleSetting2('slytherinRoleId', v) });
+
+    ddHouseChannelGryffindor = createDropdown('dd-house-channel-gryffindor', { placeholder:'— choose a channel —', onChange: v => saveHouseConfigChannel('gryffindor', v) });
+    ddHouseChannelRavenclaw = createDropdown('dd-house-channel-ravenclaw', { placeholder:'— choose a channel —', onChange: v => saveHouseConfigChannel('ravenclaw', v) });
+    ddHouseChannelHufflepuff = createDropdown('dd-house-channel-hufflepuff', { placeholder:'— choose a channel —', onChange: v => saveHouseConfigChannel('hufflepuff', v) });
+    ddHouseChannelSlytherin = createDropdown('dd-house-channel-slytherin', { placeholder:'— choose a channel —', onChange: v => saveHouseConfigChannel('slytherin', v) });
 
     ddInterviewCategory = createDropdown('dd-interview-category', {
         placeholder:'— choose a category —',
@@ -215,7 +248,7 @@ async function loadChannelsAndRoles(){
         const roleOptions = ROLES.map(r => ({ value: r.id, label: '@' + r.name }));
         const categoryOptions = INTERVIEW_CATEGORIES.map(c => ({ value: c.id, label: c.name }));
 
-        [ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddInterviewLogChannel, ddHouseCupBoard, ddHouseCupLogs].forEach(dd => dd?.setOptions(chanOptions));
+        [ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddInterviewLogChannel, ddHouseCupBoard, ddHouseCupLogs, ddHouseChannelGryffindor, ddHouseChannelRavenclaw, ddHouseChannelHufflepuff, ddHouseChannelSlytherin].forEach(dd => dd?.setOptions(chanOptions));
         [ddAzkaban, ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin].forEach(dd => dd?.setOptions(roleOptions));
         ddInterviewCategory?.setOptions(categoryOptions);
         modChannelsMS?.setAllOptions(chanOptions);
@@ -232,5 +265,87 @@ async function loadChannelsAndRoles(){
     } catch (err) {
         if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadEmojis failed', err);
     }
+
+    try {
+        const { houseConfig } = await api('/api/house-config');
+        const ddMap = { gryffindor: ddHouseChannelGryffindor, ravenclaw: ddHouseChannelRavenclaw, hufflepuff: ddHouseChannelHufflepuff, slytherin: ddHouseChannelSlytherin };
+        for (const house of Object.keys(houseConfig)){
+            ddMap[house]?.setValue(houseConfig[house].channelId);
+            const input = document.getElementById(`house-emoji-${house}`);
+            if (input) input.value = houseConfig[house].emoji || '';
+        }
+    } catch (err) {
+        if (!['not_authenticated','no_active_guild'].includes(err.message)) console.error('loadHouseConfig failed', err);
+    }
 }
+
+async function saveHouseConfigChannel(house, channelId){
+    try {
+        await api(`/api/house-config/${house}`, { method:'POST', body: JSON.stringify({ channelId }) });
+        showToast('Channel saved', 'success');
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+async function saveHouseEmoji(house){
+    const input = document.getElementById(`house-emoji-${house}`);
+    const emoji = (input?.value || '').trim();
+    try {
+        await api(`/api/house-config/${house}`, { method:'POST', body: JSON.stringify({ emoji }) });
+        showToast('Emoji saved', 'success');
+        renderHome();
+    } catch (err) {
+        showToast(friendlyError(err.message), 'error');
+    }
+}
+
+/* ── Custom emoji picker for the house emoji fields ─────────────────
+   Lightweight, reuses the same .dd/.dd-panel/.dd-option markup as the
+   main dropdown component for consistent styling, but it inserts a
+   Discord custom-emoji tag into a plain text input rather than setting
+   a dropdown value. */
+function closeAllHouseEmojiPickers(){
+    document.querySelectorAll('[id^="house-emoji-dd-"].open').forEach(el => el.classList.remove('open'));
+}
+
+function toggleHouseEmojiPicker(house){
+    const container = document.getElementById(`house-emoji-dd-${house}`);
+    if (!container) return;
+    const opening = !container.classList.contains('open');
+    closeAllHouseEmojiPickers();
+    container.classList.toggle('open', opening);
+    if (opening) renderHouseEmojiPicker(house);
+}
+
+function renderHouseEmojiPicker(house){
+    const panel = document.getElementById(`house-emoji-panel-${house}`);
+    if (!panel) return;
+
+    if (!EMOJIS.length) {
+        panel.innerHTML = `<div class="dd-empty">This server has no custom emojis yet.</div>`;
+        return;
+    }
+
+    panel.innerHTML = EMOJIS.map(e => `
+        <div class="dd-option" data-id="${e.id}" data-name="${escapeHtml(e.name)}" data-animated="${e.animated ? 1 : 0}">
+            <img src="https://cdn.discordapp.com/emojis/${e.id}.${e.animated ? 'gif' : 'png'}?size=24" alt="" style="width:20px;height:20px;border-radius:4px;">
+            <span>${escapeHtml(e.name)}</span>
+        </div>
+    `).join('');
+
+    panel.querySelectorAll('.dd-option').forEach(el => {
+        el.addEventListener('click', () => {
+            const input = document.getElementById(`house-emoji-${house}`);
+            if (input) input.value = `<${el.dataset.animated === '1' ? 'a' : ''}:${el.dataset.name}:${el.dataset.id}>`;
+            closeAllHouseEmojiPickers();
+        });
+    });
+}
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('[id^="house-emoji-dd-"]') && !e.target.closest('[onclick^="toggleHouseEmojiPicker"]')) {
+        closeAllHouseEmojiPickers();
+    }
+});
 

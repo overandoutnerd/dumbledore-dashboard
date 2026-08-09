@@ -142,12 +142,16 @@ function applyPermissionGates() {
     document.getElementById('nicknameLock').classList.toggle('login-hidden', botManagerOk);
     document.getElementById('avatarLock').classList.toggle('login-hidden', botManagerOk);
 
-    // Settings — Manage Server
+    // Settings — Manage Server. Scoped across the main Settings overview
+    // plus its Welcome/House Configuration/House Cup & XP sub-pages,
+    // since those used to be inline on #panel-settings and are still
+    // "Settings" as far as permissions go, just split across pages now.
     const manageGuildOk = u.canManageGuild;
-    document.querySelectorAll('#panel-settings .toggle').forEach(t => t.classList.toggle('disabled', !manageGuildOk));
-    document.querySelectorAll('#panel-settings input').forEach(i => i.disabled = !manageGuildOk);
-    document.querySelectorAll('#panel-settings .btn-primary').forEach(b => b.disabled = !manageGuildOk);
-    [ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddAzkaban, ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin, ddInterviewCategory, ddInterviewLogChannel].forEach(dd => dd?.setDisabled(!manageGuildOk));
+    const settingsPanels = ['#panel-settings', '#panel-welcome', '#panel-house-config', '#panel-house-cup'];
+    document.querySelectorAll(settingsPanels.map(p => `${p} .toggle`).join(', ')).forEach(t => t.classList.toggle('disabled', !manageGuildOk));
+    document.querySelectorAll(settingsPanels.map(p => `${p} input`).join(', ')).forEach(i => i.disabled = !manageGuildOk);
+    document.querySelectorAll(settingsPanels.map(p => `${p} .btn-primary`).join(', ')).forEach(b => b.disabled = !manageGuildOk);
+    [ddLogs, ddWelcome, ddStarboard, ddSortingHat, ddAzkaban, ddHouseGryffindor, ddHouseRavenclaw, ddHouseHufflepuff, ddHouseSlytherin, ddHouseChannelGryffindor, ddHouseChannelRavenclaw, ddHouseChannelHufflepuff, ddHouseChannelSlytherin, ddHouseCupBoard, ddHouseCupLogs, ddInterviewCategory, ddInterviewLogChannel].forEach(dd => dd?.setDisabled(!manageGuildOk));
     modChannelsMS?.setDisabled(!manageGuildOk);
     botManagerRolesMS?.setDisabled(!manageGuildOk);
     document.getElementById('settingsLock').classList.toggle('login-hidden', manageGuildOk);

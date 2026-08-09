@@ -206,6 +206,24 @@
         width:3px;height:60%;border-radius:0 3px 3px 0;box-shadow:none;
     }
 
+    /* Nested sub-page links shown under "Settings" while any settings
+       page (overview or one of its sub-pages) is active, so a mod can
+       jump straight from e.g. Welcome to House Cup without going back
+       to the Settings overview first. */
+    .sidebar-subnav{
+        display:none;flex-direction:column;gap:1px;
+        margin:2px 0 8px 16px;padding-left:16px;
+        border-left:1px solid var(--card-border);
+    }
+    .sidebar-subnav.open{display:flex;}
+    .subnav-btn{
+        background:none;border:none;color:var(--parchment-faint);cursor:pointer;
+        text-align:left;font-size:12px;padding:8px 10px;border-radius:8px;
+        font-family:inherit;transition:all .2s ease;
+    }
+    .subnav-btn:hover{background:rgba(255,255,255,.03);color:var(--parchment);}
+    .subnav-btn.active{color:var(--gold-light);background:rgba(252,165,3,.08);}
+
     .sidebar-switch-server{
         display:flex;align-items:center;justify-content:center;gap:6px;
         background:none;border:1px solid var(--card-border);color:var(--parchment-faint);

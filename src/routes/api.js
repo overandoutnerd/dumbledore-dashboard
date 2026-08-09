@@ -215,7 +215,67 @@ apiRouter.post("/houses/reset", requireManageGuild, async (req, res) => {
     res.json({ ok: true, houses: ALL_HOUSES.map((house) => ({ house, points: 0 })) });
 });
 
-/* ── /api/leaderboard ────────────────────────────────────────────── */
+/* ── /api/house-config — per-house channel + custom emoji ─────────── */
+
+const ALL_HOUSES = ["gryffindor", "ravenclaw", "hufflepuff", "slytherin"];
+
+apiRouter.get("/house-config", requireAuth, async (req, res) => {
+    const { rows } = await db.query(
+        `SELECT house_name, channel_id, emoji FROM house_config WHERE guild_id = $1`,
+        [req.guildId],
+    );
+
+    const byHouse = new Map(rows.map((r) => [r.house_name, r]));
+
+    const config = Object.fromEntries(
+        ALL_HOUSES.map((house) => [
+            house,
+            {
+                channelId: byHouse.get(house)?.channel_id ?? null,
+                emoji: byHouse.get(house)?.emoji ?? null,
+            },
+        ]),
+    );
+
+    res.json({ houseConfig: config });
+});
+
+apiRouter.post("/house-config/:house", requireManageGuild, async (req, res) => {
+    const { house } = req.params;
+    const { channelId, emoji } = req.body;
+
+    if (!ALL_HOUSES.includes(house)) {
+        return res.status(400).json({ error: "invalid_house" });
+    }
+
+    const current = await db.query(
+        `SELECT channel_id, emoji FROM house_config WHERE guild_id = $1 AND house_name = $2`,
+        [req.guildId, house],
+    );
+
+    const next = {
+        channelId: channelId !== undefined ? channelId : (current.rows[0]?.channel_id ?? null),
+        emoji: emoji !== undefined ? (emoji?.trim() || null) : (current.rows[0]?.emoji ?? null),
+    };
+
+    await db.query(
+        `
+        INSERT INTO house_config (guild_id, house_name, channel_id, emoji)
+        VALUES ($1, $2, $3, $4)
+        ON CONFLICT (guild_id, house_name) DO UPDATE SET
+            channel_id = EXCLUDED.channel_id,
+            emoji = EXCLUDED.emoji
+        `,
+        [req.guildId, house, next.channelId, next.emoji],
+    );
+
+    // The board shows house emojis on its buttons, so a mod changing one
+    // should be reflected right away rather than waiting for the next
+    // scheduled refresh.
+    refreshHouseCupBoardIfExists(req.guildId).catch(() => {});
+
+    res.json({ house, ...next });
+});
 
 apiRouter.get("/leaderboard", requireAuth, async (req, res) => {
     const limit = Math.min(Number(req.query.limit) || 10, 50);

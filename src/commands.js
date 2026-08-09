@@ -58,8 +58,18 @@ export const COMMANDS = [
     {
         name: "house-cup", category: "Server Config", perm: "botmanager",
         desc: "Post/update the House Cup board.",
-        full: "Mods only. Posts the House Cup standings embed in the configured board channel, or updates it in place if one's already posted there. Each house's points are its members' average XP (earned from chatting and star reactions) plus any bonus points a mod has awarded, sorted with the current leader highlighted. The board keeps itself fresh afterwards without needing this command re-run.",
+        full: "Mods only. Posts the House Cup standings embed in the configured board channel, or updates it in place if one's already posted there. The board has Home + one button per house — clicking a house shows its points breakdown and top 5 XP contributors, clicking Home returns to the overall standings. Each house's points are its members' average XP (earned from chatting and star reactions) plus any bonus points a mod has awarded. The board keeps itself fresh on a timer without needing this command re-run.",
         params: [],
+    },
+    {
+        name: "house-points", category: "Server Config", perm: "botmanager",
+        desc: "Award or deduct House Cup bonus points.",
+        full: "Mods only. Adds (or, with a negative amount, deducts) bonus points for a house on top of its automatic XP average. Requires a reason, which gets logged — along with who awarded it, to which house, and how much — to the configured House Cup log channel. Also refreshes the live board immediately.",
+        params: [
+            { name: "house", type: "string", required: true, desc: "Which house" },
+            { name: "amount", type: "integer", required: true, desc: "Points to award (negative to deduct)" },
+            { name: "reason", type: "string", required: true, desc: "Why these points are being awarded/deducted" },
+        ],
     },
     {
         name: "configure-house-cup", category: "Server Config", perm: "manageserver",
