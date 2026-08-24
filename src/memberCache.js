@@ -111,6 +111,26 @@ export function countMembersWithRole(guildId, roleId) {
     return count;
 }
 
+/**
+ * Counts non-bot members currently holding a given role who are also in
+ * the supplied set of user IDs (e.g. members who have banked xp > 0 for
+ * that house) — used for the House Cup's "average XP per contributing
+ * house member" calculation, so members who haven't earned any XP yet
+ * don't drag the average down.
+ */
+export function countMembersWithRoleIn(guildId, roleId, userIdSet) {
+    if (!roleId) return 0;
+
+    const bucket = getBucket(guildId);
+    let count = 0;
+
+    for (const m of bucket.members.values()) {
+        if (!m.bot && m.roles.includes(roleId) && userIdSet.has(m.id)) count++;
+    }
+
+    return count;
+}
+
 export function searchCached(guildId, query, limit = 8) {
     const q = query.trim().toLowerCase();
     if (!q) return [];
