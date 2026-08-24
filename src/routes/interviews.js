@@ -39,22 +39,6 @@ interviewsRouter.get("/interviews/:publicId", requireAuth, async (req, res) => {
             return res.status(403).json({ error: "not_a_member" });
         }
 
-        // The person may be signed in with a *different* server picked as
-        // their active dashboard guild (e.g. they moderate several
-        // DesiPotterheads-style servers and picked the wrong one, or an
-        // old one, from the server picker). Even though they may well have
-        // access to the interview's actual guild too, showing the
-        // transcript here would silently ignore what they just selected.
-        // Once a guild is active, it must match this interview's guild —
-        // otherwise send them back to pick the right one.
-        if (req.user.activeGuildId && req.user.activeGuildId !== interview.guildId) {
-            return res.status(403).json({
-                error: "wrong_guild",
-                guildId: interview.guildId,
-                guildName: guild.name,
-            });
-        }
-
         const permissions = computePermissions(member, guildRoles, guild);
         // Same access rule as every other dashboard system: Bot Manager role
         // or native Administrator. No separate "viewer role" concept.

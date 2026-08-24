@@ -91,7 +91,7 @@ function renderHouseCup(houses) {
             <div class="house-info">
                 <div class="hname">${meta.name}</div>
                 <div class="house-bar-track"><div class="house-bar-fill" style="width:${(h.totalPoints/maxPts*100)}%; background:${meta.color};"></div></div>
-                <div class="field-hint" style="margin-top:2px;">${fmtPts(h.averageXp)} avg XP${bonusNote} · ${h.contributorCount ?? 0}/${h.memberCount} contributing</div>
+                <div class="field-hint" style="margin-top:2px;">${fmtPts(h.averageXp)} avg XP${bonusNote} · ${h.memberCount} member${h.memberCount===1?'':'s'}</div>
             </div>
             <div class="house-pts">${fmtPts(h.totalPoints)} pts</div>
         </div>`;

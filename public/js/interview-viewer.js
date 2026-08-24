@@ -94,22 +94,6 @@
         }
 
         if (res.status === 403) {
-            let body = {};
-            try {
-                body = await res.clone().json();
-            } catch {}
-
-            if (body.error === "wrong_guild") {
-                showState({
-                    icon: "🔀",
-                    title: "Wrong server selected",
-                    message: `This transcript belongs to ${body.guildName || "a different server"}. Switch to that server on the dashboard to view it.`,
-                    actionLabel: "Go to dashboard",
-                    actionHref: "/",
-                });
-                return;
-            }
-
             showState({
                 icon: "🚫",
                 title: "You don't have access",

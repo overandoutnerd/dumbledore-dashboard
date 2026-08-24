@@ -23,9 +23,7 @@ async function api(path, opts = {}) {
 
     if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        const err = new Error(body.error || `request_failed_${res.status}`);
-        err.body = body;
-        throw err;
+        throw new Error(body.error || `request_failed_${res.status}`);
     }
 
     if (res.status === 204) return null;

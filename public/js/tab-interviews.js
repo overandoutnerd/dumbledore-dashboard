@@ -133,18 +133,6 @@ async function openInterviewDetail(publicId, opts = {}) {
     } catch (err) {
         titleEl.textContent = 'Interview';
         subtitleEl.textContent = '';
-
-        if (err.message === 'wrong_guild') {
-            const guildName = err.body?.guildName || 'the right server';
-            bodyEl.innerHTML = `
-                <div class="empty-state">
-                    <div class="eicon-wrap">${svg('alert', 22)}</div>
-                    <p>This transcript belongs to <b>${escapeHtml(guildName)}</b>, not your currently selected server.</p>
-                    <button class="btn-primary" style="margin-top:12px;" onclick="openSwitchServerModal()">Switch server</button>
-                </div>`;
-            return;
-        }
-
         const message = err.message === 'missing_permission'
             ? "You don't have permission to view this transcript."
             : "Couldn't load this transcript. Please try again.";
