@@ -39,7 +39,11 @@ export const config = {
     },
 
     sessionSecret: required("SESSION_SECRET"),
-    sessionTtlHours: Number(process.env.SESSION_TTL_HOURS || 12),
+    // Sliding expiration: this is the inactivity window, not an absolute
+    // session lifetime. attachUser() re-issues the cookie on every
+    // authenticated request, so the clock resets on activity — a user only
+    // gets logged out after this many hours pass with zero requests.
+    sessionTtlHours: Number(process.env.SESSION_TTL_HOURS || 24 * 30),
 
     // Cloudflare R2 (S3-compatible) — used to store welcome-message embed
     // images/GIFs so they survive redeploys instead of living on local

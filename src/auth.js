@@ -44,9 +44,17 @@ function readSession(req) {
     }
 }
 
-/** Attaches req.user if a valid session cookie is present. Never blocks. */
-export function attachUser(req, _res, next) {
+/** Attaches req.user if a valid session cookie is present. Never blocks.
+ *  Also slides the session: a valid cookie gets re-issued on every request,
+ *  so the expiry only ever measures inactivity, not time since login. */
+export function attachUser(req, res, next) {
     req.user = readSession(req);
+    if (req.user) {
+        // Drop fields that shouldn't round-trip back into a fresh token
+        // (jwt adds iat/exp itself; keeping old ones would confuse jwt.sign).
+        const { iat, exp, ...payload } = req.user;
+        issueSession(res, payload);
+    }
     next();
 }
 
