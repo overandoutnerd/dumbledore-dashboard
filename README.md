@@ -114,5 +114,7 @@ src/
   routes/api.js        all /api/* endpoints
   server.js            Express app entry
 public/
-  dashboard.html      the dashboard UI (fetches everything from /api/*)
+  index.html          SPA shell (loads html/ partials + js/ modules)
+  html/               tab-* partials fetched by loadPartials()
+  js/                 app.js, auth.js, api.js, tab-*.js, modals.js, etc.
 ```
