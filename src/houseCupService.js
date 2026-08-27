@@ -24,11 +24,12 @@ const HOUSE_DISPLAY = {
 const EMBED_COLOR = 0xe46c32;
 
 /**
- * House Cup standings: for each house, the average XP of its contributing
- * members (SUM of that house's banked XP in house_xp / count of *current*
- * role members who have also banked xp > 0 for that house — not every
- * current member) plus any manual bonus points a mod has awarded
- * (house_points table). This is a straight port of the bot's
+ * House Cup standings: for each house, (SUM of that house's banked XP in
+ * house_xp / (count of *current* role members who have banked at least
+ * guild_settings.min_xp_for_contributor XP for that house * 10)) — not
+ * every current member, and not everyone with any xp>0, only those past
+ * the configured threshold — plus any manual bonus points a mod has
+ * awarded (house_points table). This is a straight port of the bot's
  * houseCupService.ts — same tables, same formula — just computed here
  * instead of round-tripping through the bot.
  *
@@ -38,18 +39,21 @@ const EMBED_COLOR = 0xe46c32;
  * it just stops counting you towards that house's member count.
  */
 export async function getHouseCupStandings(guildId) {
-    const [settings, xpRes, bonusRes, contributorRes] = await Promise.all([
+    const [settings, xpRes, bonusRes] = await Promise.all([
         getGuildSettingsSummary(guildId),
         db.query(
             `SELECT house_name, COALESCE(SUM(xp), 0) AS total FROM house_xp WHERE guild_id = $1 GROUP BY house_name`,
             [guildId],
         ),
         db.query(`SELECT house_name, points FROM house_points WHERE guild_id = $1`, [guildId]),
-        db.query(
-            `SELECT house_name, user_id FROM house_xp WHERE guild_id = $1 AND xp > 0`,
-            [guildId],
-        ),
     ]);
+
+    const minXpForContributor = settings.minXpForContributor;
+
+    const contributorRes = await db.query(
+        `SELECT house_name, user_id FROM house_xp WHERE guild_id = $1 AND xp >= $2`,
+        [guildId, minXpForContributor],
+    );
 
     await ensureFresh(guildId);
 
@@ -73,7 +77,7 @@ export async function getHouseCupStandings(guildId) {
         const contributorCount = countMembersWithRoleIn(guildId, roleId, contributorIds);
         const totalXp = xpByHouse.get(house) ?? 0;
         const bonusPoints = bonusByHouse.get(house) ?? 0;
-        const averageXp = contributorCount === 0 ? 0 : totalXp / contributorCount;
+        const averageXp = contributorCount === 0 ? 0 : totalXp / (contributorCount * 10);
 
         return {
             house,
@@ -124,10 +128,10 @@ export async function buildHouseCupEmbedPayload(guildId) {
                     },
                 ],
                 footer: {
-                    text: `Points = average XP per contributing house member, plus any bonus points awarded by mods · updated ${new Date().toLocaleString(
+                    text: `Points = average XP per contributing house member ÷ 10, plus any bonus points awarded by mods · updated ${new Date().toLocaleString(
                         "en-US",
-                        { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" },
-                    )}`,
+                        { timeZone: "GMT", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" },
+                    )} GMT`,
                 },
             },
         ],
