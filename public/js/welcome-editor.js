@@ -624,11 +624,15 @@ async function loadSettings(){
         document.getElementById('xpCooldownInput').value = s.xpCooldownSeconds;
         document.getElementById('starXpValueInput').value = s.starXpValue;
         document.getElementById('starboardThresholdInput').value = s.starboardThreshold;
+        document.getElementById('bumpXpValueInput').value = s.bumpXpValue;
+        document.getElementById('minXpForContributorInput').value = s.minXpForContributor;
 
         setDefaultHint('xpPerMessageDefault', s.xpPerMessageIsDefault);
         setDefaultHint('xpCooldownDefault', s.xpCooldownIsDefault);
         setDefaultHint('starXpValueDefault', s.starXpValueIsDefault);
         setDefaultHint('starboardThresholdDefault', s.starboardThresholdIsDefault);
+        setDefaultHint('bumpXpValueDefault', s.bumpXpValueIsDefault);
+        setDefaultHint('minXpForContributorDefault', s.minXpForContributorIsDefault);
         setDefaultHint('botManagerRoleDefault', s.botManagerRoleIds.length === 0);
 
         renderBotManagerRoles(s.botManagerRoleIds);

@@ -606,6 +606,8 @@ apiRouter.post("/settings", requireManageGuild, async (req, res) => {
         ["xpCooldownSeconds", "xp_cooldown_seconds", "int"],
         ["starXpValue", "star_xp_value", "int"],
         ["starboardThreshold", "starboard_threshold", "int"],
+        ["minXpForContributor", "min_xp_for_contributor", "int"],
+        ["bumpXpValue", "bump_xp_value", "int"],
         ["houseCupChannelId", "house_cup_channel_id", "str"],
         ["houseCupLogChannelId", "house_cup_log_channel_id", "str"],
     ];

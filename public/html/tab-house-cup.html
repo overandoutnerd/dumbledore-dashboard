@@ -26,6 +26,13 @@
                         <div class="dd" id="dd-housecup-board"></div>
                         <label class="field-label" style="margin:10px 0 4px;">Log channel <span class="field-hint">— where manual bonus-point awards are logged</span></label>
                         <div class="dd" id="dd-housecup-logs"></div>
+                        <div class="field-group" style="margin:10px 0 0;">
+                            <label class="field-label">Min XP to count as contributing <span id="minXpForContributorDefault" class="tag" style="color:var(--parchment-faint);"></span> <span class="field-hint">— members below this don't count towards a house's average</span></label>
+                            <div class="field-input-row">
+                                <input class="field-input" id="minXpForContributorInput" type="number" min="0" step="1">
+                                <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('minXpForContributor','minXpForContributorInput')">Save</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -47,11 +54,18 @@
                         <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('xpCooldownSeconds','xpCooldownInput')">Save</button>
                     </div>
                 </div>
-                <div class="field-group" style="margin-bottom:0;">
+                <div class="field-group">
                     <label class="field-label">XP per ⭐ reaction <span id="starXpValueDefault" class="tag" style="color:var(--parchment-faint);"></span></label>
                     <div class="field-input-row">
                         <input class="field-input" id="starXpValueInput" type="number" min="0" step="1">
                         <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('starXpValue','starXpValueInput')">Save</button>
+                    </div>
+                </div>
+                <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label">XP per bump <span id="bumpXpValueDefault" class="tag" style="color:var(--parchment-faint);"></span> <span class="field-hint">— awarded to whoever runs /bump</span></label>
+                    <div class="field-input-row">
+                        <input class="field-input" id="bumpXpValueInput" type="number" min="0" step="1">
+                        <button class="btn btn-primary btn-sm" onclick="saveNumberSetting('bumpXpValue','bumpXpValueInput')">Save</button>
                     </div>
                 </div>
                 <p class="locked-note login-hidden" id="xpSettingsLock"><span data-icon="lock" data-size="12"></span> Requires Manage Server permission</p>

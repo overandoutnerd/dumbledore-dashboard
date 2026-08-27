@@ -66,6 +66,8 @@ export async function getGuildSettingsSummary(guildId) {
         xpCooldownSeconds: s.xp_cooldown_seconds ?? d.xpCooldownSeconds,
         starXpValue: s.star_xp_value ?? d.starXpValue,
         starboardThreshold: s.starboard_threshold ?? d.starboardThreshold,
+        minXpForContributor: s.min_xp_for_contributor ?? d.minXpForContributor,
+        bumpXpValue: s.bump_xp_value ?? d.bumpXpValue,
 
         houseCupChannelId: s.house_cup_channel_id ?? null,
         houseCupLogChannelId: s.house_cup_log_channel_id ?? null,
@@ -74,6 +76,8 @@ export async function getGuildSettingsSummary(guildId) {
         xpCooldownIsDefault: s.xp_cooldown_seconds == null,
         starXpValueIsDefault: s.star_xp_value == null,
         starboardThresholdIsDefault: s.starboard_threshold == null,
+        minXpForContributorIsDefault: s.min_xp_for_contributor == null,
+        bumpXpValueIsDefault: s.bump_xp_value == null,
     };
 }
 
